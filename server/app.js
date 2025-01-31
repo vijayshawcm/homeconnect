@@ -2,6 +2,8 @@ const express = require('express');
 const cors = require('cors');
 // Multer used for form handling but idk if i wanna keep it cuz html forms use urlencoding
 const multer = require('multer');
+// Bcrypt for password hashing
+const bcrypt = require('bcryptjs');
 const mongodb = require('./mongodb');
 const User = require('./models/user');
 
@@ -19,44 +21,59 @@ app.set('view engine', 'ejs');
 
 // Home page
 app.get('/', (req, res) => {
-	res.send('HomeConnect Backend is running!');
+	return res.render('./home');
 });
+
+// Secret page
+// TODO: jwt token stuff
+app.get('/secret', (req, res) => {
+	return res.send('Authenticated to system');
+})
 
 // Very pretty register form
 // TODO: Link this with front end form lol
 app.get('/register', (req, res) => {
-	res.render('./register');
+	return res.render('./register');
 });
 
 // Register user
 app.post('/register-user', upload.none(), async (req, res) => {
-	console.log(req.body);
+	const passwordHash = await bcrypt.hash(req.body.password, 10)
 
 	try {
 		const user = await User.create({
 			username: req.body.username,
-			password: req.body.password,
+			passwordHash: passwordHash,
 		})
-		
-		return res.status(200).json(user);
+		return res.status(200).redirect('/');
 	} catch (err) {
-		return res.status(500).send("Internal Server Error.")
+		return res.status(500).send("Internal Server Error.");
 	}
 });
 
+// Very pretty login form
+// TODO: Link this with front end form lol
+app.get('/login', (req, res) => {
+	return res.render('./login', {message : null});
+});
 
+// Handle user login
+// Note that this passes a message to the ejs part so we might want to handle it differently in the front end
+app.post('/login', async (req, res) => {
+	// Check if user exists
+	const validUser = await User.findOne({username: req.body.username});
+	if(!validUser) {
+		return res.render('./login', { message: 'Invalid username or password!' });
+	}
 
-// app.get('/v', async (req, res) => {
-// 	const collections = await mongodb.db.listCollections().toArray()
-// 	console.log('Collections:', collections);
+	// Check if password hash matches
+	const validPassword = await bcrypt.compare(req.body.password, validUser.passwordHash) 
+	if(!validPassword) {
+		return res.render('./login', { message: 'Invalid username or password!' });
+	}
 
-// 	console.log('sending stuff now');
-// 	res.json(collections);
-// });
-
-
-
-
+	return res.redirect('/secret');
+});
 
 // Export the app
 module.exports = app;
