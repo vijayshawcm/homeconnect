@@ -4,6 +4,8 @@ const cors = require('cors');
 const multer = require('multer');
 // Bcrypt for password hashing
 const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
+const cookieParser = require('cookie-parser');
 const mongodb = require('./mongodb');
 const User = require('./models/user');
 
@@ -14,10 +16,36 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({extended: true}));
+app.use(cookieParser());
 const upload = multer();
 
 // Set default view engine and file extension to render
 app.set('view engine', 'ejs');
+
+// JSON Web Token functions
+const jwtSecret = process.env.JWT_SECRET;
+
+async function generateJWT(res, user) {
+	let data = {
+        time: Date(),
+        userId: user._id,
+		username: user.username,
+    }
+
+	// Create JWT
+	const token = jwt.sign(data, jwtSecret); 
+	console.log('New json token was created.');
+
+	// Save JWT in browser cookies
+	// TODO: add cookie kill time probably
+	res.clearCookie('JWT');
+	res.cookie('JWT', token);
+}
+
+// Test route to check cookies (to be deleted)
+app.get('/test', (req, res) => {
+	return res.send(req.cookies);
+});
 
 // Home page
 app.get('/', (req, res) => {
@@ -25,9 +53,22 @@ app.get('/', (req, res) => {
 });
 
 // Secret page
-// TODO: jwt token stuff
 app.get('/secret', (req, res) => {
-	return res.send('Authenticated to system');
+
+	const token = req.cookies['JWT'];
+	console.log(token)
+
+	if(!token) {
+		return res.status(401).send('Unauthorised access, please create or sign in to an existing account.');
+	}
+
+	const verifyToken = jwt.verify(token, jwtSecret);
+
+	if(verifyToken) {
+		return res.send('Authenticated to system');
+	}
+
+	return res.status(401).send('Unauthorised access, please create or sign in to an existing account.');
 })
 
 // Very pretty register form
@@ -45,7 +86,9 @@ app.post('/register-user', upload.none(), async (req, res) => {
 			username: req.body.username,
 			passwordHash: passwordHash,
 		})
-		return res.status(200).redirect('/');
+		
+		generateJWT(res, user); // Generate JWT for user and save in cookie
+		return res.status(200).redirect('/secret');
 	} catch (err) {
 		return res.status(500).send("Internal Server Error.");
 	}
@@ -72,8 +115,15 @@ app.post('/login', async (req, res) => {
 		return res.render('./login', { message: 'Invalid username or password!' });
 	}
 
+	generateJWT(res, validUser); // Generate JWT for user and save in cookie
 	return res.redirect('/secret');
 });
+
+// Handle user logout
+app.get('/logout', (req, res) => {
+	res.clearCookie('JWT');
+	res.send("Logout successful");
+})
 
 // Export the app
 module.exports = app;
