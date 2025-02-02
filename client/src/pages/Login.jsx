@@ -2,6 +2,7 @@ import { useState } from 'react';
 import Input from '../components/Input';
 import Button from '../components/Button';
 import Checkbox from '../components/Checkbox';
+import HomeConnectLogo from '../assets/homeconnect-logo.svg';
 
 export default function Login() {
 	const [username, setUsername] = useState('');
@@ -18,6 +19,13 @@ export default function Login() {
 	return (
 		<div className="min-h-screen bg-gray-100 flex items-center justify-center">
 			<div className="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
+				<div className="flex justify-center">
+					<img
+						src={HomeConnectLogo}
+						alt="HomeConnect Logo"
+						className="h-48 w-48"
+					/>
+				</div>
 				<h1 className="text-2xl font-bold text-center text-blue-600 mb-6">
 					Login to HomeConnect
 				</h1>
