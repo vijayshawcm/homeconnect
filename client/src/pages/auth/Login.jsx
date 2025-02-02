@@ -1,8 +1,8 @@
 import { useState } from 'react';
-import Input from '../components/Input';
-import Button from '../components/Button';
-import Checkbox from '../components/Checkbox';
-import HomeConnectLogo from '../assets/homeconnect-logo.svg';
+import Input from '../../components/Input';
+import Button from '../../components/Button';
+import Checkbox from '../../components/Checkbox';
+import HomeConnectLogo from '../../assets/homeconnect-logo.svg';
 
 export default function Login() {
 	const [username, setUsername] = useState('');
