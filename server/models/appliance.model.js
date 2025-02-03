@@ -1,64 +1,69 @@
 const mongoose = require("mongoose");
+const Schema = mongoose.Schema;
 
-const applianceSchema = new mongoose.Schema(
+// Base Appliance Schema
+const applianceSchema = new Schema(
   {
     name: {
       type: String,
       required: true,
+      trim: true,
     },
     status: {
       type: String,
-      enum: ["on", "off"],
+      enum: ["on", "off", "disabled"],
       default: "off",
     },
-    powerConsumption: {
-      type: Number,
+    room: {
+      type: Schema.Types.ObjectId,
+      ref: "Room",
       required: true,
     },
+    powerConsumption: {
+      current: {
+        type: Number,
+        default: 0,
+      },
+      dailyConsumption: {
+        type: Number,
+        default: 0,
+      },
+      monthlyConsumption: {
+        type: Number,
+        default: 0,
+      },
+    },
+    schedules: [
+      {
+        startTime: Date,
+        endTime: Date,
+        days: [
+          {
+            type: String,
+            enum: [
+              "monday",
+              "tuesday",
+              "wednesday",
+              "thursday",
+              "friday",
+              "saturday",
+              "sunday",
+            ],
+          },
+        ],
+        active: {
+          type: Boolean,
+          default: true,
+        },
+      },
+    ],
   },
-  { discriminatorKey: "type" }
+  {
+    timestamps: true,
+    discriminatorKey: "applianceType",
+  }
 );
 
+// Create the base model
 const ApplianceModel = mongoose.model("Appliance", applianceSchema);
-
-// Fan Schema
-const fanSchema = new mongoose.Schema({
-  speed: { type: String, enum: ["low", "medium", "high"], default: "low" },
-});
-
-const FanModel = ApplianceModel.discriminator("Fan", fanSchema);
-
-// AirConditioner Schema
-const airConditionerSchema = new mongoose.Schema({
-  temperature: { type: Number, required: true },
-});
-
-const AirConditionerModel = ApplianceModel.discriminator(
-  "AirConditioner",
-  airConditionerSchema
-);
-
-// Light Schema
-const lightSchema = new mongoose.Schema({
-  brightness: { type: Number, min: 0, max: 100, default: 100 },
-});
-
-const LightModel = ApplianceModel.discriminator("Light", lightSchema);
-
-// Sprinkler Schema
-const sprinklerSchema = new mongoose.Schema({
-  waterFlowRate: { type: Number, required: true },
-});
-
-const SprinklerModel = ApplianceModel.discriminator(
-  "Sprinkler",
-  sprinklerSchema
-);
-
-module.exports = {
-  ApplianceModel,
-  FanModel,
-  AirConditionerModel,
-  LightModel,
-  SprinklerModel,
-};
+module.exports = ApplianceModel;
