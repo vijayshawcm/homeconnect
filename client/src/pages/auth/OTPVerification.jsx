@@ -12,6 +12,16 @@ export default function OTPVerification() {
 		e.preventDefault();
 		const otpCode = otp.join('');
 		console.log('OTP submitted:', otpCode);
+		// Check for empty inputs
+		if (otpCode.length < 6) {
+			alert('Please enter all 6 digits!');
+			const firstEmptyIndex = otp.findIndex((digit) => digit === '');
+			if (firstEmptyIndex !== -1) {
+				otpInputRefs.current[firstEmptyIndex].focus(); // Focus on the first empty input box
+			}
+			return;
+		}
+
 		// Simulate OTP verification
 		if (otpCode === '123456') {
 			// Replace with actual OTP validation
