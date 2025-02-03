@@ -22,6 +22,8 @@ export default function OTPVerification() {
 			// Clear input box to allow user to reenter OTP code
 			// include cases where the phone number gets blocked after a certain amount of time
 			alert('Invalid OTP!');
+			setOtp(['', '', '', '', '', '']); // Clear all input boxes
+			otpInputRefs.current[0].focus(); // Focus on the first input box
 		}
 	};
 
