@@ -78,6 +78,18 @@ export default function OTPVerification() {
 					<Button type="submit" className="w-full">
 						Verify OTP
 					</Button>
+					<div className="mt-4 text-center">
+						<p className="text-sm text-gray-600">
+							Didn't receive the code?{' '}
+							<button
+								type="button"
+								onClick={() => alert('OTP resent!')} // Simulate OTP resend
+								className="text-blue-600 hover:underline focus:outline-none"
+							>
+								Resend
+							</button>
+						</p>
+					</div>
 				</form>
 			</div>
 		</div>
