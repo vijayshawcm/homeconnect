@@ -7,5 +7,5 @@ module.exports = {
   AirConditioning: require("./airConditioner.model"),
   Light: require("./light.model"),
   Sprinkler: require("./sprinkler.model"),
-  Home: require('./home.model')
+  Home: require("./home.model"),
 };
