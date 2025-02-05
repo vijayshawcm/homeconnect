@@ -12,6 +12,16 @@ export default function OTPVerification() {
 		e.preventDefault();
 		const otpCode = otp.join('');
 		console.log('OTP submitted:', otpCode);
+		// Check for empty inputs
+		if (otpCode.length < 6) {
+			alert('Please enter all 6 digits!');
+			const firstEmptyIndex = otp.findIndex((digit) => digit === '');
+			if (firstEmptyIndex !== -1) {
+				otpInputRefs.current[firstEmptyIndex].focus(); // Focus on the first empty input box
+			}
+			return;
+		}
+
 		// Simulate OTP verification
 		if (otpCode === '123456') {
 			// Replace with actual OTP validation
@@ -22,6 +32,8 @@ export default function OTPVerification() {
 			// Clear input box to allow user to reenter OTP code
 			// include cases where the phone number gets blocked after a certain amount of time
 			alert('Invalid OTP!');
+			setOtp(['', '', '', '', '', '']); // Clear all input boxes
+			otpInputRefs.current[0].focus(); // Focus on the first input box
 		}
 	};
 
@@ -76,6 +88,18 @@ export default function OTPVerification() {
 					<Button type="submit" className="w-full">
 						Verify OTP
 					</Button>
+					<div className="mt-4 text-center">
+						<p className="text-sm text-gray-600">
+							Didn't receive the code?{' '}
+							<button
+								type="button"
+								onClick={() => alert('OTP resent!')} // Simulate OTP resend
+								className="text-blue-600 hover:underline focus:outline-none"
+							>
+								Resend
+							</button>
+						</p>
+					</div>
 				</form>
 			</div>
 		</div>
