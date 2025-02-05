@@ -1,8 +1,11 @@
+// Provides a single point of entry for all the models
+// Example: const { Room, Fan, Light } = require('./models');
 module.exports = {
-  Room: require("./Room"),
-  BaseAppliance: require("./BaseAppliance"),
-  Fan: require("./Fan"),
-  AirConditioning: require("./AirConditioning"),
-  Light: require("./Light"),
-  Sprinkler: require("./Sprinkler"),
+  Room: require("./room.model"),
+  BaseAppliance: require("./appliance.model"),
+  Fan: require("./fan.model"),
+  AirConditioning: require("./airConditioner.model"),
+  Light: require("./light.model"),
+  Sprinkler: require("./sprinkler.model"),
+  Home: require('./home.model')
 };
