@@ -1,6 +1,7 @@
-const express = require('express');
-const cors = require('cors');
-const dotenv = require('dotenv');
+const express = require("express");
+const cors = require("cors");
+const dotenv = require("dotenv");
+const roomRoutes = require("./routes/room.routes");
 
 // Load environment variables
 dotenv.config();
@@ -11,10 +12,11 @@ const app = express();
 // Middleware
 app.use(cors());
 app.use(express.json());
+app.use("/api/rooms", roomRoutes);
 
 // Test route
-app.get('/', (req, res) => {
-	res.send('HomeConnect Backend is running!');
+app.get("/", (req, res) => {
+  res.send("HomeConnect Backend is running!");
 });
 
 // Export the app

@@ -10,14 +10,14 @@ const homeSchema = new Schema(
     },
     owner: {
       type: Schema.Types.ObjectId,
-      ref: User,
+      ref: "User",
       required: true,
     },
     dwellers: [
       {
         user: {
           type: Schema.Types.ObjectId,
-          ref: User,
+          ref: "User",
         },
         accessLevel: {
           type: String,

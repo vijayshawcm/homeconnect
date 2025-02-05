@@ -1,14 +1,4 @@
-const { Room, Fan, AirConditioning, Light, Sprinkler } = require("./models");
-
-const createAppliance = async (req, res) => {
-  const appliance = req.body;
-
-  if (!appliance.name || !appliance.room) {
-    return res
-      .status(400)
-      .json({ success: false, message: "Please provide all fields" });
-  }
-};
+const { Room, Fan, AirConditioning, Light, Sprinkler } = require("../models");
 
 const createRoom = async (req, res) => {
   const room = req.body;
@@ -29,4 +19,8 @@ const createRoom = async (req, res) => {
     console.error("Error in creating advert: ", error.message);
     res.status(500).json({ success: false, message: "Server Error" });
   }
+};
+
+module.exports = {
+  createRoom,
 };
