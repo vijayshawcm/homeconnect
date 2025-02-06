@@ -10,4 +10,9 @@ export default defineConfig({
 			plugins: [tailwindcss(), autoprefixer()],
 		},
 	},
+	resolve: {
+		alias: {
+			'@': path.resolve(__dirname, './src'),
+		},
+	},
 });
