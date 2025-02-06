@@ -16,7 +16,7 @@ const createRoom = async (req, res) => {
     await newRoom.save();
     res.status(201).json({ success: true, data: newRoom });
   } catch (error) {
-    console.error("Error in creating advert: ", error.message);
+    console.error("Error in creating room: ", error.message);
     res.status(500).json({ success: false, message: "Server Error" });
   }
 };
