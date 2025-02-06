@@ -9,3 +9,7 @@ const createAppliance = async (req, res) => {
       .json({ success: false, message: "Please provide all fields" });
   }
 };
+
+
+
+module.exports = {createAppliance}

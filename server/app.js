@@ -1,13 +1,15 @@
 const express = require('express');
 const cors = require('cors');
+const dotenv = require('dotenv');
 // Multer used for form handling but idk if i wanna keep it cuz html forms use urlencoding
 const multer = require('multer');
 // Bcrypt for password hashing
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const cookieParser = require('cookie-parser');
-const mongodb = require('./mongodb');
-const User = require('./models/user');
+
+// Load environment variables
+dotenv.config();
 
 // Initialize Express app
 const app = express();
@@ -18,9 +20,6 @@ app.use(express.json());
 app.use(express.urlencoded({extended: true}));
 app.use(cookieParser());
 const upload = multer();
-
-// Set default view engine and file extension to render
-app.set('view engine', 'ejs');
 
 // JSON Web Token functions
 const jwtSecret = process.env.JWT_SECRET;
@@ -41,11 +40,6 @@ async function generateJWT(res, user) {
 	res.clearCookie('JWT');
 	res.cookie('JWT', token);
 }
-
-// Home page
-app.get('/', (req, res) => {
-	return res.render('./home');
-});
 
 // Secret page
 app.get('/secret', (req, res) => {

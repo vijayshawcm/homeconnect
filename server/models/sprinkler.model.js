@@ -3,7 +3,7 @@ const Schema = mongoose.Schema;
 const BaseAppliance = require("./appliance.model");
 
 // Sprinkler Schema
-const sprinklerSchema = new mongoose.Schema({
+const sprinklerSchema = new Schema({
   waterFlowRate: { type: Number, required: true },
 });
 

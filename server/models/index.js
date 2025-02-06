@@ -8,4 +8,5 @@ module.exports = {
   Light: require("./light.model"),
   Sprinkler: require("./sprinkler.model"),
   Home: require("./home.model"),
+  User: require("./user.model"),
 };
