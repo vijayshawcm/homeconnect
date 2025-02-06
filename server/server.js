@@ -1,13 +1,9 @@
-const dotenv = require('dotenv');
-// Load environment variables
-dotenv.config();
+const app = require("./app");
+const connectDB = require("./config/db");
 
-const app = require('./app');
-
-// Environment variables
 const PORT = process.env.PORT || 5000;
-
-// Start the server
+// Connect to MongoDB
 app.listen(PORT, () => {
-	console.log(`Server is running on port ${PORT}`);
-})
+  connectDB();
+  console.log("Server started at http://localhost:" + PORT);
+});
