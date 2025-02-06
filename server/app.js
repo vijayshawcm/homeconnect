@@ -42,11 +42,6 @@ async function generateJWT(res, user) {
 	res.cookie('JWT', token);
 }
 
-// Test route to check cookies (to be deleted)
-app.get('/test', (req, res) => {
-	return res.send(req.cookies);
-});
-
 // Home page
 app.get('/', (req, res) => {
 	return res.render('./home');
@@ -71,12 +66,6 @@ app.get('/secret', (req, res) => {
 	return res.status(401).send('Unauthorised access, please create or sign in to an existing account.');
 })
 
-// Very pretty register form
-// TODO: Link this with front end form lol
-app.get('/register', (req, res) => {
-	return res.render('./register');
-});
-
 // Register user
 app.post('/register-user', upload.none(), async (req, res) => {
 	const passwordHash = await bcrypt.hash(req.body.password, 10)
@@ -92,12 +81,6 @@ app.post('/register-user', upload.none(), async (req, res) => {
 	} catch (err) {
 		return res.status(500).send("Internal Server Error.");
 	}
-});
-
-// Very pretty login form
-// TODO: Link this with front end form lol
-app.get('/login', (req, res) => {
-	return res.render('./login', {message : null});
 });
 
 // Handle user login
