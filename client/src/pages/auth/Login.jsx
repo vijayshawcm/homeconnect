@@ -13,7 +13,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Link } from 'react-router-dom';
 import { Eye, EyeOff } from 'lucide-react';
 import HomeConnectLogo from '@/assets/homeconnect-logo.svg';
-import Background from '@/assets/tempbg.jpg';
+import Background from '@/assets/background.svg';
 
 // Validation Functions using regex
 const isValidEmail = (value) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
