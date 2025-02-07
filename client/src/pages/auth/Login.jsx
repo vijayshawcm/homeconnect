@@ -15,11 +15,6 @@ import { Eye, EyeOff } from 'lucide-react';
 import HomeConnectLogo from '@/assets/homeconnect-logo.svg';
 import Background from '@/assets/background.svg';
 
-// Validation Functions using regex
-const isValidEmail = (value) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
-const isValidUsername = (value) => /^[a-zA-Z0-9_]+$/.test(value);
-const isValidPassword = (value) => value.length >= 6;
-
 function Login() {
 	const [usernameOrEmail, setUsernameOrEmail] = useState('');
 	const [password, setPassword] = useState('');
@@ -41,26 +36,11 @@ function Login() {
 			newErrors.usernameOrEmail = 'Username or Email is required';
 			setErrors(newErrors); // Update errors state
 			return false; // Stop further validation
-		} else if (usernameOrEmail.length < 5) {
-			newErrors.usernameOrEmail = 'Please enter a valid email or username';
-			setErrors(newErrors); // Update errors state
-			return false; // Stop further validation
-		} else if (
-			!isValidEmail(usernameOrEmail) &&
-			!isValidUsername(usernameOrEmail)
-		) {
-			newErrors.usernameOrEmail = 'Please enter a valid email or username';
-			setErrors(newErrors); // Update errors state
-			return false; // Stop further validation
 		}
 
 		// Validate Password
 		if (!password) {
 			newErrors.password = 'Password is required';
-			setErrors(newErrors); // Update errors state
-			return false; // Stop further validation
-		} else if (!isValidPassword(password)) {
-			newErrors.password = 'Password must be at least 6 characters long';
 			setErrors(newErrors); // Update errors state
 			return false; // Stop further validation
 		}
