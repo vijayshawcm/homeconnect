@@ -2,7 +2,16 @@
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const { User } = require("../models");
+const AWS = require("aws-sdk");
 require("dotenv").config();
+
+// Set AWS Region
+AWS.config.update({region: "ap-southeast-1"});
+
+// Function to generate random integer
+function randInt(min, max) {
+  return Math.floor(Math.random() * (max-min) + min);
+}
 
 // JSON Web Token functions
 const jwtSecret = process.env.JWT_SECRET;
@@ -18,13 +27,61 @@ async function generateJWT(res, user) {
   console.log("New json token was created.");
 
   // Save JWT in browser cookies
-  // TODO: add cookie kill time probably
-  res.clearCookie("JWT");
-  res.cookie("JWT", token);
+  res.clearCookie("JWTAuth");
+  res.cookie("JWTAuth", token, { httpOnly: true });
+}
+
+// Send OTP
+const sendOTP = async (req, res) => {
+  var otp = randInt(100000,999999);
+  console.log("New OTP generated: " + otp);
+
+  var params = {
+    Message: "Your HomeConnect verification code is: " + otp,
+    PhoneNumber: req.body.phoneNum
+  }
+
+  try {
+    await new AWS.SNS({apiVersion: '2010-03-31'})
+      .publish(params)
+      .promise()
+
+    console.log("otp sent successfully")
+
+    // Store OTP in cookies to be validated (probably wanna hash this)
+    res.clearCookie("OTP");
+    res.cookie("OTP", otp, { maxAge: 300000, httpOnly: true });
+    console.log("new otp stored in cookie");
+
+    return res
+    .status(200)
+    .send("otp sent!");
+
+  } catch (err) {
+    return res
+      .status(500)
+      .send(err);
+  }
+}
+
+const verifyOTP = async (req, res) => {
+  if(req.body.OTP == req.cookies["OTP"]) {
+
+    res.clearCookie("OTP")
+    console.log("otp gone");
+
+    return res
+    .status(200)
+    .send("otp verified!");
+  } 
+
+  return res
+    .status(401)
+    .send("invalid otp");
 }
 
 const secretPage = async (req, res) => {
-  const token = req.cookies["JWT"];
+  const token = req.cookies["JWTAuth"];
   console.log(token);
 
   if (!token) {
@@ -64,7 +121,6 @@ const registerUser = async (req, res) => {
   }
 };
 
-//! Note that this passes a message to the ejs part so we might want to handle it differently in the front end
 const loginUser = async (req, res) => {
   // Check if user exists
   const validUser = await User.findOne({ username: req.body.username });
@@ -90,4 +146,4 @@ const logoutUser = (req, res) => {
   res.send("Logout successful");
 };
 
-module.exports = { secretPage, registerUser, loginUser, logoutUser };
+module.exports = { secretPage, registerUser, loginUser, logoutUser, sendOTP, verifyOTP };
