@@ -12,7 +12,8 @@ import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Link } from 'react-router-dom';
 import { Eye, EyeOff } from 'lucide-react';
-import HomeConnectLogo from '../../assets/homeconnect-logo.svg';
+import HomeConnectLogo from '@/assets/homeconnect-logo.svg';
+import Background from '@/assets/tempbg.jpg';
 
 // Validation Functions using regex
 const isValidEmail = (value) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
@@ -38,20 +39,30 @@ function Login() {
 		// Validate Username or Email
 		if (!usernameOrEmail) {
 			newErrors.usernameOrEmail = 'Username or Email is required';
+			setErrors(newErrors); // Update errors state
+			return false; // Stop further validation
 		} else if (usernameOrEmail.length < 5) {
 			newErrors.usernameOrEmail = 'Please enter a valid email or username';
+			setErrors(newErrors); // Update errors state
+			return false; // Stop further validation
 		} else if (
 			!isValidEmail(usernameOrEmail) &&
 			!isValidUsername(usernameOrEmail)
 		) {
 			newErrors.usernameOrEmail = 'Please enter a valid email or username';
+			setErrors(newErrors); // Update errors state
+			return false; // Stop further validation
 		}
 
 		// Validate Password
 		if (!password) {
 			newErrors.password = 'Password is required';
+			setErrors(newErrors); // Update errors state
+			return false; // Stop further validation
 		} else if (!isValidPassword(password)) {
 			newErrors.password = 'Password must be at least 6 characters long';
+			setErrors(newErrors); // Update errors state
+			return false; // Stop further validation
 		}
 
 		setErrors(newErrors); // Update errors state
@@ -65,7 +76,7 @@ function Login() {
 		// Clear previous errors
 		setErrors({ usernameOrEmail: '', password: '' });
 
-		// Validate form
+		// Validate Form
 		if (!validateForm()) return;
 
 		// Auth logic here @isaac (API call to backend)
@@ -105,59 +116,82 @@ function Login() {
 	};
 
 	return (
-		<div className="flex items-center justify-center min-h-screen bg-gray-100">
-			<Card className="w-full max-w-md">
+		<div
+			className="flex items-center justify-center min-h-screen bg-cover bg-center"
+			style={{ backgroundImage: `url(${Background})` }}
+		>
+			{/* HomeConnect Logo */}
+			<img
+				src={HomeConnectLogo}
+				alt="HomeConnect Logo"
+				className="absolute top-6 left-7 w-48 h-12 object-contain"
+			/>
+
+			{/* Card Container */}
+			<Card className="w-full max-w-md shadow-lg bg-white">
 				<CardHeader className="text-center">
-					{/* Icon/Image */}
-					<img
-						src={HomeConnectLogo}
-						alt="HomeConnect Logo"
-						className="mx-auto mb-4 w-48 h-48 object-contain"
-					/>
-					{/* Title */}
-					<CardTitle className="text-2xl font-bold">
-						Login to HomeConnect
+					{/* Title and Subtitle */}
+					<CardTitle className="text-xl font-bold text-gray-800">
+						Welcome to HomeConnect
 					</CardTitle>
+					<p className="text-sm text-gray-600">
+						Your personalized home management solution.
+					</p>
 				</CardHeader>
 				<CardContent>
-					<form onSubmit={handleLogin} noValidate className="space-y-4">
+					<form onSubmit={handleLogin} noValidate className="space-y-3">
 						{/* Username or Email Field */}
-						<div className="space-y-2">
-							<Label htmlFor="usernameOrEmail">Username or Email</Label>
+						<div className="space-y-1">
+							<div className="flex items-center space-x-1">
+								<Label htmlFor="usernameOrEmail" className="text-sm">
+									Username or Email
+								</Label>
+								<span className="text-red-500">*</span>
+								{errors.usernameOrEmail && (
+									<span className="text-red-500 text-xs ml-auto">
+										- {errors.usernameOrEmail}
+									</span>
+								)}
+							</div>
 							<Input
 								id="usernameOrEmail"
-								type="text" // Allow both username and email
-								placeholder="Enter your username or email"
+								type="text"
 								value={usernameOrEmail}
 								onChange={(e) => setUsernameOrEmail(e.target.value)}
-								onFocus={() => setIsUsernameFocused(true)} // Set focus state
-								onBlur={() => setIsUsernameFocused(false)} // Reset focus state
+								onFocus={() => setIsUsernameFocused(true)}
+								onBlur={() => setIsUsernameFocused(false)}
 								required
-								className={`w-full ${
+								className={`w-full border border-gray-300 focus:border-black focus-visible:ring-0 focus:outline-none transition-colors duration-150 ${
 									errors.usernameOrEmail && !isUsernameFocused
 										? 'border-red-500'
 										: ''
 								}`}
 							/>
-							{errors.usernameOrEmail && (
-								<p className="text-red-500 text-sm">{errors.usernameOrEmail}</p>
-							)}
 						</div>
 
 						{/* Password Field with Eye Icon */}
-						<div className="space-y-2">
-							<Label htmlFor="password">Password</Label>
+						<div className="space-y-1">
+							<div className="flex items-center space-x-1">
+								<Label htmlFor="password" className="text-sm">
+									Password
+								</Label>
+								<span className="text-red-500">*</span>
+								{errors.password && (
+									<span className="text-red-500 text-xs ml-auto">
+										- {errors.password}
+									</span>
+								)}
+							</div>
 							<div className="relative">
 								<Input
 									id="password"
 									type={showPassword ? 'text' : 'password'}
-									placeholder="Enter your password"
 									value={password}
 									onChange={(e) => setPassword(e.target.value)}
-									onFocus={() => setIsPasswordFocused(true)} // Set focus state
-									onBlur={() => setIsPasswordFocused(false)} // Reset focus state
+									onFocus={() => setIsPasswordFocused(true)}
+									onBlur={() => setIsPasswordFocused(false)}
 									required
-									className={`h-10 pr-10 ${
+									className={`h-9 pr-10 border border-gray-300 focus:border-black focus-visible:ring-0 focus:outline-none transition-colors duration-150 ${
 										errors.password && !isPasswordFocused
 											? 'border-red-500'
 											: ''
@@ -169,18 +203,15 @@ function Login() {
 									className="absolute inset-y-0 right-3 flex items-center text-gray-500 hover:text-gray-700"
 									onClick={() => setShowPassword(!showPassword)}
 								>
-									{showPassword ? <Eye size={20} /> : <EyeOff size={20} />}
+									{showPassword ? <Eye size={16} /> : <EyeOff size={16} />}
 								</button>
 							</div>
-							{errors.password && (
-								<p className="text-red-500 text-sm">{errors.password}</p>
-							)}
 						</div>
 
 						{/* Remember Me and Forgot Password */}
-						<div className="flex items-center justify-between">
+						<div className="flex items-center justify-between text-sm">
 							{/* Remember Me Checkbox */}
-							<div className="flex items-center space-x-2">
+							<div className="flex items-center space-x-1">
 								<Checkbox
 									id="remember-me"
 									checked={rememberMe}
@@ -193,7 +224,7 @@ function Login() {
 							{/* Forgot Password Link */}
 							<Link
 								to="/forgot-password"
-								className="text-sm text-blue-500 hover:underline"
+								className="text-blue-500 hover:underline"
 							>
 								Forgot Password?
 							</Link>
@@ -201,18 +232,18 @@ function Login() {
 
 						{/* Login Error Message */}
 						{loginError && (
-							<p className="text-red-500 text-sm text-center">{loginError}</p>
+							<p className="text-red-500 text-xs text-center">{loginError}</p>
 						)}
 
 						{/* Login Button */}
-						<Button type="submit" className="w-full">
+						<Button type="submit" className="w-full h-9 text-sm">
 							Login
 						</Button>
 					</form>
 				</CardContent>
-				<CardFooter className="flex flex-col space-y-4">
+				<CardFooter className="flex flex-col space-y-2">
 					{/* Register Link */}
-					<div className="text-center text-sm">
+					<div className="text-center text-xs text-gray-600">
 						Don't have an account?{' '}
 						<Link to="/register" className="text-blue-500 hover:underline">
 							Register here
