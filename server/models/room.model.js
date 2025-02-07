@@ -12,6 +12,11 @@ const roomSchema = new Schema({
     enum: ["bedroom", "living_room", "kitchen", "kitchen", "bathroom", "other"],
     required: true,
   },
+  home: {
+    type: Schema.Types.ObjectId,
+    ref: "Home",
+    required: true,
+  },
   occupancyStatus: {
     type: Boolean,
     default: false,
