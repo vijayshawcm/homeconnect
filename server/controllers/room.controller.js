@@ -1,11 +1,4 @@
-const {
-  Home,
-  Room,
-  Fan,
-  AirConditioning,
-  Light,
-  Sprinkler,
-} = require("../models");
+const { Home, Room, Appliance } = require("../models");
 
 const createRoom = async (req, res) => {
   const room = req.body;
@@ -40,4 +33,22 @@ const createRoom = async (req, res) => {
   }
 };
 
-module.exports = {createRoom};
+const getAppliances = async (req, res) => {
+  const { id } = req.params;
+  try {
+    // Population is the process of automatically replacing the specified paths in the document with document(s) from other collection(s).
+    // https://mongoosejs.com/docs/populate.html
+    const room = await Room.findById(id).populate("appliances");
+    if (!room) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Home not found" });
+    }
+    return res.status(200).json({ success: true, appliances: room.appliances });
+  } catch (error) {
+    res.status(500).json({ success: false, message: "Server Error" });
+    console.log(error.message);
+  }
+};
+
+module.exports = { createRoom, getAppliances };

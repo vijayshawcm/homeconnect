@@ -2,7 +2,7 @@
 // Example: const { Room, Fan, Light } = require('./models');
 module.exports = {
   Room: require("./room.model"),
-  BaseAppliance: require("./appliance.model"),
+  Appliance: require("./appliance.model"),
   Fan: require("./fan.model"),
   AirConditioner: require("./airConditioner.model"),
   Light: require("./light.model"),

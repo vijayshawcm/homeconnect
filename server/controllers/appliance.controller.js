@@ -22,7 +22,7 @@ const createAppliance = async (req, res) => {
     case "Light":
       newAppliance = new Light(appliance);
       break;
-    case "Air Conditioner":
+    case "AirConditioner":
       newAppliance = new AirConditioner(appliance);
       break;
     case "Sprinkler":
