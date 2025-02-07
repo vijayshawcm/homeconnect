@@ -7,13 +7,17 @@ const {
   secretPage,
   registerUser,
   loginUser,
-  logoutUser
+  logoutUser,
+  sendOTP,
+  verifyOTP
 } = require("../controllers/user.controller");
 
 const router = express.Router();
 router.get("/secret", secretPage);
-router.get('/logout', logoutUser)
+router.get("/logout", logoutUser)
 router.post("/register", upload.none(), registerUser);
 router.post("/login", loginUser);
+router.post("/sendOTP", sendOTP);
+router.post("/verifyOTP", verifyOTP);
 
 module.exports = router;
