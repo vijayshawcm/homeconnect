@@ -33,6 +33,7 @@ const createAppliance = async (req, res) => {
     await newAppliance.save();
     const updatedRoom = await Room.findByIdAndUpdate(
       appliance.room,
+      // Pushes the new appliances onto the appliance list
       { $push: { appliances: newAppliance } },
       { new: true }
     );

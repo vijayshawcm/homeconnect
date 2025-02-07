@@ -28,7 +28,7 @@ const createRoom = async (req, res) => {
     await newRoom.save();
     const updatedHome = await Home.findByIdAndUpdate(
       room.home,
-      // Pushes the new order onto the current order list
+      // Pushes the new room onto the current room list
       { $push: { rooms: newRoom } },
       // Returns the newly updated object
       { new: true }
