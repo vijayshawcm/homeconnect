@@ -11,7 +11,18 @@ const roomSchema = new Schema({
     type: String,
     enum: ["bedroom", "living_room", "kitchen", "kitchen", "bathroom", "other"],
     required: true,
+  }, 
+  home: {
+    type: Schema.Types.ObjectId,
+    ref: "Home",
+    required: true,
   },
+  appliances: [
+    {
+      type: Schema.Types.ObjectId,
+      ref: "Appliance",
+    },
+  ],
   occupancyStatus: {
     type: Boolean,
     default: false,
