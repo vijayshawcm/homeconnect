@@ -4,7 +4,7 @@ const BaseAppliance = require("./appliance.model");
 
 // AirConditioner Schema
 const airConditionerSchema = new Schema({
-  temperature: { type: Number, required: true },
+  temperature: { type: Number, default: '28'},
 });
 
 const AirConditioner = BaseAppliance.discriminator(

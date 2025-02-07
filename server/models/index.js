@@ -4,7 +4,7 @@ module.exports = {
   Room: require("./room.model"),
   BaseAppliance: require("./appliance.model"),
   Fan: require("./fan.model"),
-  AirConditioning: require("./airConditioner.model"),
+  AirConditioner: require("./airConditioner.model"),
   Light: require("./light.model"),
   Sprinkler: require("./sprinkler.model"),
   Home: require("./home.model"),

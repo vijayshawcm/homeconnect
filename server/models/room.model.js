@@ -17,6 +17,12 @@ const roomSchema = new Schema({
     ref: "Home",
     required: true,
   },
+  appliances: [
+    {
+      type: Schema.Types.ObjectId,
+      ref: "Appliance",
+    },
+  ],
   occupancyStatus: {
     type: Boolean,
     default: false,

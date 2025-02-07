@@ -4,7 +4,7 @@ const BaseAppliance = require("./appliance.model");
 
 // Sprinkler Schema
 const sprinklerSchema = new Schema({
-  waterFlowRate: { type: Number, required: true },
+  waterFlowRate: { type: Number, default: 0 },
 });
 
 const Sprinkler = BaseAppliance.discriminator("Sprinkler", sprinklerSchema);

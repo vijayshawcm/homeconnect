@@ -13,9 +13,9 @@ const lightSchema = new Schema({
     type: Number,
     min: 0,
     max: 100,
-    default: 100,
+    default: 0,
   },
 });
-
+ 
 const Light = BaseAppliance.discriminator("Light", lightSchema);
 module.exports = Light;
