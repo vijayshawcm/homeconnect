@@ -4,8 +4,18 @@ import Register from "./pages/auth/Register";
 import PhoneVerification from "./pages/auth/PhoneVerification";
 import OTPVerification from "./pages/auth/OTPVerification";
 import AppliancePage from "./pages/home/AppliancePage";
+import { useHomeStore } from "./store/home";
+import { useEffect } from "react";
+import { useRoomStore } from "./store/room";
 
 export default function AppRoutes() {
+  const { homes, fetchHomes } = useHomeStore();
+  const { rooms, fetchRoomsByHome} = useRoomStore()
+
+  useEffect(() => {
+    fetchHomes();
+  }, [fetchHomes]);
+
   return (
     <Router>
       <Routes>
@@ -14,7 +24,8 @@ export default function AppRoutes() {
         <Route path="/register" element={<Register />} />
         <Route path="/phone-verification" element={<PhoneVerification />} />
         <Route path="/otp-verification" element={<OTPVerification />} />
-        <Route path="/appliancePage" element={<AppliancePage />} />
+        {homes.map((home) => (
+        ))}
       </Routes>
     </Router>
   );

@@ -1,6 +1,8 @@
-const AppliancePage = () => {
+const AppliancePage = ( {room} ) => {
   return (
-    <div>AppliancePage</div>
+    <div>
+      <h1> {room.name} </h1>
+    </div>
   )
 }
 
