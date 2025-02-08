@@ -37,7 +37,7 @@ async function generateJWT(res, user) {
   res.cookie("JWTAuth", token, { httpOnly: true });
 }
 
-// Send OTP
+// Send OTP to provided email
 const sendOTP = async (req, res) => {
   var otp = randInt(100000,999999);
   console.log("New OTP generated: " + otp);
@@ -74,6 +74,7 @@ const sendOTP = async (req, res) => {
   .send("otp sent!");
 }
 
+// TODO: hash with bcrypt in abit im kinda lazy rn
 const verifyOTP = async (req, res) => {
   if(req.body.OTP == req.cookies["OTP"]) {
 
@@ -90,6 +91,7 @@ const verifyOTP = async (req, res) => {
     .send("invalid otp");
 }
 
+// Secret page for authentication testing, probably should be replaced with zustand authentication at some point
 const secretPage = async (req, res) => {
   const token = req.cookies["JWTAuth"];
   console.log(token);
@@ -116,23 +118,24 @@ const secretPage = async (req, res) => {
 };
 
 const registerUser = async (req, res) => {
+  // ? chore: move this to database side
   const passwordHash = await bcrypt.hash(req.body.password, 10);
 
   try {
     const user = await User.create({
       username: req.body.username,
       email: req.body.email,
-      phoneNum: req.body.phoneNum,
       passwordHash: passwordHash,
     });
 
     generateJWT(res, user); // Generate JWT for user and save in cookie
-    return res.status(200).redirect("/server/users/secret");
+    return res.status(200).send("Account created");
   } catch (err) {
     return res.status(500).send("Internal Server Error.");
   }
 };
 
+// TODO: make sign ins work with email too
 const loginUser = async (req, res) => {
   // Check if user exists
   const validUser = await User.findOne({ username: req.body.usernameOrEmail });
