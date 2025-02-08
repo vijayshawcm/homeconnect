@@ -1,17 +1,37 @@
+// ! THIS PAGE IS CURRENTLY UNUSED AND MAY BE DELETED SOON IN FAVOUR OF EMAIL VERIFICATION
+// ! REGISTRATION PAGE WILL JUMP STRAIGHT TO OTP VERIFICATION
+
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Input from '../../components/common/Input';
 import Button from '../../components/common/Button';
 import HotspotIcon from '../../assets/hotspot-icon.svg';
+// import { useRegistrationStore } from '@/store/userRegistration';
 
 export default function PhoneVerification() {
 	const [phoneNumber, setPhoneNumber] = useState('');
 	const navigate = useNavigate();
 
-	const handlePhoneSubmit = (e) => {
+	// ! Uncommenting this code breaks everything because phone num is no longer in zustand store
+	// const {
+	// 	setPhoneNum
+	// } = useRegistrationStore();
+
+	const handlePhoneSubmit = async (e) => {
 		e.preventDefault();
 		console.log('Phone number submitted:', phoneNumber);
-		// Simulate OTP sent to the user
+		// ! This breaks too
+		// setPhoneNum(phoneNumber) // Store data in zustand store
+		
+		// Send OTP to user
+		const response = await fetch('server/users/sendOTP', {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			// ! This may not work as expected
+			body: JSON.stringify({ phoneNum: phoneNumber}),
+		});
+
+		
 		alert('OTP sent to your phone number!');
 		navigate('/otp-verification'); // Redirect to OTP verification
 	};

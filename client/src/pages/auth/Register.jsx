@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import Input from '../../components/common/Input';
 import Button from '../../components/common/Button';
 import WelcomeIcon from '../../assets/welcome-icon.svg';
+import { userRegistrationStore } from '@/store/userRegistration';
 
 export default function Register() {
 	const [username, setUsername] = useState('');
@@ -11,6 +12,32 @@ export default function Register() {
 	const [confirmPassword, setConfirmPassword] = useState('');
 	const navigate = useNavigate();
 
+	// Initialise zustand store modification methods
+	const {
+		setUsername: setUsernameStore,
+		setEmail: setEmailStore,
+		setPassword: setPasswordStore,
+	} = userRegistrationStore();
+
+	// Call otp mailing api
+	const sendOTP = async (e) =>{
+		console.log('email submitted:', email);
+		
+		// Send OTP to user
+		const response = await fetch('server/users/sendOTP', {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({ email }),
+		});
+
+		if(!response.ok) {
+			throw new Error('Invalid email entered!');
+		}
+
+		alert('OTP sent to your email!');
+	}
+
+	//TODO: regex and block empty inputs
 	const handleRegister = (e) => {
 		e.preventDefault();
 		// Basic validation
@@ -18,9 +45,22 @@ export default function Register() {
 			alert('Passwords do not match!');
 			return;
 		}
-		// Simulate successful registration
-		console.log('Registration successful!');
-		navigate('/phone-verification'); // Redirect to phone verification
+
+		// Store user data in zustand store
+		setUsernameStore(username);
+		setEmailStore(email);
+		setPasswordStore(password);
+
+		// Send otp and redirect user after valid details entered
+		console.log('Registration details entered, attempting to send OTP to user');
+		try {
+			sendOTP();
+			console.log('OTP sent succesfully! Redirecting to otp verification')
+		} catch (err) {
+			return alert(err.message || 'Invalid email entered!');
+		}
+
+		navigate('/otp-verification'); // Redirect to otp verification
 	};
 
 	return (
