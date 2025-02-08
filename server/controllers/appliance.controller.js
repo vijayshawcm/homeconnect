@@ -42,6 +42,32 @@ const createAppliance = async (req, res) => {
     console.error("Error in creating appliance: ", error.message);
     res.status(500).json({ success: false, message: "Server Error" });
   }
+
+  const modifyAppliance = async (req, res) => {
+    const id = req.params;
+
+    // Verify that the applaince exists
+    if (!(await Appliance.findById(id))) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Room not found" });
+    }
+
+    switch (req.applianceType) {
+      case "Fan":
+        
+        break;
+      case "Light":
+        newAppliance = new Light(appliance);
+        break;
+      case "AirConditioner":
+        newAppliance = new AirConditioner(appliance);
+        break;
+      case "Sprinkler":
+        newAppliance = new Sprinkler(appliance);
+        break;
+    }
+  };
 };
 
 module.exports = { createAppliance };
