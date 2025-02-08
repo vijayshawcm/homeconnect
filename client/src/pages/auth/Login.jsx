@@ -10,7 +10,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Eye, EyeOff } from 'lucide-react';
 import HomeConnectLogo from '@/assets/homeconnect-logo.svg';
 import Background from '@/assets/tempbg.jpg';
@@ -26,6 +26,9 @@ function Login() {
 	// Track focus state for input fields
 	const [isUsernameFocused, setIsUsernameFocused] = useState(false);
 	const [isPasswordFocused, setIsPasswordFocused] = useState(false);
+
+	// Setup redirect
+	const navigate = useNavigate();
 
 	// Form Validation
 	const validateForm = () => {
@@ -59,17 +62,17 @@ function Login() {
 		// Validate Form
 		if (!validateForm()) return;
 
-		// Auth logic here @isaac (API call to backend)
+		// Auth logic
 		try {
 			// Simulate API call to the backend
 			console.log('Logging in with:', {
 				usernameOrEmail,
 				password,
-				rememberMe,
+				rememberMe, // ? do we need this
 			});
 
-			// Replace this part with actual API call thanks
-			const response = await fetch('/api/auth/login', {
+			// Api call
+			const response = await fetch('server/users/login', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({ usernameOrEmail, password }),
@@ -85,11 +88,12 @@ function Login() {
 
 			// Handle response status
 			if (!response.ok) {
-				throw new Error(data.message || 'Login failed');
+				throw new Error(data.message || 'Invalid username or password!');
 			}
 
-			// Handle successful login by redirecting to dashboard
+			// TODO: Handle successful login by redirecting to dashboard (no dashboard)
 			console.log('Login successful:', data);
+			navigate('/dashboard');
 		} catch (error) {
 			setLoginError(error.message || 'An error occurred during login');
 		}
