@@ -106,7 +106,7 @@ const secretPage = async (req, res) => {
 };
 
 const registerUser = async (req, res) => {
-  const passwordHash = await bcrypt.hash(req.body.passwordHash, 10);
+  const passwordHash = await bcrypt.hash(req.body.password, 10);
 
   try {
     const user = await User.create({
@@ -123,9 +123,9 @@ const registerUser = async (req, res) => {
 
 const loginUser = async (req, res) => {
   // Check if user exists
-  const validUser = await User.findOne({ username: req.body.username });
+  const validUser = await User.findOne({ username: req.body.usernameOrEmail });
   if (!validUser) {
-    return res.render("./login", { message: "Invalid username or password!" });
+    return res.status(401).json("Invalid credentials!");
   }
 
   // Check if password hash matches
@@ -134,11 +134,11 @@ const loginUser = async (req, res) => {
     validUser.passwordHash
   );
   if (!validPassword) {
-    return res.render("./login", { message: "Invalid username or password!" });
+    return res.status(401).json("Invalid credentials!");
   }
 
   generateJWT(res, validUser); // Generate JWT for user and save in cookie
-  return res.redirect("/secret");
+  return res.status(200).json({username: validUser.username});
 };
 
 const logoutUser = (req, res) => {
