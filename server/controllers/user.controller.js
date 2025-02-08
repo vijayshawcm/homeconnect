@@ -2,11 +2,17 @@
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const { User } = require("../models");
-const AWS = require("aws-sdk");
+const nodemailer = require("nodemailer");
 require("dotenv").config();
 
-// Set AWS Region
-AWS.config.update({region: "ap-southeast-1"});
+// Set up email transport
+const transporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+      user: "homeconnect.hwu@gmail.com",
+      pass: process.env.EMAIL_PASSWORD
+  }
+});
 
 // Function to generate random integer
 function randInt(min, max) {
@@ -36,32 +42,36 @@ const sendOTP = async (req, res) => {
   var otp = randInt(100000,999999);
   console.log("New OTP generated: " + otp);
 
-  var params = {
-    Message: "Your HomeConnect verification code is: " + otp,
-    PhoneNumber: req.body.phoneNum
+  const mailOptions = {
+    from: {
+      name: "HomeConnect",
+      address: "homeconnect.hwu@gmail.com",
+    },
+
+    to: req.body.email,
+    subject: "HomeConnect Email Verification",
+    text: "Your HomeConnect verification code is: " + otp,
   }
 
-  try {
-    await new AWS.SNS({apiVersion: '2010-03-31'})
-      .publish(params)
-      .promise()
-
-    console.log("otp sent successfully")
-
-    // Store OTP in cookies to be validated (probably wanna hash this)
-    res.clearCookie("OTP");
-    res.cookie("OTP", otp, { maxAge: 300000, httpOnly: true });
-    console.log("new otp stored in cookie");
-
-    return res
-    .status(200)
-    .send("otp sent!");
-
-  } catch (err) {
-    return res
+  transporter.sendMail(mailOptions, (error, info) => {
+    if (error) {
+      console.error("Error sending email: ", error);
+      return res
       .status(500)
       .send(err);
-  }
+    } else {
+      console.log("Email sent: ", info.response);
+    }
+  });
+
+  // Store OTP in cookies to be validated (probably wanna hash this)
+  res.clearCookie("OTP");
+  res.cookie("OTP", otp, { maxAge: 300000, httpOnly: true });
+  console.log("new otp stored in cookie");
+
+  return res
+  .status(200)
+  .send("otp sent!");
 }
 
 const verifyOTP = async (req, res) => {
@@ -111,6 +121,8 @@ const registerUser = async (req, res) => {
   try {
     const user = await User.create({
       username: req.body.username,
+      email: req.body.email,
+      phoneNum: req.body.phoneNum,
       passwordHash: passwordHash,
     });
 
