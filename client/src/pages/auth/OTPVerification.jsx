@@ -2,13 +2,39 @@ import { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Button from '../../components/common/Button';
 import ShieldIcon from '../../assets/shield-icon.svg';
+import { userRegistrationStore } from '@/store/userRegistration';
 
 export default function OTPVerification() {
 	const [otp, setOtp] = useState(['', '', '', '', '', '']);
 	const otpInputRefs = useRef([]); // Refs for each input box
 	const navigate = useNavigate();
 
-	const handleOtpSubmit = (e) => {
+	// Get user registration info from zustand store
+	const {
+		username,
+		email,
+		password
+	} = userRegistrationStore();
+
+
+
+	// User registration
+	const registerUser = async (e) => {
+		console.log("registering user: " + username + "\n" + email + "\n" + password)
+		const response = await fetch('server/users/register', {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({ username, email, password }),
+		});
+
+		if(!response.ok) {
+			throw new Error('Invalid user details entered!');
+		}
+
+		alert('Account succesfully registered!');
+	}
+
+	const handleOtpSubmit = async (e) => {
 		e.preventDefault();
 		const otpCode = otp.join('');
 		console.log('OTP submitted:', otpCode);
@@ -22,19 +48,24 @@ export default function OTPVerification() {
 			return;
 		}
 
-		// Simulate OTP verification
-		if (otpCode === '123456') {
-			// Replace with actual OTP validation
-			alert('Phone number verified!');
-			navigate('/dashboard'); // Redirect to dashboard
-		} else {
-			// Wrong OTP code logic:
-			// Clear input box to allow user to reenter OTP code
-			// include cases where the phone number gets blocked after a certain amount of time
-			alert('Invalid OTP!');
-			setOtp(['', '', '', '', '', '']); // Clear all input boxes
+		// OTP verification
+		const response = await fetch('server/users/verifyOTP', {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({ OTP: otpCode }),
+		});
+
+		// Logic for incorrect OTP
+		if(!response.ok) {
+			// ? (this required?) include cases where the email gets blocked after a certain amount of time
+			setOtp(['', '', '', '', '', '']); // Clear input box to allow user to reenter OTP code
 			otpInputRefs.current[0].focus(); // Focus on the first input box
+			return alert('Incorrect OTP entered!');
 		}
+
+		registerUser(); // Register user if email verification is successful
+		navigate('/dashboard'); // Redirect to dashboard
+
 	};
 
 	const handleOtpChange = (index, value) => {
@@ -57,6 +88,8 @@ export default function OTPVerification() {
 
 	// Nice thing to have if the OTP auto submits upon input boxes' completion
 	// but then what would be the point of the 'Verify OTP' button if we added this functionality?
+	// idk bro it'll look nice! - 
+	// TODO: regex to prevent alphabet and symbols
 
 	return (
 		<div className="min-h-screen bg-gray-100 flex items-center justify-center">
