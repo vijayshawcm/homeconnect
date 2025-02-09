@@ -23,7 +23,7 @@ function randInt(min, max) {
 const jwtSecret = process.env.JWT_SECRET;
 async function generateJWT(res, user) {
   let data = {
-    user,
+    username: user.username,
     login: true,
   };
 
@@ -145,7 +145,7 @@ const registerUser = async (req, res) => {
 // TODO: make sign ins work with email too
 const loginUser = async (req, res) => {
   // Check if user exists
-  const validUser = await User.findOne({ username: req.body.usernameOrEmail });
+  const validUser = await User.findOne({ username_lower: req.body.usernameOrEmail.toLowerCase() });
   if (!validUser) {
     return res.status(401).json("Invalid credentials!");
   }
@@ -161,7 +161,7 @@ const loginUser = async (req, res) => {
   }
 
   generateJWT(res, validUser); // Generate JWT for user and save in cookie
-  return res.status(200).json({username: validUser.username});
+  return res.status(200).json("User authenticated to system");
 };
 
 const logoutUser = (req, res) => {
