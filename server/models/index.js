@@ -9,4 +9,5 @@ module.exports = {
   Sprinkler: require("./sprinkler.model"),
   Home: require("./home.model"),
   User: require("./user.model"),
+  EnergyProfile: require("./energyProfile.model"),
 };

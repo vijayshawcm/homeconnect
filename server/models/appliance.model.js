@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
+const EnergyProfile = require("./energyProfile.model")
 
 // Base Appliance Schema
 const applianceSchema = new Schema(
