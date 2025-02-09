@@ -19,19 +19,9 @@ const applianceSchema = new Schema(
       ref: "Room",
       required: true,
     },
-    powerConsumption: {
-      current: {
-        type: Number,
-        default: 0,
-      },
-      dailyConsumption: {
-        type: Number,
-        default: 0,
-      },
-      monthlyConsumption: {
-        type: Number,
-        default: 0,
-      },
+    energyProfile: {
+      type: Schema.Types.ObjectId,
+      ref: "EnergyProfile",
     },
     schedules: [
       {
@@ -57,6 +47,7 @@ const applianceSchema = new Schema(
         },
       },
     ],
+    methods: {},
   },
   {
     timestamps: true,

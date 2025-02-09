@@ -11,7 +11,7 @@ const roomSchema = new Schema({
     type: String,
     enum: ["bedroom", "living_room", "kitchen", "kitchen", "bathroom", "other"],
     required: true,
-  }, 
+  },
   home: {
     type: Schema.Types.ObjectId,
     ref: "Home",
@@ -28,18 +28,8 @@ const roomSchema = new Schema({
     default: false,
   },
   energyProfile: {
-    totalConsumption: {
-      type: Number,
-      default: 0,
-    },
-    previousDayConsumption: {
-      type: Number,
-      default: 0,
-    },
-    targetConsumption: {
-      type: Number,
-      default: null,
-    },
+    type: Schema.Types.ObjectId,
+    ref: "EnergyProfile",
   },
 });
 
