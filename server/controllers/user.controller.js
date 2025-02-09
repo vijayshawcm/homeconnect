@@ -63,9 +63,10 @@ const sendOTP = async (req, res) => {
     }
   });
 
-  // Store OTP in cookies to be validated (probably wanna hash this)
+  // Store OTP in cookies to be validated
+  const otpHash = await bcrypt.hash(otp.toString(), 10);
   res.clearCookie("OTP");
-  res.cookie("OTP", otp, { maxAge: 300000, httpOnly: true });
+  res.cookie("OTP", otpHash, { maxAge: 300000, httpOnly: true });
   console.log("new otp stored in cookie");
 
   return res
@@ -73,17 +74,26 @@ const sendOTP = async (req, res) => {
   .send("otp sent!");
 }
 
-// TODO: hash with bcrypt in abit im kinda lazy rn
+// Verify OTP
 const verifyOTP = async (req, res) => {
-  if(req.body.OTP == req.cookies["OTP"]) {
+  var validOTP;
+  try {
+     validOTP = await bcrypt.compare(
+      req.body.OTP,
+      req.cookies["OTP"],
+    )
+  } catch (err) {
+    return res.status(500).send(err)
+  }
 
+  if(validOTP) {
     res.clearCookie("OTP")
     console.log("otp gone");
 
     return res
     .status(200)
     .send("otp verified!");
-  } 
+  }
 
   return res
     .status(401)
@@ -145,6 +155,7 @@ const loginUser = async (req, res) => {
     req.body.password,
     validUser.passwordHash
   );
+
   if (!validPassword) {
     return res.status(401).json("Invalid credentials!");
   }
