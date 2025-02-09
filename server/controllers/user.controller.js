@@ -23,9 +23,8 @@ function randInt(min, max) {
 const jwtSecret = process.env.JWT_SECRET;
 async function generateJWT(res, user) {
   let data = {
-    time: Date(),
-    userId: user._id,
-    username: user.username,
+    user,
+    login: true,
   };
 
   // Create JWT
@@ -91,8 +90,8 @@ const verifyOTP = async (req, res) => {
     .send("invalid otp");
 }
 
-// Secret page for authentication testing, probably should be replaced with zustand authentication at some point
-const secretPage = async (req, res) => {
+// Check if a user is currently authenticated to the system
+const loginStatus = async (req, res) => {
   const token = req.cookies["JWTAuth"];
   console.log(token);
 
@@ -107,7 +106,7 @@ const secretPage = async (req, res) => {
   const verifyToken = jwt.verify(token, jwtSecret);
 
   if (verifyToken) {
-    return res.send("Authenticated to system");
+    return res.status(200).send("Authenticated to system");
   }
 
   return res
@@ -117,15 +116,13 @@ const secretPage = async (req, res) => {
     );
 };
 
+// Registers user
 const registerUser = async (req, res) => {
-  // ? chore: move this to database side
-  const passwordHash = await bcrypt.hash(req.body.password, 10);
-
   try {
     const user = await User.create({
       username: req.body.username,
       email: req.body.email,
-      passwordHash: passwordHash,
+      passwordHash: req.body.password,
     });
 
     generateJWT(res, user); // Generate JWT for user and save in cookie
@@ -161,4 +158,4 @@ const logoutUser = (req, res) => {
   res.send("Logout successful");
 };
 
-module.exports = { secretPage, registerUser, loginUser, logoutUser, sendOTP, verifyOTP };
+module.exports = { loginStatus, registerUser, loginUser, logoutUser, sendOTP, verifyOTP };
