@@ -31,6 +31,16 @@ const roomSchema = new Schema({
     type: Schema.Types.ObjectId,
     ref: "EnergyProfile",
   },
+  methods: {},
+});
+
+// Pre-save hook to auto-create an EnergyProfile if missing
+roomSchema.pre("save", async function (next) {
+  if (!this.energyProfile) {
+    const energyProfile = await EnergyProfile.create({});
+    this.energyProfile = energyProfile._id;
+  }
+  next();
 });
 
 const RoomModel = mongoose.model("Room", roomSchema);

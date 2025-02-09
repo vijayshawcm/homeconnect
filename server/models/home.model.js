@@ -42,5 +42,14 @@ const homeSchema = new Schema(
   }
 );
 
+// Pre-save hook to auto-create an EnergyProfile if missing
+homeSchema.pre("save", async function (next) {
+  if (!this.energyProfile) {
+    const energyProfile = await EnergyProfile.create({});
+    this.energyProfile = energyProfile._id;
+  }
+  next();
+});
+
 const homeModel = mongoose.model("Home", homeSchema);
 module.exports = homeModel;
