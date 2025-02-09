@@ -7,10 +7,11 @@ import AppliancePage from "./pages/home/AppliancePage";
 import { useHomeStore } from "./store/home";
 import { useEffect } from "react";
 import { useRoomStore } from "./store/room";
+import Sidebar from "./components/home/Sidebar";
 
 export default function AppRoutes() {
   const { homes, fetchHomes } = useHomeStore();
-  const { rooms, fetchRoomsByHome} = useRoomStore()
+  const { rooms, fetchRoomsByHome } = useRoomStore();
 
   useEffect(() => {
     fetchHomes();
@@ -24,8 +25,7 @@ export default function AppRoutes() {
         <Route path="/register" element={<Register />} />
         <Route path="/phone-verification" element={<PhoneVerification />} />
         <Route path="/otp-verification" element={<OTPVerification />} />
-        {homes.map((home) => (
-        ))}
+        <Route path= '/sidebar' element = {<Sidebar/>}></Route>
       </Routes>
     </Router>
   );
