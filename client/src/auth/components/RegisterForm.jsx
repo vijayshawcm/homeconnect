@@ -2,8 +2,9 @@ import React, { useState } from 'react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Eye, EyeOff } from 'lucide-react';
+import { userRegistrationStore } from '@/store/userRegistration';
 
 function RegisterForm() {
 	const [username, setUsername] = useState('');
@@ -19,8 +20,17 @@ function RegisterForm() {
 	const [isUsernameFocused, setIsUsernameFocused] = useState(false);
 	const [isEmailFocused, setIsEmailFocused] = useState(false);
 	const [isPasswordFocused, setIsPasswordFocused] = useState(false);
-	const [isConfirmPasswordFocused, setIsConfirmPasswordFocused] =
-		useState(false);
+	const [isConfirmPasswordFocused, setIsConfirmPasswordFocused] = useState(false);
+
+	// Setup redirect
+	const navigate = useNavigate();
+
+	// Initialise zustand store modification methods
+	const {
+		setUsername: setUsernameStore,
+		setEmail: setEmailStore,
+		setPassword: setPasswordStore,
+	} = userRegistrationStore();
 
 	// Form Validation
 	const validateForm = () => {
@@ -70,6 +80,24 @@ function RegisterForm() {
 		return Object.keys(newErrors).length === 0; // Return true if no errors
 	};
 
+	// Call otp mailing api
+	const sendOTP = async (e) =>{
+		console.log('email submitted:', email);
+		
+		// Send OTP to user
+		const response = await fetch('server/users/sendOTP', {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({ email }),
+		});
+
+		if(!response.ok) {
+			throw new Error('Invalid email entered!');
+		}
+
+		//alert('OTP sent to your email!'); otp sent animation or whatever
+	}
+
 	// Handle Registration
 	const handleRegister = async (e) => {
 		e.preventDefault();
@@ -81,33 +109,26 @@ function RegisterForm() {
 		// Validate Form
 		if (!validateForm()) return;
 
-		// Auth logic here @isaac (API call to backend)
+		// Auth logic here
 		try {
-			// Simulate API call to the backend
 			console.log('Registering with:', { username, email, password });
 
-			// Replace this part with actual API call thanks
-			const response = await fetch('/api/auth/register', {
-				method: 'POST',
-				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ username, email, password }),
-			});
+			// Store user data in zustand store
+			setUsernameStore(username);
+			setEmailStore(email);
+			setPasswordStore(password);
 
-			// Check if response is valid JSON
-			let data;
+			// Send otp and redirect user after valid details entered
+			console.log('Registration details entered, attempting to send OTP to user');
 			try {
-				data = await response.json();
-			} catch (error) {
-				throw new Error('Invalid server response');
+				sendOTP();
+				console.log('OTP sent succesfully! Redirecting to otp verification')
+			} catch (err) {
+				return alert(err.message || 'Invalid email entered!');
 			}
 
-			// Handle response status
-			if (!response.ok) {
-				throw new Error(data.message || 'Registration failed');
-			}
+			navigate('/verify'); // Redirect to otp verification
 
-			// Handle successful registration
-			console.log('Registration successful:', data);
 		} catch (error) {
 			setRegisterError(
 				error.message || 'An error occurred during registration'
