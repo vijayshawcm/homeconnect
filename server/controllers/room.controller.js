@@ -51,4 +51,20 @@ const getRoomsByHome = async (req, res) => {
   }
 };
 
-module.exports = { createRoom, getRoomsByHome };
+const deleteRoom = async (req, res) => {
+  const { id } = req.params;
+  try {
+    const room = await Room.findByIdAndDelete(id);
+    if (!room) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Room not found" });
+    }
+    res.status(200).json({ success: true, message: "Room Deleted" });
+  } catch (error) {
+    res.status(500).json({ success: false, message: "Server Error" });
+    console.log(error.message);
+  }
+};
+
+module.exports = { createRoom, getRoomsByHome, deleteRoom };

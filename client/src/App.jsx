@@ -25,7 +25,9 @@ export default function AppRoutes() {
         <Route path="/register" element={<Register />} />
         <Route path="/phone-verification" element={<PhoneVerification />} />
         <Route path="/otp-verification" element={<OTPVerification />} />
-        <Route path= '/sidebar' element = {<Sidebar/>}></Route>
+        {homes.map((home) => {
+          console.log(home.name);
+        })}
       </Routes>
     </Router>
   );
