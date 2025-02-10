@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Login from "./pages/auth/Login";
 import Register from "./pages/auth/Register";
@@ -31,4 +32,17 @@ export default function AppRoutes() {
       </Routes>
     </Router>
   );
+=======
+import React from 'react';
+import AppRoutes from './routes';
+
+function App() {
+	return (
+		<div className="min-h-screen">
+			<AppRoutes />
+		</div>
+	);
+>>>>>>> main
 }
+
+export default App;
