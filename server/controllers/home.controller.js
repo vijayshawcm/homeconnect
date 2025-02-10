@@ -21,7 +21,7 @@ const getHomes = async (req, res) => {
   } catch (error) {
     console.log("Error in fetching homes:", error.message);
     res.status(500).json({ success: false, message: "Server Error" });
-  }
+  }    
 };
 
 const getHomesByUserId = async (req, res) => {
