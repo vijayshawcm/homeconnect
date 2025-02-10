@@ -41,7 +41,7 @@ function AuthContainer({ mode }) {
 			style={{ backgroundImage: `url(${Background})` }}
 		>
 			{/* HomeConnect Logo */}
-			<Link to="/login">
+			<Link to="/">
 				<img
 					src={HomeConnectLogo}
 					alt="HomeConnect Logo"
