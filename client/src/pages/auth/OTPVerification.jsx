@@ -36,7 +36,6 @@ export default function OTPVerification() {
 			throw new Error('Invalid user details entered!');
 		}
 
-		await fetchLogin() // Fetch user login status
 		alert('Account succesfully registered!');
 	}
 
@@ -70,6 +69,7 @@ export default function OTPVerification() {
 		}
 
 		registerUser(); // Register user if email verification is successful
+		await fetchLogin() // Fetch user login status
 		navigate('/dashboard'); // Redirect to dashboard
 
 	};
