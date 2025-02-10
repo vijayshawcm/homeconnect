@@ -3,7 +3,7 @@ import react from "@vitejs/plugin-react";
 import tailwindcss from "tailwindcss";
 import autoprefixer from "autoprefixer";
 import path from "path";
-import dotenv from "dotenv";    
+import dotenv from "dotenv";
 dotenv.config();
 
 export default defineConfig({
