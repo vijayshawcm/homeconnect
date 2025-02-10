@@ -14,6 +14,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Eye, EyeOff } from 'lucide-react';
 import HomeConnectLogo from '@/assets/homeconnect-logo.svg';
 import Background from '@/assets/tempbg.jpg';
+import { userAuthStore } from "@/store/userAuth";
 
 function Login() {
 	const [usernameOrEmail, setUsernameOrEmail] = useState('');
@@ -29,6 +30,11 @@ function Login() {
 
 	// Setup redirect
 	const navigate = useNavigate();
+
+	// Setup zustand auth store
+	const {
+		fetchLogin,
+	} = userAuthStore();
 
 	// Form Validation
 	const validateForm = () => {
@@ -91,9 +97,10 @@ function Login() {
 				throw new Error(data.message || 'Invalid username or password!');
 			}
 
-			// TODO: Handle successful login by redirecting to dashboard (no dashboard)
+			// Handle successful login by updating login status and redirecting to dashboard
+			await fetchLogin(); // This can probably be written better lol
 			console.log('Login successful:', data);
-			navigate('/dashboard');
+			await navigate('/dashboard');
 		} catch (error) {
 			setLoginError(error.message || 'An error occurred during login');
 		}

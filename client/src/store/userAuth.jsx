@@ -15,6 +15,7 @@ export const userAuthStore = create((set)=>({
         if(response.ok) {
             const user = response['username'];
             set({user, isAuthenticated: true });
+            console.log("User is currently logged in")
         } else {
             set({user: null, isAuthenticated: false});
         }
