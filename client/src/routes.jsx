@@ -1,6 +1,7 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import AuthContainer from './auth/AuthContainer'; // Import AuthContainer
+import NotFound from './pages/NotFound';
 
 function AppRoutes() {
 	return (
@@ -14,6 +15,8 @@ function AppRoutes() {
 					element={<AuthContainer mode="forgot-password" />}
 				/>
 				<Route path="/verify" element={<AuthContainer mode="verify" />} />
+				{/* 404 Route */}
+				<Route path="*" element={<NotFound />} />
 			</Routes>
 		</Router>
 	);
