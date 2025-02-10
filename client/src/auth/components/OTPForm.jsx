@@ -3,6 +3,9 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import Lottie from 'lottie-react'; // Import Lottie
 import successAnimation from '@/assets/lottie/success-checkmark.json'; // Import successful checkmark animation
+import { userRegistrationStore } from '@/store/userRegistration';
+import { userAuthStore } from "@/store/userAuth";
+import { useNavigate } from 'react-router-dom';
 
 function OTPForm({ mode = 'verify', onVerificationSuccess, successMessage }) {
 	const [otp, setOtp] = useState(['', '', '', '', '', '']); // Array to hold 6 digits
@@ -14,6 +17,9 @@ function OTPForm({ mode = 'verify', onVerificationSuccess, successMessage }) {
 	const [fadeOut, setFadeOut] = useState(false); // Track fade-out animation
 	const [animateBoxes, setAnimateBoxes] = useState(false); // Track simultaneous animations (green border + jump)
 
+	// Setup redirect
+	const navigate = useNavigate();
+
 	// Refs for each input field
 	const inputRefs = [
 		useRef(null),
@@ -23,6 +29,18 @@ function OTPForm({ mode = 'verify', onVerificationSuccess, successMessage }) {
 		useRef(null),
 		useRef(null),
 	];
+
+	// Get user registration info from zustand store
+	const {
+		username,
+		email,
+		password
+	} = userRegistrationStore();
+
+	// Prepare auth store to fetch user login
+	const {
+		fetchLogin,
+	} = userAuthStore();
 
 	// Handle OTP input change
 	const handleInputChange = (index, value) => {
@@ -66,6 +84,22 @@ function OTPForm({ mode = 'verify', onVerificationSuccess, successMessage }) {
 		return true;
 	};
 
+	// User registration
+	const registerUser = async (e) => {
+		console.log("registering user: " + username + "\n" + email + "\n" + password)
+		const response = await fetch('server/users/register', {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({ username, email, password }),
+		});
+
+		if(!response.ok) {
+			throw new Error('Invalid user details entered!');
+		}
+
+		// alert('Account succesfully registered!');
+	}
+
 	// Handle OTP Verification
 	const handleVerify = async (e) => {
 		e.preventDefault();
@@ -77,19 +111,34 @@ function OTPForm({ mode = 'verify', onVerificationSuccess, successMessage }) {
 		try {
 			setIsVerifying(true); // Show loading state
 			console.log('Verifying OTP:', otp.join(''));
-			// Simulate API call to verify OTP
-			if (otp.join('') !== '123456') {
+			// OTP verification
+			const response = await fetch('server/users/verifyOTP', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ OTP: otp.join('') }),
+			});
+
+			// Logic for incorrect OTP
+			if(!response.ok) {
 				setShake(true); // Trigger shake animation
 				setTimeout(() => setShake(false), 500); // Reset shake after animation
 				throw new Error('Incorrect OTP');
 			}
+
+			
 
 			// Step 1: Trigger green border and jumping animation simultaneously
 			setAnimateBoxes(true);
 			setTimeout(() => {
 				// Step 2: Fade out OTP fields
 				setFadeOut(true);
-				setTimeout(() => {
+				setTimeout(async () => {
+					registerUser(); // Register user if email verification is successful
+					await fetchLogin() // Fetch user login status
+					setTimeout(() => {
+						// ! We don't question this it just works, changing this breaks everything
+						window.location.replace('/dashboard'); // Redirect to dashboard
+					}, 2000);
 					// Step 3: Show success animation
 					setVerificationSuccess(true);
 					// Notify parent component about successful verification
