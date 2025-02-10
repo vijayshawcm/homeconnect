@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import Button from '../../components/common/Button';
 import ShieldIcon from '../../assets/shield-icon.svg';
 import { userRegistrationStore } from '@/store/userRegistration';
+import { userAuthStore } from "@/store/userAuth";
 
 export default function OTPVerification() {
 	const [otp, setOtp] = useState(['', '', '', '', '', '']);
@@ -16,6 +17,10 @@ export default function OTPVerification() {
 		password
 	} = userRegistrationStore();
 
+	// Prepare auth store to fetch user login
+	const {
+		fetchLogin,
+	} = userAuthStore();
 
 
 	// User registration
@@ -64,6 +69,7 @@ export default function OTPVerification() {
 		}
 
 		registerUser(); // Register user if email verification is successful
+		await fetchLogin() // Fetch user login status
 		navigate('/dashboard'); // Redirect to dashboard
 
 	};

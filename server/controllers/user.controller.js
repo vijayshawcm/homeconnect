@@ -3,6 +3,7 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const { User } = require("../models");
 const nodemailer = require("nodemailer");
+const { jwtDecode } = require("jwt-decode");
 require("dotenv").config();
 
 // Set up email transport
@@ -23,9 +24,8 @@ function randInt(min, max) {
 const jwtSecret = process.env.JWT_SECRET;
 async function generateJWT(res, user) {
   let data = {
-    time: Date(),
-    userId: user._id,
     username: user.username,
+    login: true,
   };
 
   // Create JWT
@@ -42,6 +42,7 @@ const sendOTP = async (req, res) => {
   var otp = randInt(100000,999999);
   console.log("New OTP generated: " + otp);
 
+  // Set up mail information
   const mailOptions = {
     from: {
       name: "HomeConnect",
@@ -53,92 +54,104 @@ const sendOTP = async (req, res) => {
     text: "Your HomeConnect verification code is: " + otp,
   }
 
+  // Send mail
   transporter.sendMail(mailOptions, (error, info) => {
     if (error) {
       console.error("Error sending email: ", error);
       return res
       .status(500)
-      .send(err);
+      .json(err);
     } else {
       console.log("Email sent: ", info.response);
     }
   });
 
-  // Store OTP in cookies to be validated (probably wanna hash this)
+  // Store OTP in cookies to be validated
+  const otpHash = await bcrypt.hash(otp.toString(), 10);
   res.clearCookie("OTP");
-  res.cookie("OTP", otp, { maxAge: 300000, httpOnly: true });
+  res.cookie("OTP", otpHash, { maxAge: 300000, httpOnly: true });
   console.log("new otp stored in cookie");
 
   return res
   .status(200)
-  .send("otp sent!");
+  .json("otp sent!");
 }
 
-// TODO: hash with bcrypt in abit im kinda lazy rn
+// Verify OTP
 const verifyOTP = async (req, res) => {
-  if(req.body.OTP == req.cookies["OTP"]) {
+  try {
+     const validOTP = await bcrypt.compare(
+      req.body.OTP,
+      req.cookies["OTP"],
+    )
 
-    res.clearCookie("OTP")
-    console.log("otp gone");
+    if(validOTP) {
+      res.clearCookie("OTP")
+      console.log("otp gone");
 
-    return res
-    .status(200)
-    .send("otp verified!");
-  } 
+      return res
+        .status(200)
+        .json("otp verified!");
+    }
+  } catch (err) {
+    return res.status(500).json(err)
+  }
 
   return res
     .status(401)
-    .send("invalid otp");
+    .json("invalid otp");
 }
 
-// Secret page for authentication testing, probably should be replaced with zustand authentication at some point
-const secretPage = async (req, res) => {
+// Check if a user is currently authenticated to the system
+const loginStatus = async (req, res) => {
   const token = req.cookies["JWTAuth"];
   console.log(token);
 
   if (!token) {
     return res
       .status(401)
-      .send(
+      .json(
         "Unauthorised access, please create or sign in to an existing account."
       );
   }
 
-  const verifyToken = jwt.verify(token, jwtSecret);
-
-  if (verifyToken) {
-    return res.send("Authenticated to system");
+  try {
+    const verifyToken = jwt.verify(token, jwtSecret);
+    const decodedToken = jwtDecode(token);
+    if (verifyToken) {
+      return res.status(200).json(decodedToken);
+    }
+  } catch (err){
+    return res.status(401).json("Invalid token!")
   }
-
+  
   return res
     .status(401)
-    .send(
+    .json(
       "Unauthorised access, please create or sign in to an existing account."
     );
 };
 
+// Registers user
 const registerUser = async (req, res) => {
-  // ? chore: move this to database side
-  const passwordHash = await bcrypt.hash(req.body.password, 10);
-
   try {
     const user = await User.create({
       username: req.body.username,
       email: req.body.email,
-      passwordHash: passwordHash,
+      passwordHash: req.body.password,
     });
 
     generateJWT(res, user); // Generate JWT for user and save in cookie
-    return res.status(200).send("Account created");
+    return res.status(200).json("Account created");
   } catch (err) {
-    return res.status(500).send("Internal Server Error.");
+    return res.status(500).json("Internal Server Error.");
   }
 };
 
 // TODO: make sign ins work with email too
 const loginUser = async (req, res) => {
   // Check if user exists
-  const validUser = await User.findOne({ username: req.body.usernameOrEmail });
+  const validUser = await User.findOne({ username_lower: req.body.usernameOrEmail.toLowerCase() });
   if (!validUser) {
     return res.status(401).json("Invalid credentials!");
   }
@@ -148,17 +161,18 @@ const loginUser = async (req, res) => {
     req.body.password,
     validUser.passwordHash
   );
+
   if (!validPassword) {
     return res.status(401).json("Invalid credentials!");
   }
 
   generateJWT(res, validUser); // Generate JWT for user and save in cookie
-  return res.status(200).json({username: validUser.username});
+  return res.status(200).json("Authenticated to system");
 };
 
 const logoutUser = (req, res) => {
-  res.clearCookie("JWT");
-  res.send("Logout successful");
+  res.clearCookie("JWTAuth");
+  res.json("Logout successful");
 };
 
-module.exports = { secretPage, registerUser, loginUser, logoutUser, sendOTP, verifyOTP };
+module.exports = { loginStatus, registerUser, loginUser, logoutUser, sendOTP, verifyOTP };

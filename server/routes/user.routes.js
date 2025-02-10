@@ -4,7 +4,7 @@ const multer = require("multer");
 const upload = multer();
 
 const {
-  secretPage,
+  loginStatus,
   registerUser,
   loginUser,
   logoutUser,
@@ -13,7 +13,7 @@ const {
 } = require("../controllers/user.controller");
 
 const router = express.Router();
-router.get("/secret", secretPage);
+router.get("/loginStatus", loginStatus);
 router.get("/logout", logoutUser)
 router.post("/register", upload.none(), registerUser);
 router.post("/login", loginUser);
