@@ -18,6 +18,3 @@ server/build/
 
 # Miscellaneous
 .DS_Store
-
-# views
-.server/views
