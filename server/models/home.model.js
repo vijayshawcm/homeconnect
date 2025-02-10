@@ -23,7 +23,7 @@ const homeSchema = new Schema(
         accessLevel: {
           type: String,
           enum: ["full", "limited", "guest"],
-          default: ["full"],
+          default: "full",
         },
       },
     ],
