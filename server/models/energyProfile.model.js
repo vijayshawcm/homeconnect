@@ -28,5 +28,5 @@ const energyProfileSchema = new Schema({
   },
 });
 
-const EnergyProfile = mongoose.model("EnergyProfiel", energyProfileSchema);
+const EnergyProfile = mongoose.model("EnergyProfile", energyProfileSchema);
 module.exports = EnergyProfile;
