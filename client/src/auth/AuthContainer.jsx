@@ -7,7 +7,6 @@ import {
 	CardFooter,
 } from '@/components/ui/card';
 import HomeConnectLogo from '../assets/homeconnect-logo.svg';
-import Background from '../assets/tempbg.jpg';
 import LoginForm from './components/LoginForm'; // Import LoginForm
 import RegisterForm from './components/RegisterForm'; // Import RegisterForm
 import OTPForm from './components/OTPForm'; // Import OTPForm
@@ -36,10 +35,7 @@ function AuthContainer({ mode }) {
 	};
 
 	return (
-		<div
-			className="flex items-center justify-center min-h-screen bg-cover bg-center"
-			style={{ backgroundImage: `url(${Background})` }}
-		>
+		<div className="flex items-center justify-center min-h-screen bg-cover bg-center bg-gradient-to-br from-white to-sky-100">
 			{/* HomeConnect Logo */}
 			<Link to="/">
 				<img
