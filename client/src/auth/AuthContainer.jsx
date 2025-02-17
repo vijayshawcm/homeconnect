@@ -6,7 +6,7 @@ import {
 	CardContent,
 	CardFooter,
 } from '@/components/ui/card';
-import HomeConnectLogo from '../assets/homeconnect-logo.svg';
+import HomeConnectLogo from '../assets/homeconnect-logo.png';
 import LoginForm from './components/LoginForm'; // Import LoginForm
 import RegisterForm from './components/RegisterForm'; // Import RegisterForm
 import OTPForm from './components/OTPForm'; // Import OTPForm
