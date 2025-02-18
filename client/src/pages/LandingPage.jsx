@@ -9,7 +9,7 @@ import CTASection from '@/components/landing/CTASection';
 import Footer from '@/components/landing/Footer';
 import ScrollToTop from '@/components/landing/ScrollToTop';
 
-export default function LandingPage() {
+function LandingPage() {
 	const [isScrolled, setIsScrolled] = useState(false);
 	const [showScrollTop, setShowScrollTop] = useState(false);
 
@@ -38,3 +38,5 @@ export default function LandingPage() {
 		</div>
 	);
 }
+
+export default LandingPage;
