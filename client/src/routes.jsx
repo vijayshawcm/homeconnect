@@ -19,7 +19,6 @@ function AppRoutes() {
 					path="/forgot-password"
 					element={<AuthContainer mode="forgot-password" />}
 				/>
-				<Route path="/verify" element={<AuthContainer mode="verify" />} />
 				{/* Protected Routes */}
 				<Route element={<ProtectedRoute />}>
 					<Route path="/dashboard" element={<Dashboard />} />
