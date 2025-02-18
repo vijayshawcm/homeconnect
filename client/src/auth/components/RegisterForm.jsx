@@ -6,7 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import { Eye, EyeOff } from 'lucide-react';
 import { userRegistrationStore } from '@/store/userRegistration';
 
-function RegisterForm() {
+function RegisterForm({ onRegisterSuccess }) {
 	const [username, setUsername] = useState('');
 	const [email, setEmail] = useState('');
 	const [password, setPassword] = useState('');
@@ -111,7 +111,7 @@ function RegisterForm() {
 		});
 
 		if (!response.ok) {
-			throw new Error('Invalid email entered!');
+			throw new Error('Failed to send OTP. Please try again.');
 		}
 
 		//alert('OTP sent to your email!'); otp sent animation or whatever
@@ -145,13 +145,14 @@ function RegisterForm() {
 				'Registration details entered, attempting to send OTP to user'
 			);
 			try {
-				sendOTP();
+				await sendOTP();
 				console.log('OTP sent succesfully! Redirecting to otp verification');
+				onRegisterSuccess(); // transition to otp verification step
 			} catch (err) {
-				return alert(err.message || 'Invalid email entered!');
+				setRegisterError(
+					err.message || 'Failed to send OTP. Please try again.'
+				);
 			}
-
-			navigate('/verify'); // Redirect to otp verification
 		} catch (error) {
 			setRegisterError(
 				error.message || 'An error occurred during registration'
