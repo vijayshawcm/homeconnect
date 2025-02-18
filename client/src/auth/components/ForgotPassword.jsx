@@ -74,7 +74,7 @@ function ForgotPassword({
 
 	const validatePasswordRequirements = (value) => {
 		setPasswordRequirements({
-			minLength: value.length >= 10,
+			minLength: value.length >= 8,
 			hasLetterCase: /[A-Z]/.test(value) && /[a-z]/.test(value),
 			hasNumber: /[0-9]/.test(value),
 			hasSymbol: /[!@#$%^&*(),.?":{}|<>]/.test(value),
@@ -214,7 +214,7 @@ function ForgotPassword({
 												: 'bg-gray-300'
 										}`}
 									/>
-									<span className="text-xs">At least 10 characters</span>
+									<span className="text-xs">At least 8 characters</span>
 								</div>
 								<div
 									className={`flex items-center space-x-1 ${
