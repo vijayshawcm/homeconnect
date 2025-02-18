@@ -14,14 +14,22 @@ import ForgotPassword from './components/ForgotPassword'; // Import ForgotPasswo
 import { Link, useNavigate } from 'react-router-dom';
 
 function AuthContainer({ mode }) {
+	const [hasMounted, setHasMounted] = useState(false);
 	const [currentMode, setCurrentMode] = useState(mode); // Track current mode
 	const [isTransitioning, setIsTransitioning] = useState(false); // Track transition state
 	const [isOTPVerified, setIsOTPVerified] = useState(false); // Track OTP verification status
+	const [registrationStep, setRegistrationStep] = useState(1); // Track registration step
 	const [forgotPasswordStep, setForgotPasswordStep] = useState(1); // Track forgot-password step
 	const navigate = useNavigate(); // For navigation
 
 	// Update currentMode with smooth transition
 	useEffect(() => {
+		// Prevent transition on first render, but allow after mount
+		if (!hasMounted) {
+			setCurrentMode(mode);
+			setHasMounted(true);
+			return;
+		}
 		setIsTransitioning(true); // Start transition
 		setTimeout(() => {
 			setCurrentMode(mode); // Update mode after transition
@@ -35,7 +43,7 @@ function AuthContainer({ mode }) {
 	};
 
 	return (
-		<div className="flex items-center justify-center min-h-screen bg-cover bg-center bg-gradient-to-br from-white to-sky-100">
+		<div className="flex items-center justify-center min-h-screen bg-cover bg-center bg-gradient-to-br from-white to-sky-100 px-4 sm:px-6 md:px-8">
 			{/* HomeConnect Logo */}
 			<Link to="/">
 				<img
@@ -53,7 +61,9 @@ function AuthContainer({ mode }) {
 							{currentMode === 'login'
 								? 'Welcome to HomeConnect'
 								: currentMode === 'register'
-								? 'Create an Account'
+								? registrationStep === 1
+									? 'Create an Account'
+									: 'Verify your Email'
 								: currentMode === 'forgot-password' && forgotPasswordStep === 1
 								? 'Forgot Password'
 								: currentMode === 'forgot-password' && forgotPasswordStep === 2
@@ -66,7 +76,9 @@ function AuthContainer({ mode }) {
 							{currentMode === 'login'
 								? 'Your personalized home management solution.'
 								: currentMode === 'register'
-								? 'Join us and start managing your home today.'
+								? registrationStep === 1
+									? 'Join us and start managing your home today.'
+									: 'Please enter the 6-digit code sent to your email.'
 								: currentMode === 'forgot-password' && forgotPasswordStep === 1
 								? 'Enter your email to reset your password.'
 								: currentMode === 'forgot-password' && forgotPasswordStep === 2
@@ -89,7 +101,18 @@ function AuthContainer({ mode }) {
 						{currentMode === 'login' ? (
 							<LoginForm />
 						) : currentMode === 'register' ? (
-							<RegisterForm />
+							registrationStep === 1 ? (
+								<RegisterForm
+									onRegisterSuccess={() => setRegistrationStep(2)}
+								/>
+							) : (
+								<OTPForm
+									mode="verify"
+									onVerificationSuccess={() => {
+										setIsOTPVerified(true);
+									}}
+								/>
+							)
 						) : currentMode === 'forgot-password' ? (
 							<ForgotPassword
 								onBackToLogin={handleBackToLogin}
@@ -97,49 +120,39 @@ function AuthContainer({ mode }) {
 								forgotPasswordStep={forgotPasswordStep} // Pass forgotPasswordStep
 								setForgotPasswordStep={setForgotPasswordStep} // Pass setForgotPasswordStep
 							/>
-						) : (
-							<OTPForm
-								mode={
-									currentMode === 'forgot-password'
-										? 'reset-password'
-										: 'verify'
-								}
-								onVerificationSuccess={() => {
-									setIsOTPVerified(true);
-									setForgotPasswordStep(3); // Update step to password reset
-								}}
-							/>
-						)}
+						) : null}
 					</div>
 				</CardContent>
-				{currentMode !== 'verify' && !isOTPVerified && (
-					<CardFooter className="flex flex-col space-y-2">
-						{/* Switch Between Login and Register */}
-						<div className="text-center text-xs text-gray-600">
-							{currentMode === 'login' ? (
-								<>
-									Don't have an account?{' '}
-									<Link
-										to="/register"
-										className="text-blue-500 hover:underline cursor-pointer"
-									>
-										Register here
-									</Link>
-								</>
-							) : currentMode === 'register' ? (
-								<>
-									Already have an account?{' '}
-									<Link
-										to="/login"
-										className="text-blue-500 hover:underline cursor-pointer"
-									>
-										Login here
-									</Link>
-								</>
-							) : null}
-						</div>
-					</CardFooter>
-				)}
+				{currentMode !== 'verify' &&
+					!isOTPVerified &&
+					!(currentMode === 'register' && registrationStep === 2) && (
+						<CardFooter className="flex flex-col space-y-2">
+							{/* Switch Between Login and Register */}
+							<div className="text-center text-xs text-gray-600">
+								{currentMode === 'login' ? (
+									<>
+										Don't have an account?{' '}
+										<Link
+											to="/register"
+											className="text-blue-500 hover:underline cursor-pointer"
+										>
+											Register here
+										</Link>
+									</>
+								) : currentMode === 'register' && registrationStep === 1 ? (
+									<>
+										Already have an account?{' '}
+										<Link
+											to="/login"
+											className="text-blue-500 hover:underline cursor-pointer"
+										>
+											Login here
+										</Link>
+									</>
+								) : null}
+							</div>
+						</CardFooter>
+					)}
 			</Card>
 		</div>
 	);
