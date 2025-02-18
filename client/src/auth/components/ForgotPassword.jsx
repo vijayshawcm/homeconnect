@@ -15,6 +15,7 @@ function ForgotPassword({
 }) {
 	const [email, setEmail] = useState(''); // Track email input
 	const [isLoading, setIsLoading] = useState(false); // Track loading state
+	const [isUpdatingPassword, setIsUpdatingPassword] = useState(false); // Track loading state for updating password
 	const [isOTPSent, setIsOTPSent] = useState(false); // Track if OTP has been sent
 	const [isPasswordReset, setIsPasswordReset] = useState(false); // Track if user is resetting password
 	const [error, setError] = useState(''); // Track error messages
@@ -105,6 +106,8 @@ function ForgotPassword({
 			}
 			return;
 		}
+		setIsUpdatingPassword(true); // set loading state to true
+		await new Promise((resolve) => setTimeout(resolve, 2000)); // Simulate network delay
 		try {
 			console.log('Updating password:', password);
 			// Simulate API call to update password
@@ -118,6 +121,8 @@ function ForgotPassword({
 				password:
 					error.message || 'An error occurred while updating the password.',
 			});
+		} finally {
+			setIsUpdatingPassword(false); // set loading state to false
 		}
 	};
 
@@ -304,8 +309,12 @@ function ForgotPassword({
 					</div>
 				</div>
 				{/* Submit Button */}
-				<Button type="submit" className="w-full h-10 text-sm">
-					Update Password
+				<Button
+					type="submit"
+					className="w-full h-10 text-sm"
+					disabled={isUpdatingPassword}
+				>
+					{isUpdatingPassword ? 'Updating Password...' : 'Update Password'}
 				</Button>
 			</form>
 		);

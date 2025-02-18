@@ -15,6 +15,7 @@ function RegisterForm() {
 	const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 	const [errors, setErrors] = useState({});
 	const [registerError, setRegisterError] = useState('');
+	const [isRegistering, setIsRegistering] = useState(false); // loading state
 
 	// Track focus state for input fields
 	const [isUsernameFocused, setIsUsernameFocused] = useState(false);
@@ -126,6 +127,9 @@ function RegisterForm() {
 
 		// Validate Form
 		if (!validateForm()) return;
+
+		setIsRegistering(true); // set loading state to true
+		await new Promise((resolve) => setTimeout(resolve, 2000)); // Simulate network delay
 
 		// Auth logic here
 		try {
@@ -371,8 +375,12 @@ function RegisterForm() {
 			)}
 
 			{/* Register Button */}
-			<Button type="submit" className="w-full h-9 text-sm">
-				Register
+			<Button
+				type="submit"
+				className="w-full h-9 text-sm"
+				disabled={isRegistering}
+			>
+				{isRegistering ? 'Registering...' : 'Register'}
 			</Button>
 		</form>
 	);
