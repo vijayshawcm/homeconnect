@@ -14,6 +14,7 @@ import ForgotPassword from './components/ForgotPassword'; // Import ForgotPasswo
 import { Link, useNavigate } from 'react-router-dom';
 
 function AuthContainer({ mode }) {
+	const [hasMounted, setHasMounted] = useState(false);
 	const [currentMode, setCurrentMode] = useState(mode); // Track current mode
 	const [isTransitioning, setIsTransitioning] = useState(false); // Track transition state
 	const [isOTPVerified, setIsOTPVerified] = useState(false); // Track OTP verification status
@@ -22,6 +23,12 @@ function AuthContainer({ mode }) {
 
 	// Update currentMode with smooth transition
 	useEffect(() => {
+		// Prevent transition on first render, but allow after mount
+		if (!hasMounted) {
+			setCurrentMode(mode);
+			setHasMounted(true);
+			return;
+		}
 		setIsTransitioning(true); // Start transition
 		setTimeout(() => {
 			setCurrentMode(mode); // Update mode after transition
