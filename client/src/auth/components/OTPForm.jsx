@@ -108,6 +108,7 @@ function OTPForm({ mode = 'verify', onVerificationSuccess, successMessage }) {
 
 		try {
 			setIsVerifying(true); // Show loading state
+			await new Promise((resolve) => setTimeout(resolve, 1000)); // Simulate network delay
 			console.log('Verifying OTP:', otp.join(''));
 			// OTP verification
 			const response = await fetch('server/users/verifyOTP', {
