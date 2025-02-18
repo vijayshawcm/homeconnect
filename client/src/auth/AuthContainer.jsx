@@ -42,7 +42,7 @@ function AuthContainer({ mode }) {
 	};
 
 	return (
-		<div className="flex items-center justify-center min-h-screen bg-cover bg-center bg-gradient-to-br from-white to-sky-100">
+		<div className="flex items-center justify-center min-h-screen bg-cover bg-center bg-gradient-to-br from-white to-sky-100 px-4 sm:px-6 md:px-8">
 			{/* HomeConnect Logo */}
 			<Link to="/">
 				<img
