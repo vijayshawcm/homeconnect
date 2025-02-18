@@ -15,10 +15,8 @@ function AppRoutes() {
 				{/* Public Routes */}
 				<Route path="/login" element={<AuthContainer mode="login" />} />
 				<Route path="/register" element={<AuthContainer mode="register" />} />
-				<Route
-					path="/forgot-password"
-					element={<AuthContainer mode="forgot-password" />}
-				/>
+				{/* prettier-ignore */}
+				<Route path="/forgot-password" element={<AuthContainer mode="forgot-password" />} />
 				{/* Protected Routes */}
 				<Route element={<ProtectedRoute />}>
 					<Route path="/dashboard" element={<Dashboard />} />
