@@ -145,6 +145,15 @@ const modifyPassword = async (req, res) => {
 
 // Registers user
 const registerUser = async (req, res) => {
+  /* 
+  TODO: Probably should check for this before proceeding to otp page i guess 
+  I know this is super spaghetti rn just bear with me here
+  It'll work for now
+  */
+  if(await User.findOne({ email: req.body.email }) || await User.findOne({ username: req.body.username })) {
+    return res.status(409).json("Account or Email has already been registered!") // Woah 409 code!
+  }
+
   try {
     const user = await User.create({
       username: req.body.username,
