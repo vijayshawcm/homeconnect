@@ -78,9 +78,9 @@ function ForgotPassword({
 		if (!validateEmail()) return;
 		try {
 			setIsLoading(true); // Show loading state
-			console.log('Sending password reset email to:', email);
-			sendOTP();
 			// Simulate API call
+			console.log('Sending password reset email to:', email);
+			await sendOTP();
 			await new Promise((resolve) => setTimeout(resolve, 2000)); // Simulate network delay
 			setIsOTPSent(true); // Proceed to OTP verification
 			onOTPSent(); // Notify AuthContainer about OTP sent
