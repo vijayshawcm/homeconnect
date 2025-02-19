@@ -127,20 +127,25 @@ function OTPForm({ mode = 'verify', onVerificationSuccess, successMessage }) {
 			// Step 1: Trigger green border and jumping animation simultaneously
 			setAnimateBoxes(true);
 			setTimeout(() => {
-				// Step 2: Fade out OTP fields
-				setFadeOut(true);
-				setTimeout(async () => {
-					registerUser(); // Register user if email verification is successful
-					await fetchLogin(); // Fetch user login status
-					setTimeout(() => {
-						// ! We don't question this it just works, changing this breaks everything
-						window.location.replace('/dashboard'); // Redirect to dashboard
-					}, 2000);
-					// Step 3: Show success animation
-					setVerificationSuccess(true);
+				if (mode === 'verify') {
+					// Step 2: Fade out OTP fields
+					setFadeOut(true);
+					setTimeout(async () => {
+						registerUser(); // Register user if email verification is successful
+						await fetchLogin(); // Fetch user login status
+						setTimeout(() => {
+							// ! We don't question this it just works, changing this breaks everything
+							window.location.replace('/dashboard'); // Redirect to dashboard
+						}, 2000);
+						// Step 3: Show success animation
+						setVerificationSuccess(true);
+						// Notify parent component about successful verification
+						if (onVerificationSuccess) onVerificationSuccess();
+					}, 500); // Match with fade-out animation
+				} else if (mode === 'reset-password') {
 					// Notify parent component about successful verification
 					if (onVerificationSuccess) onVerificationSuccess();
-				}, 500); // Match with fade-out animation
+				}
 			}, 500); // Match with border/jump animation
 
 			// Remove focus from all OTP inputs to clear borders

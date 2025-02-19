@@ -52,6 +52,24 @@ function ForgotPassword({
 		return true;
 	};
 
+	// Call otp mailing api
+	const sendOTP = async (e) => {
+		console.log('email submitted:', email);
+
+		// Send OTP to user
+		const response = await fetch('server/users/sendOTP', {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({ email }),
+		});
+
+		if (!response.ok) {
+			throw new Error('Failed to send OTP. Please try again.');
+		}
+
+		//alert('OTP sent to your email!'); otp sent animation or whatever
+	};
+
 	// Handle form submission (Send OTP to Email)
 	const handleSubmit = async (e) => {
 		e.preventDefault();
@@ -60,6 +78,7 @@ function ForgotPassword({
 		try {
 			setIsLoading(true); // Show loading state
 			console.log('Sending password reset email to:', email);
+			sendOTP();
 			// Simulate API call
 			await new Promise((resolve) => setTimeout(resolve, 2000)); // Simulate network delay
 			setIsOTPSent(true); // Proceed to OTP verification
