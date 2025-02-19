@@ -12,6 +12,7 @@ function ForgotPassword({
 	onOTPSent,
 	forgotPasswordStep,
 	setForgotPasswordStep,
+	onPasswordChangeSuccess,
 }) {
 	const [email, setEmail] = useState(''); // Track email input
 	const [isLoading, setIsLoading] = useState(false); // Track loading state
@@ -131,6 +132,7 @@ function ForgotPassword({
 			console.log('Updating password:', password);
 			// Simulate API call to update password
 			await new Promise((resolve) => setTimeout(resolve, 2000));
+			if (onPasswordChangeSuccess) onPasswordChangeSuccess(); // Notify parent component about successful password change
 			setPasswordChangeSuccess(true); // Show success animation
 			setTimeout(() => {
 				window.location.href = '/login'; // Redirect to login page after 2 seconds

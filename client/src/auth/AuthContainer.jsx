@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import {
 	Card,
 	CardHeader,
@@ -20,6 +20,7 @@ function AuthContainer({ mode }) {
 	const [isOTPVerified, setIsOTPVerified] = useState(false); // Track OTP verification status
 	const [registrationStep, setRegistrationStep] = useState(1); // Track registration step
 	const [forgotPasswordStep, setForgotPasswordStep] = useState(1); // Track forgot-password step
+	const [isPasswordChanged, setIsPasswordChanged] = useState(false); // Track if password has been changed successfully
 	const navigate = useNavigate(); // For navigation
 
 	// Update currentMode with smooth transition
@@ -54,7 +55,7 @@ function AuthContainer({ mode }) {
 			</Link>
 			{/* Card Container */}
 			<Card className="w-full max-w-md shadow-lg bg-white">
-				{!isOTPVerified ? (
+				{!isOTPVerified && !isPasswordChanged ? (
 					<CardHeader className="text-center">
 						{/* Conditional Rendering of Title and Subtitle */}
 						<CardTitle className="text-xl font-bold text-gray-800">
@@ -119,12 +120,14 @@ function AuthContainer({ mode }) {
 								onOTPSent={() => setForgotPasswordStep(2)} // Update step to OTP verification
 								forgotPasswordStep={forgotPasswordStep} // Pass forgotPasswordStep
 								setForgotPasswordStep={setForgotPasswordStep} // Pass setForgotPasswordStep
+								onPasswordChangeSuccess={() => setIsPasswordChanged(true)} // Render successful animation on successful password change
 							/>
 						) : null}
 					</div>
 				</CardContent>
 				{currentMode !== 'verify' &&
 					!isOTPVerified &&
+					!isPasswordChanged &&
 					!(currentMode === 'register' && registrationStep === 2) && (
 						<CardFooter className="flex flex-col space-y-2">
 							{/* Switch Between Login and Register */}
