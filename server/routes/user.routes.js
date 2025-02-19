@@ -9,7 +9,8 @@ const {
   loginUser,
   logoutUser,
   sendOTP,
-  verifyOTP
+  verifyOTP,
+  modifyPassword
 } = require("../controllers/user.controller");
 
 const router = express.Router();
@@ -19,5 +20,6 @@ router.post("/register", upload.none(), registerUser);
 router.post("/login", loginUser);
 router.post("/sendOTP", sendOTP);
 router.post("/verifyOTP", verifyOTP);
+router.post("/modifyPassword", modifyPassword);
 
 module.exports = router;
