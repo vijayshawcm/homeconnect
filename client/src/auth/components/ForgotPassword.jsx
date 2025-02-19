@@ -6,6 +6,7 @@ import OTPForm from './OTPForm'; // Import OTPForm
 import { Eye, EyeOff } from 'lucide-react'; // Eye icons for password visibility
 import Lottie from 'lottie-react'; // Import Lottie
 import successAnimation from '@/assets/lottie/success-checkmark.json'; // Import successful checkmark animation
+import { forgotPasswordStore } from '@/store/forgotPassword';
 
 function ForgotPassword({
 	onBackToLogin,
@@ -14,7 +15,7 @@ function ForgotPassword({
 	setForgotPasswordStep,
 	onPasswordChangeSuccess,
 }) {
-	const [email, setEmail] = useState(''); // Track email input
+	const { email, setEmail } = forgotPasswordStore();
 	const [isLoading, setIsLoading] = useState(false); // Track loading state
 	const [isUpdatingPassword, setIsUpdatingPassword] = useState(false); // Track loading state for updating password
 	const [isOTPSent, setIsOTPSent] = useState(false); // Track if OTP has been sent
@@ -76,6 +77,7 @@ function ForgotPassword({
 		e.preventDefault();
 		setError('');
 		if (!validateEmail()) return;
+		setEmail(email); // Update Zustand store before sending OTP
 		try {
 			setIsLoading(true); // Show loading state
 			// Simulate API call

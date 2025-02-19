@@ -6,6 +6,7 @@ import successAnimation from '@/assets/lottie/success-checkmark.json'; // Import
 import { userRegistrationStore } from '@/store/userRegistration';
 import { userAuthStore } from '@/store/userAuth';
 import { useNavigate } from 'react-router-dom';
+import { forgotPasswordStore } from '@/store/forgotPassword';
 
 function OTPForm({ mode = 'verify', onVerificationSuccess, successMessage }) {
 	const [otp, setOtp] = useState(['', '', '', '', '', '']); // Array to hold 6 digits
@@ -33,7 +34,17 @@ function OTPForm({ mode = 'verify', onVerificationSuccess, successMessage }) {
 	];
 
 	// Get user registration info from zustand store
-	const { username, email, password } = userRegistrationStore();
+	const {
+		email: registrationEmail,
+		username: registrationUsername,
+		password: registrationPassword,
+	} = userRegistrationStore();
+
+	const { email: forgotPasswordEmail } = forgotPasswordStore();
+
+	const email = mode === 'verify' ? registrationEmail : forgotPasswordEmail;
+	const username = mode === 'verify' ? registrationUsername : null; // Handle username for different modes
+	const password = mode === 'verify' ? registrationPassword : null; // Handle password for different modes
 
 	// Prepare auth store to fetch user login
 	const { fetchLogin } = userAuthStore();
@@ -157,6 +168,24 @@ function OTPForm({ mode = 'verify', onVerificationSuccess, successMessage }) {
 		}
 	};
 
+	// Call otp mailing api
+	const sendOTP = async (e) => {
+		console.log('email submitted:', email);
+
+		// Send OTP to user
+		const response = await fetch('server/users/sendOTP', {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({ email }),
+		});
+
+		if (!response.ok) {
+			throw new Error('Failed to send OTP. Please try again.');
+		}
+
+		//alert('OTP sent to your email!'); otp sent animation or whatever
+	};
+
 	// Handle Resend OTP
 	const handleResend = async (e) => {
 		e.preventDefault(); // Prevent form submission
@@ -165,7 +194,7 @@ function OTPForm({ mode = 'verify', onVerificationSuccess, successMessage }) {
 			setIsResendDisabled(true); // Disable the resend button
 			setCountdown(60); // Reset countdown
 			console.log('Resending OTP...');
-			// Replace this part with actual API call
+			await sendOTP();
 			await new Promise((resolve) => setTimeout(resolve, 2000)); // Simulate network delay
 			// alert here for debugging ye
 		} catch (error) {
