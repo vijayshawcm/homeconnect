@@ -6,14 +6,16 @@ import OTPForm from './OTPForm'; // Import OTPForm
 import { Eye, EyeOff } from 'lucide-react'; // Eye icons for password visibility
 import Lottie from 'lottie-react'; // Import Lottie
 import successAnimation from '@/assets/lottie/success-checkmark.json'; // Import successful checkmark animation
+import { forgotPasswordStore } from '@/store/forgotPassword';
 
 function ForgotPassword({
 	onBackToLogin,
 	onOTPSent,
 	forgotPasswordStep,
 	setForgotPasswordStep,
+	onPasswordChangeSuccess,
 }) {
-	const [email, setEmail] = useState(''); // Track email input
+	const { email, setEmail } = forgotPasswordStore();
 	const [isLoading, setIsLoading] = useState(false); // Track loading state
 	const [isUpdatingPassword, setIsUpdatingPassword] = useState(false); // Track loading state for updating password
 	const [isOTPSent, setIsOTPSent] = useState(false); // Track if OTP has been sent
@@ -52,15 +54,35 @@ function ForgotPassword({
 		return true;
 	};
 
+	// Call otp mailing api
+	const sendOTP = async (e) => {
+		console.log('email submitted:', email);
+
+		// Send OTP to user
+		const response = await fetch('server/users/sendOTP', {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({ email }),
+		});
+
+		if (!response.ok) {
+			throw new Error('Failed to send OTP. Please try again.');
+		}
+
+		//alert('OTP sent to your email!'); otp sent animation or whatever
+	};
+
 	// Handle form submission (Send OTP to Email)
 	const handleSubmit = async (e) => {
 		e.preventDefault();
 		setError('');
 		if (!validateEmail()) return;
+		setEmail(email); // Update Zustand store before sending OTP
 		try {
 			setIsLoading(true); // Show loading state
-			console.log('Sending password reset email to:', email);
 			// Simulate API call
+			console.log('Sending password reset email to:', email);
+			await sendOTP();
 			await new Promise((resolve) => setTimeout(resolve, 2000)); // Simulate network delay
 			setIsOTPSent(true); // Proceed to OTP verification
 			onOTPSent(); // Notify AuthContainer about OTP sent
@@ -112,6 +134,7 @@ function ForgotPassword({
 			console.log('Updating password:', password);
 			// Simulate API call to update password
 			await new Promise((resolve) => setTimeout(resolve, 2000));
+			if (onPasswordChangeSuccess) onPasswordChangeSuccess(); // Notify parent component about successful password change
 			setPasswordChangeSuccess(true); // Show success animation
 			setTimeout(() => {
 				window.location.href = '/login'; // Redirect to login page after 2 seconds

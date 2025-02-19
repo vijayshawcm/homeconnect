@@ -45,10 +45,10 @@ function HeroSection() {
 							<Link to="/login">
 								<Button
 									size="lg"
-									className="h-12 px-8 bg-white text-violet-600 hover:bg-violet-50 group"
+									className="h-12 px-8 bg-white text-violet-600 hover:bg-violet-50 group w-full"
 								>
 									Get Started
-									<ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
+									<ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform" />
 								</Button>
 							</Link>
 							<Button
