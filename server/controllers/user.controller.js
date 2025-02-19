@@ -132,6 +132,17 @@ const loginStatus = async (req, res) => {
     );
 };
 
+// Change user password
+const modifyPassword = async (req, res) => {
+  const validUser = await User.findOneAndUpdate({ email: req.body.email }, { passwordHash: req.body.password });
+
+  if(!validUser) {
+    return res.status(500).json("How did you even get past OTP verification?");
+  }
+  
+  return res.status(200).json("Password updated successfully.");
+};
+
 // Registers user
 const registerUser = async (req, res) => {
   try {
@@ -175,4 +186,4 @@ const logoutUser = (req, res) => {
   res.json("Logout successful");
 };
 
-module.exports = { loginStatus, registerUser, loginUser, logoutUser, sendOTP, verifyOTP };
+module.exports = { loginStatus, registerUser, loginUser, logoutUser, sendOTP, verifyOTP, modifyPassword };
