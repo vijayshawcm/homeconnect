@@ -21,7 +21,18 @@ const getHomes = async (req, res) => {
   } catch (error) {
     console.log("Error in fetching homes:", error.message);
     res.status(500).json({ success: false, message: "Server Error" });
-  }    
+  }
+};
+
+const getHomeById = async (req, res) => {
+  const { id } = req.params;
+  try {
+    const home = await Home.findById(id);
+    res.status(200).json({ success: true, data: home });
+  } catch (error) {
+    console.log("Error in fetching home:", error.message);
+    res.status(500).json({ success: false, message: "Server Error" });
+  }
 };
 
 const getHomesByUserId = async (req, res) => {
@@ -78,6 +89,7 @@ const addDweller = async (req, res) => {
 module.exports = {
   createHome,
   getHomes,
+  getHomeById,
   getHomesByUserId,
   addDweller,
 };

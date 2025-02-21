@@ -10,7 +10,7 @@ const roomSchema = new Schema({
   },
   type: {
     type: String,
-    enum: ["bedroom", "living_room", "kitchen", "kitchen", "bathroom", "other"],
+    enum: ["bedroom", "living_room", "kitchen", "bathroom", "other"],
     required: true,
   },
   home: {
