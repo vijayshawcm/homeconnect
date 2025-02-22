@@ -124,61 +124,61 @@ HomeConnect is a smart home management system focused on energy savings and effi
 
 ```
 homeconnect/
-├── client/                       # Frontend (React) application
-│   ├── public/                   # Static assets
-│   ├── src/                      # Source code for the React app
-│   │   ├── assets/               # Media files (images, fonts, SVG icons)
-│   │   ├── components/           # Shared UI components (buttons, cards, etc.)
-│   │   ├── features/             # Feature-based modules with self-contained logic
-│   │   │   ├── <feature1>/       # Feature module template
-│   │   │   │   ├── components/   # Feature-specific UI components
-│   │   │   │   ├── hooks/        # Feature-specific custom hooks
-│   │   │   │   ├── store/        # Feature-specific state management logic
-│   │   │   │   ├── feature1.jsx  # Main entry point/container for this feature
-│   │   │   ├── <feature2>/       # Feature module template
-│   │   │   ├── <feature3>/       # Feature module template
-│   │   ├── hooks/                # Global reusable hooks
-│   │   ├── lib/                  # Utility functions and libraries
-│   │   ├── pages/                # Page-level components
-│   │   ├── routes/               # Centralized Routing config
-│   │   ├── store/                # Global state management
-│   │   ├── styles/               # Global styles/theming
-│   │   ├── App.jsx               # Root application component
-│   │   └── main.jsx              # Application entry point
-│   ├── .env                      # Frontend environment variables
-│   ├── .gitignore                # Files to ignore in version control (frontend)
-│   ├── components.json           # ShadCN UI components config
-│   ├── eslint.config.js          # ESLint config
-│   ├── index.html                # Main HTML entry point (Vite)
-│   ├── jsconfig.json             # JavaScript path aliases config
-│   ├── package-lock.json         # Auto-generated exact dependency tree
-│   ├── package.json              # Frontend dependencies and scripts
-│   ├── postcss.config.js         # PostCSS config
-│   ├── README.md                 # Frontend-specific documentation
-│   ├── tailwind.config.js        # Tailwind CSS config
-│   └── vite.config.js            # Vite config
-├── server/                       # Backend (Node.js + Express) application
-│   ├── config/                   # Config files
-│   ├── controllers/              # API controllers
-│   ├── middleware/               # Custom middleware functions
-│   ├── models/                   # MongoDB models (Mongoose schemas)
-│   ├── routes/                   # API route definitions
-│   ├── services/                 # External service integrations
-│   ├── utils/                    # Utility functions and helpers
-│   ├── .env                      # Backend environment variables
-│   ├── app.js                    # Main Express application setup
-│   ├── package-lock.json         # Auto-generated exact dependency tree
-│   ├── package.json              # Backend dependencies and scripts
-│   └── server.js                 # Entry point for backend server
-├── config/                       # Shared config files
-├── scripts/                      # Utility scripts for deployment, testing, etc.
-├── tests/                        # Test files for both frontend and backend
-├── docs/                         # Documentation files
-├── .env                          # Root environment variables (shared)
-├── .gitignore                    # Root level git ignore file
-├── package-lock.json             # Root dependency tree
-├── package.json                  # Root dependencies and shared scripts
-└── README.md                     # Project overview and documentation
+├── client/                         # Frontend (React) application
+│   ├── public/                     # Static assets
+│   ├── src/                        # Source code for the React app
+│   │   ├── assets/                 # Media files (images, fonts, SVG icons)
+│   │   ├── components/             # Shared UI components (buttons, cards, etc.)
+│   │   ├── features/               # Feature-based modules with self-contained logic
+│   │   │   ├── <feature1>/         # Feature module template
+│   │   │   │   ├── components/     # Feature-specific UI components
+│   │   │   │   ├── hooks/          # Feature-specific custom hooks
+│   │   │   │   ├── store/          # Feature-specific state management logic
+│   │   │   │   ├── feature1.jsx    # Main entry point/container for this feature
+│   │   │   ├── <feature2>/         # Feature module template
+│   │   │   ├── <feature3>/         # Feature module template
+│   │   ├── hooks/                  # Global reusable hooks
+│   │   ├── lib/                    # Utility functions and libraries
+│   │   ├── pages/                  # Page-level components
+│   │   ├── routes/                 # Centralized Routing config
+│   │   ├── store/                  # Global state management
+│   │   ├── styles/                 # Global styles/theming
+│   │   ├── App.jsx                 # Root application component
+│   │   └── main.jsx                # Application entry point
+│   ├── .env                        # Frontend environment variables
+│   ├── .gitignore                  # Files to ignore in version control (frontend)
+│   ├── components.json             # ShadCN UI components config
+│   ├── eslint.config.js            # ESLint config
+│   ├── index.html                  # Main HTML entry point (Vite)
+│   ├── jsconfig.json               # JavaScript path aliases config
+│   ├── package-lock.json           # Auto-generated exact dependency tree
+│   ├── package.json                # Frontend dependencies and scripts
+│   ├── postcss.config.js           # PostCSS config
+│   ├── README.md                   # Frontend-specific documentation
+│   ├── tailwind.config.js          # Tailwind CSS config
+│   └── vite.config.js              # Vite config
+├── server/                         # Backend (Node.js + Express) application
+│   ├── config/                     # Config files
+│   ├── controllers/                # API controllers
+│   ├── middleware/                 # Custom middleware functions
+│   ├── models/                     # MongoDB models (Mongoose schemas)
+│   ├── routes/                     # API route definitions
+│   ├── services/                   # External service integrations
+│   ├── utils/                      # Utility functions and helpers
+│   ├── .env                        # Backend environment variables
+│   ├── app.js                      # Main Express application setup
+│   ├── package-lock.json           # Auto-generated exact dependency tree
+│   ├── package.json                # Backend dependencies and scripts
+│   └── server.js                   # Entry point for backend server
+├── config/                         # Shared config files
+├── scripts/                        # Utility scripts for deployment, testing, etc.
+├── tests/                          # Test files for both frontend and backend
+├── docs/                           # Documentation files
+├── .env                            # Root environment variables (shared)
+├── .gitignore                      # Root level git ignore file
+├── package-lock.json               # Root dependency tree
+├── package.json                    # Root dependencies and shared scripts
+└── README.md                       # Project overview and documentation
 ```
 
 ## Contributing
