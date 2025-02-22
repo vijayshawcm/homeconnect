@@ -6,11 +6,11 @@ import {
 	CardContent,
 	CardFooter,
 } from '@/components/ui/card';
-import HomeConnectLogo from '../assets/homeconnect-logo.png';
-import LoginForm from './components/LoginForm'; // Import LoginForm
-import RegisterForm from './components/RegisterForm'; // Import RegisterForm
-import OTPForm from './components/OTPForm'; // Import OTPForm
-import ForgotPassword from './components/ForgotPassword'; // Import ForgotPassword
+import HomeConnectLogo from '@/assets/homeconnect-logo.png';
+import LoginForm from '@/features/auth/components/LoginForm'; // Import LoginForm
+import RegisterForm from '@/features/auth/components/RegisterForm'; // Import RegisterForm
+import OTPForm from '@/features/auth/components/OTPForm'; // Import OTPForm
+import ForgotPassword from '@/features/auth/components/ForgotPassword'; // Import ForgotPassword
 import { Link, useNavigate } from 'react-router-dom';
 
 function AuthContainer({ mode }) {

@@ -1,10 +1,10 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import LandingPage from './pages/LandingPage';
-import AuthContainer from './auth/AuthContainer'; // Import AuthContainer
-import ProtectedRoute from './pages/auth/ProtectedRoute';
-import Dashboard from './pages/home/Dashboard';
-import NotFound from './pages/NotFound';
+import LandingPage from '@/features/landing/LandingPage';
+import AuthContainer from '@/features/auth/AuthContainer'; // Import AuthContainer
+import ProtectedRoute from '@/routes/ProtectedRoute';
+import Dashboard from '@/features/dashboard/Dashboard';
+import NotFound from '@/pages/NotFound';
 
 function AppRoutes() {
 	return (
