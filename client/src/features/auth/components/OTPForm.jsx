@@ -3,10 +3,10 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import Lottie from 'lottie-react'; // Import Lottie
 import successAnimation from '@/assets/lottie/success-checkmark.json'; // Import successful checkmark animation
-import { userRegistrationStore } from '@/store/userRegistration';
+import { userRegistrationStore } from '@/features/auth/store/userRegistration';
 import { userAuthStore } from '@/store/userAuth';
 import { useNavigate } from 'react-router-dom';
-import { forgotPasswordStore } from '@/store/forgotPassword';
+import { forgotPasswordStore } from '@/features/auth/store/forgotPassword';
 
 function OTPForm({ mode = 'verify', onVerificationSuccess, successMessage }) {
 	const [otp, setOtp] = useState(['', '', '', '', '', '']); // Array to hold 6 digits

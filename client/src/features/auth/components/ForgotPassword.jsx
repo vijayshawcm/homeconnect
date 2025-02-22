@@ -2,11 +2,11 @@ import { useState } from 'react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
-import OTPForm from './OTPForm'; // Import OTPForm
+import OTPForm from '@/features/auth/components/OTPForm'; // Import OTPForm
 import { Eye, EyeOff } from 'lucide-react'; // Eye icons for password visibility
 import Lottie from 'lottie-react'; // Import Lottie
 import successAnimation from '@/assets/lottie/success-checkmark.json'; // Import successful checkmark animation
-import { forgotPasswordStore } from '@/store/forgotPassword';
+import { forgotPasswordStore } from '@/features/auth/store/forgotPassword';
 
 function ForgotPassword({
 	onBackToLogin,

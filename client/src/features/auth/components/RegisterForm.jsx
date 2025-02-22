@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { useNavigate } from 'react-router-dom';
 import { Eye, EyeOff } from 'lucide-react';
-import { userRegistrationStore } from '@/store/userRegistration';
+import { userRegistrationStore } from '@/features/auth/store/userRegistration';
 
 function RegisterForm({ onRegisterSuccess }) {
 	const [username, setUsername] = useState('');

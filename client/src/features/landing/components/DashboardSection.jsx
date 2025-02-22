@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import DashboardGallery from './DashboardGallery';
+import DashboardGallery from '@/features/landing/components/DashboardGallery';
 
 const stats = [
 	{ value: '30%', label: 'Average Energy Savings' },
