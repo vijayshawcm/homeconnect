@@ -12,6 +12,7 @@ import RegisterForm from '@/features/auth/components/RegisterForm'; // Import Re
 import OTPForm from '@/features/auth/components/OTPForm'; // Import OTPForm
 import ForgotPassword from '@/features/auth/components/ForgotPassword'; // Import ForgotPassword
 import { Link, useNavigate } from 'react-router-dom';
+import { updatePageTitle } from '@/lib/utils';
 
 function AuthContainer({ mode }) {
 	const [hasMounted, setHasMounted] = useState(false);
@@ -42,6 +43,22 @@ function AuthContainer({ mode }) {
 	const handleBackToLogin = () => {
 		navigate('/login'); // Redirect to login page
 	};
+
+	useEffect(() => {
+		// Set title based on current mode and steps
+		if (currentMode === 'login') {
+			updatePageTitle('Login');
+		} else if (currentMode === 'register') {
+			updatePageTitle(registrationStep === 1 ? 'Register' : 'Verify Email');
+		} else if (currentMode === 'forgot-password') {
+			const titles = {
+				1: 'Forgot Password',
+				2: 'Verify Email',
+				3: 'Reset Password',
+			};
+			updatePageTitle(titles[forgotPasswordStep]);
+		}
+	}, [currentMode, registrationStep, forgotPasswordStep]);
 
 	return (
 		<div className="flex items-center justify-center min-h-screen bg-cover bg-center bg-gradient-to-br from-white to-sky-100 px-4 sm:px-6 md:px-8">

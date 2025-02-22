@@ -8,6 +8,7 @@ import DashboardSection from '@/features/landing/components/DashboardSection';
 import CTASection from '@/features/landing/components/CTASection';
 import Footer from '@/features/landing/components/Footer';
 import ScrollToTop from '@/features/landing/components/ScrollToTop';
+import { updatePageTitle } from '@/lib/utils';
 
 function LandingPage() {
 	const [isScrolled, setIsScrolled] = useState(false);
@@ -23,6 +24,10 @@ function LandingPage() {
 		return () => {
 			window.removeEventListener('scroll', handleScroll);
 		};
+	}, []);
+
+	useEffect(() => {
+		updatePageTitle(); // Use default title
 	}, []);
 
 	return (
