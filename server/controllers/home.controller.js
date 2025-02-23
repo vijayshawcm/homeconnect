@@ -1,4 +1,5 @@
-const { Home } = require("../models");
+const { Home, User } = require("../models");
+const mongoose = require("mongoose");
 
 const createHome = async (req, res) => {
   const home = req.body;
@@ -64,20 +65,38 @@ const addDweller = async (req, res) => {
         .json({ success: false, message: "Please provide all fields" });
     }
 
-    // Find the home and update it with the new dweller
-    const home = await Home.findByIdAndUpdate(
-      id,
-      {
-        $addToSet: {
-          dwellers: { user: userId },
-        },
-      },
-      { new: true }
-    ).populate("dwellers.user");
+    // Check if user exists
+    const userExists = await User.findById(userId);
+    if (!userExists) {
+      return res
+        .status(404)
+        .json({ success: false, message: "User not found" });
+    }
+
+    // Find the home
+    const home = await Home.findById(id).populate("dwellers.user");
 
     if (!home) {
-      return res.status(404).json({ message: "Home not found" });
+      return res
+        .status(404)
+        .json({ success: false, message: "Home not found" });
     }
+
+    // Check if user is already a dweller
+    const isAlreadyDweller = home.dwellers.some(
+      (dweller) => dweller.user._id.toString() === userId
+    );
+
+    if (isAlreadyDweller) {
+      return res.status(400).json({
+        success: false,
+        message: "User is already a dweller of this home",
+      });
+    }
+
+    // Add the new dweller
+    home.dwellers.push({ user: userId });
+    await home.save();
 
     res.status(200).json({ success: true, data: home });
   } catch (error) {
