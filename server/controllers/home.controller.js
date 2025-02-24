@@ -1,4 +1,5 @@
-const { Home } = require("../models");
+const { Home, User } = require("../models");
+const mongoose = require("mongoose");
 
 const createHome = async (req, res) => {
   const home = req.body;
@@ -14,25 +15,100 @@ const createHome = async (req, res) => {
   }
 };
 
-const getRooms = async (req, res) => {
+const getHomes = async (req, res) => {
+  try {
+    const homes = await Home.find({});
+    res.status(200).json({ success: true, data: homes });
+  } catch (error) {
+    console.log("Error in fetching homes:", error.message);
+    res.status(500).json({ success: false, message: "Server Error" });
+  }
+};
+
+const getHomeById = async (req, res) => {
   const { id } = req.params;
   try {
-    // Population is the process of automatically replacing the specified paths in the document with document(s) from other collection(s).
-    // https://mongoosejs.com/docs/populate.html
     const home = await Home.findById(id).populate("rooms");
-    if (!home) {
-      return res
-        .status(404)
-        .json({ success: false, message: "Home not found" });
-    }
-    return res.status(200).json({ success: true, appliances: home.rooms });
+    res.status(200).json({ success: true, data: home });
+  } catch (error) {
+    console.log("Error in fetching home:", error.message);
+    res.status(500).json({ success: false, message: "Server Error" });
+  }
+};
+
+const getHomesByUserId = async (req, res) => {
+  const { id } = req.params;
+  try {
+    const ownedHomes = await Home.find({ owner: id });
+    const dwelledHomes = await Home.find({ "dwellers.user": id });
+    res.status(200).json({
+      success: true,
+      data: {
+        ownedHomes,
+        dwelledHomes,
+      },
+    });
   } catch (error) {
     res.status(500).json({ success: false, message: "Server Error" });
     console.log(error.message);
   }
 };
 
+const addDweller = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { userId } = req.body;
+
+    if (!userId) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Please provide all fields" });
+    }
+
+    // Check if user exists
+    const userExists = await User.findById(userId);
+    if (!userExists) {
+      return res
+        .status(404)
+        .json({ success: false, message: "User not found" });
+    }
+
+    // Find the home
+    const home = await Home.findById(id).populate("dwellers.user");
+
+    if (!home) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Home not found" });
+    }
+
+    // Check if user is already a dweller
+    const isAlreadyDweller = home.dwellers.some(
+      (dweller) => dweller.user._id.toString() === userId
+    );
+
+    if (isAlreadyDweller) {
+      return res.status(400).json({
+        success: false,
+        message: "User is already a dweller of this home",
+      });
+    }
+
+    // Add the new dweller
+    home.dwellers.push({ user: userId });
+    await home.save();
+
+    res.status(200).json({ success: true, data: home });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
 module.exports = {
   createHome,
-  getRooms,
+  getHomes,
+  getHomeById,
+  getHomesByUserId,
+  addDweller,
 };

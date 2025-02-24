@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
+const EnergyProfile = require("./energyProfile.model")
 
 // Base Appliance Schema
 const applianceSchema = new Schema(
@@ -19,19 +20,9 @@ const applianceSchema = new Schema(
       ref: "Room",
       required: true,
     },
-    powerConsumption: {
-      current: {
-        type: Number,
-        default: 0,
-      },
-      dailyConsumption: {
-        type: Number,
-        default: 0,
-      },
-      monthlyConsumption: {
-        type: Number,
-        default: 0,
-      },
+    energyProfile: {
+      type: Schema.Types.ObjectId,
+      ref: "EnergyProfile",
     },
     schedules: [
       {
@@ -57,12 +48,22 @@ const applianceSchema = new Schema(
         },
       },
     ],
+    methods: {},
   },
   {
     timestamps: true,
     discriminatorKey: "applianceType",
   }
 );
+
+// Pre-save hook to auto-create an EnergyProfile if missing
+applianceSchema.pre("save", async function (next) {
+  if (!this.energyProfile) {
+    const energyProfile = await EnergyProfile.create({});
+    this.energyProfile = energyProfile._id;
+  }
+  next();
+});
 
 // Create the base model
 const ApplianceModel = mongoose.model("Appliance", applianceSchema);

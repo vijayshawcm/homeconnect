@@ -8,16 +8,16 @@ require("dotenv").config();
 
 // Set up email transport
 const transporter = nodemailer.createTransport({
-  service: 'gmail',
+  service: "gmail",
   auth: {
-      user: "homeconnect.hwu@gmail.com",
-      pass: process.env.EMAIL_PASSWORD
-  }
+    user: "homeconnect.hwu@gmail.com",
+    pass: process.env.EMAIL_PASSWORD,
+  },
 });
 
 // Function to generate random integer
 function randInt(min, max) {
-  return Math.floor(Math.random() * (max-min) + min);
+  return Math.floor(Math.random() * (max - min) + min);
 }
 
 // JSON Web Token functions
@@ -39,7 +39,7 @@ async function generateJWT(res, user) {
 
 // Send OTP to provided email
 const sendOTP = async (req, res) => {
-  var otp = randInt(100000,999999);
+  var otp = randInt(100000, 999999);
   console.log("New OTP generated: " + otp);
 
   // Set up mail information
@@ -52,15 +52,13 @@ const sendOTP = async (req, res) => {
     to: req.body.email,
     subject: "HomeConnect Email Verification",
     text: "Your HomeConnect verification code is: " + otp,
-  }
+  };
 
   // Send mail
   transporter.sendMail(mailOptions, (error, info) => {
     if (error) {
       console.error("Error sending email: ", error);
-      return res
-      .status(500)
-      .json(err);
+      return res.status(500).json(err);
     } else {
       console.log("Email sent: ", info.response);
     }
@@ -72,35 +70,26 @@ const sendOTP = async (req, res) => {
   res.cookie("OTP", otpHash, { maxAge: 300000, httpOnly: true });
   console.log("new otp stored in cookie");
 
-  return res
-  .status(200)
-  .json("otp sent!");
-}
+  return res.status(200).json("otp sent!");
+};
 
 // Verify OTP
 const verifyOTP = async (req, res) => {
   try {
-     const validOTP = await bcrypt.compare(
-      req.body.OTP,
-      req.cookies["OTP"],
-    )
+    const validOTP = await bcrypt.compare(req.body.OTP, req.cookies["OTP"]);
 
-    if(validOTP) {
-      res.clearCookie("OTP")
+    if (validOTP) {
+      res.clearCookie("OTP");
       console.log("otp gone");
 
-      return res
-        .status(200)
-        .json("otp verified!");
+      return res.status(200).json("otp verified!");
     }
   } catch (err) {
-    return res.status(500).json(err)
+    return res.status(500).json(err);
   }
 
-  return res
-    .status(401)
-    .json("invalid otp");
-}
+  return res.status(401).json("invalid otp");
+};
 
 // Check if a user is currently authenticated to the system
 const loginStatus = async (req, res) => {
@@ -121,10 +110,10 @@ const loginStatus = async (req, res) => {
     if (verifyToken) {
       return res.status(200).json(decodedToken);
     }
-  } catch (err){
-    return res.status(401).json("Invalid token!")
+  } catch (err) {
+    return res.status(401).json("Invalid token!");
   }
-  
+
   return res
     .status(401)
     .json(
@@ -171,7 +160,9 @@ const registerUser = async (req, res) => {
 // TODO: make sign ins work with email too
 const loginUser = async (req, res) => {
   // Check if user exists
-  const validUser = await User.findOne({ username_lower: req.body.usernameOrEmail.toLowerCase() });
+  const validUser = await User.findOne({
+    username_lower: req.body.usernameOrEmail.toLowerCase(),
+  });
   if (!validUser) {
     return res.status(401).json("Invalid credentials!");
   }

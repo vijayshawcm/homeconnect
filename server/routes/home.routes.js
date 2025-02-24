@@ -1,9 +1,18 @@
 const express = require("express");
 
-const { createHome, getRooms } = require("../controllers/home.controller");
+const {
+  createHome,
+  getHomes,
+  getHomeById,
+  getHomesByUserId,
+  addDweller,
+} = require("../controllers/home.controller");
 
 const router = express.Router();
 router.post("/", createHome);
-router.get("/:id", getRooms);
+router.get("/", getHomes);
+router.get("/:id", getHomeById);
+router.get("/forUser/:id", getHomesByUserId);
+router.patch("/:id", addDweller);
 
 module.exports = router;

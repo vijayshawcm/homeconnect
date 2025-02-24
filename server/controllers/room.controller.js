@@ -33,22 +33,38 @@ const createRoom = async (req, res) => {
   }
 };
 
-const getAppliances = async (req, res) => {
+const getRoomsByHome = async (req, res) => {
   const { id } = req.params;
   try {
     // Population is the process of automatically replacing the specified paths in the document with document(s) from other collection(s).
     // https://mongoosejs.com/docs/populate.html
-    const room = await Room.findById(id).populate("appliances");
-    if (!room) {
+    const home = await Home.findById(id).populate("rooms");
+    if (!home) {
       return res
         .status(404)
         .json({ success: false, message: "Home not found" });
     }
-    return res.status(200).json({ success: true, appliances: room.appliances });
+    return res.status(200).json({ success: true, appliances: home.rooms });
   } catch (error) {
     res.status(500).json({ success: false, message: "Server Error" });
     console.log(error.message);
   }
 };
 
-module.exports = { createRoom, getAppliances };
+const deleteRoom = async (req, res) => {
+  const { id } = req.params;
+  try {
+    const room = await Room.findByIdAndDelete(id);
+    if (!room) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Room not found" });
+    }
+    res.status(200).json({ success: true, message: "Room Deleted" });
+  } catch (error) {
+    res.status(500).json({ success: false, message: "Server Error" });
+    console.log(error.message);
+  }
+};
+
+module.exports = { createRoom, getRoomsByHome, deleteRoom };

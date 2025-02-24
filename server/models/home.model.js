@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
+const EnergyProfile = require("./energyProfile.model");
 
 const homeSchema = new Schema(
   {
@@ -22,7 +23,7 @@ const homeSchema = new Schema(
         accessLevel: {
           type: String,
           enum: ["full", "limited", "guest"],
-          default: ["full"],
+          default: "full",
         },
       },
     ],
@@ -33,29 +34,23 @@ const homeSchema = new Schema(
       },
     ],
     energyProfile: {
-      totalConsumption: {
-        type: Number,
-        default: 0,
-      },
-      monthlyConsumption: {
-        type: Number,
-        default: 0,
-      },
-      // Just in case for international users
-      currency: {
-        type: String,
-        default: "RM",
-      },
-      lastBillAmount: {
-        type: Number,
-        default: 0,
-      },
+      type: Schema.Types.ObjectId,
+      ref: "EnergyProfile",
     },
   },
   {
     timestamps: true,
   }
 );
+
+// Pre-save hook to auto-create an EnergyProfile if missing
+homeSchema.pre("save", async function (next) {
+  if (!this.energyProfile) {
+    const energyProfile = await EnergyProfile.create({});
+    this.energyProfile = energyProfile._id;
+  }
+  next();
+});
 
 const homeModel = mongoose.model("Home", homeSchema);
 module.exports = homeModel;
