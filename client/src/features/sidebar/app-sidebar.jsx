@@ -12,8 +12,8 @@ import {
   CookingPot,
 } from "lucide-react";
 
-import { NavMain } from "@/components/nav-main";
-import { HomeSwitcher } from "@/components/home-switcher";
+import { NavMain } from "@/features/sidebar/nav-main";
+import { HomeSwitcher } from "@/features/sidebar/home-switcher";
 import {
   Sidebar,
   SidebarContent,

@@ -16,8 +16,8 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
-import HomeLogo from "../assets/homeconnect-logo-icon.svg";
-import HomeText from "../assets/homeconnect-logo-text.svg";
+import HomeLogo from "../../assets/homeconnect-logo-icon.svg";
+import HomeText from "../../assets/homeconnect-logo-text.svg";
 import { useHomeStore } from "@/store/home";
 
 export function HomeSwitcher() {

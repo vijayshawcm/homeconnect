@@ -1,5 +1,5 @@
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
-import sampleAvatar from "../../assets/sampleAvatar.png";
+import sampleAvatar from "../../../assets/sampleAvatar.png";
 import {
   DropdownMenu,
   DropdownMenuContent,

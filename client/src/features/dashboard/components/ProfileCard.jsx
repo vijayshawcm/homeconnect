@@ -1,6 +1,6 @@
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { Card } from "@/components/ui/card";
-import sampleAvatar from "../../assets/sampleAvatar.png";
+import sampleAvatar from "../../../assets/sampleAvatar.png";
 
 const ProfileCard = () => {
   return (
