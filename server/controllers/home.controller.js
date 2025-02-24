@@ -28,7 +28,7 @@ const getHomes = async (req, res) => {
 const getHomeById = async (req, res) => {
   const { id } = req.params;
   try {
-    const home = await Home.findById(id);
+    const home = await Home.findById(id).populate("rooms");
     res.status(200).json({ success: true, data: home });
   } catch (error) {
     console.log("Error in fetching home:", error.message);
