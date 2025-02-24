@@ -1,8 +1,13 @@
-import React from 'react';
+import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
+import { updatePageTitle } from '@/lib/utils';
 
 function NotFound() {
+	useEffect(() => {
+		updatePageTitle('Page Not Found');
+	}, []);
+
 	return (
 		<div className="flex items-center justify-center min-h-screen bg-gray-100">
 			<div className="text-center">

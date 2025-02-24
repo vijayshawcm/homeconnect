@@ -1,12 +1,12 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { Eye, EyeOff } from 'lucide-react';
-import { userRegistrationStore } from '@/store/userRegistration';
+import { userRegistrationStore } from '@/features/auth/store/userRegistration';
 
-function RegisterForm() {
+function RegisterForm({ onRegisterSuccess }) {
 	const [username, setUsername] = useState('');
 	const [email, setEmail] = useState('');
 	const [password, setPassword] = useState('');
@@ -15,12 +15,22 @@ function RegisterForm() {
 	const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 	const [errors, setErrors] = useState({});
 	const [registerError, setRegisterError] = useState('');
+	const [isRegistering, setIsRegistering] = useState(false); // loading state
 
 	// Track focus state for input fields
 	const [isUsernameFocused, setIsUsernameFocused] = useState(false);
 	const [isEmailFocused, setIsEmailFocused] = useState(false);
 	const [isPasswordFocused, setIsPasswordFocused] = useState(false);
-	const [isConfirmPasswordFocused, setIsConfirmPasswordFocused] = useState(false);
+	const [isConfirmPasswordFocused, setIsConfirmPasswordFocused] =
+		useState(false);
+
+	// Password Requirements State
+	const [passwordRequirements, setPasswordRequirements] = useState({
+		minLength: false,
+		hasLetterCase: false, // Combined uppercase and lowercase
+		hasNumber: false,
+		hasSymbol: false,
+	});
 
 	// Setup redirect
 	const navigate = useNavigate();
@@ -57,12 +67,12 @@ function RegisterForm() {
 		// Validate Password
 		if (!password) {
 			newErrors.password = 'Password is required';
-			setErrors(newErrors); // Update errors state
-			return false; // Stop further validation
-		} else if (password.length < 6) {
-			newErrors.password = 'Password must be at least 6 characters long';
-			setErrors(newErrors); // Update errors state
-			return false; // Stop further validation
+			setErrors(newErrors);
+			return false;
+		} else if (!Object.values(passwordRequirements).every(Boolean)) {
+			newErrors.password = 'Password does not meet all requirements';
+			setErrors(newErrors);
+			return false;
 		}
 
 		// Validate Confirm Password
@@ -80,10 +90,19 @@ function RegisterForm() {
 		return Object.keys(newErrors).length === 0; // Return true if no errors
 	};
 
+	const validatePasswordRequirements = (value) => {
+		setPasswordRequirements({
+			minLength: value.length >= 8,
+			hasLetterCase: /[A-Z]/.test(value) && /[a-z]/.test(value),
+			hasNumber: /[0-9]/.test(value),
+			hasSymbol: /[!@#$%^&*(),.?":{}|<>]/.test(value),
+		});
+	};
+
 	// Call otp mailing api
-	const sendOTP = async (e) =>{
+	const sendOTP = async (e) => {
 		console.log('email submitted:', email);
-		
+
 		// Send OTP to user
 		const response = await fetch('server/users/sendOTP', {
 			method: 'POST',
@@ -91,12 +110,12 @@ function RegisterForm() {
 			body: JSON.stringify({ email }),
 		});
 
-		if(!response.ok) {
-			throw new Error('Invalid email entered!');
+		if (!response.ok) {
+			throw new Error('Failed to send OTP. Please try again.');
 		}
 
 		//alert('OTP sent to your email!'); otp sent animation or whatever
-	}
+	};
 
 	// Handle Registration
 	const handleRegister = async (e) => {
@@ -109,6 +128,9 @@ function RegisterForm() {
 		// Validate Form
 		if (!validateForm()) return;
 
+		setIsRegistering(true); // set loading state to true
+		await new Promise((resolve) => setTimeout(resolve, 2000)); // Simulate network delay
+
 		// Auth logic here
 		try {
 			console.log('Registering with:', { username, email, password });
@@ -119,16 +141,18 @@ function RegisterForm() {
 			setPasswordStore(password);
 
 			// Send otp and redirect user after valid details entered
-			console.log('Registration details entered, attempting to send OTP to user');
+			console.log(
+				'Registration details entered, attempting to send OTP to user'
+			);
 			try {
-				sendOTP();
-				console.log('OTP sent succesfully! Redirecting to otp verification')
+				await sendOTP();
+				console.log('OTP sent succesfully! Redirecting to otp verification');
+				onRegisterSuccess(); // transition to otp verification step
 			} catch (err) {
-				return alert(err.message || 'Invalid email entered!');
+				setRegisterError(
+					err.message || 'Failed to send OTP. Please try again.'
+				);
 			}
-
-			navigate('/verify'); // Redirect to otp verification
-
 		} catch (error) {
 			setRegisterError(
 				error.message || 'An error occurred during registration'
@@ -210,7 +234,10 @@ function RegisterForm() {
 						id="password"
 						type={showPassword ? 'text' : 'password'}
 						value={password}
-						onChange={(e) => setPassword(e.target.value)}
+						onChange={(e) => {
+							setPassword(e.target.value);
+							validatePasswordRequirements(e.target.value);
+						}}
 						onFocus={() => setIsPasswordFocused(true)}
 						onBlur={() => setIsPasswordFocused(false)}
 						required
@@ -227,6 +254,81 @@ function RegisterForm() {
 						{showPassword ? <Eye size={16} /> : <EyeOff size={16} />}
 					</button>
 				</div>
+				{password && (
+					<div className="!mt-2 space-y-2">
+						<p className="text-xs text-gray-600">
+							Your password should contain:
+						</p>
+						<div className="space-y-1.5">
+							<div
+								className={`flex items-center space-x-1 ${
+									passwordRequirements.minLength
+										? 'text-green-500'
+										: 'text-gray-500'
+								}`}
+							>
+								<div
+									className={`h-1.5 w-1.5 rounded-full ${
+										passwordRequirements.minLength
+											? 'bg-green-500'
+											: 'bg-gray-300'
+									}`}
+								/>
+								<span className="text-xs">At least 8 characters</span>
+							</div>
+							<div
+								className={`flex items-center space-x-1 ${
+									passwordRequirements.hasLetterCase
+										? 'text-green-500'
+										: 'text-gray-500'
+								}`}
+							>
+								<div
+									className={`h-1.5 w-1.5 rounded-full ${
+										passwordRequirements.hasLetterCase
+											? 'bg-green-500'
+											: 'bg-gray-300'
+									}`}
+								/>
+								<span className="text-xs">
+									One uppercase and lowercase character
+								</span>
+							</div>
+							<div
+								className={`flex items-center space-x-1 ${
+									passwordRequirements.hasNumber
+										? 'text-green-500'
+										: 'text-gray-500'
+								}`}
+							>
+								<div
+									className={`h-1.5 w-1.5 rounded-full ${
+										passwordRequirements.hasNumber
+											? 'bg-green-500'
+											: 'bg-gray-300'
+									}`}
+								/>
+								<span className="text-xs">One digit</span>
+							</div>
+							<div
+								className={`flex items-center space-x-1 ${
+									passwordRequirements.hasSymbol
+										? 'text-green-500'
+										: 'text-gray-500'
+								}`}
+							>
+								<div
+									className={`h-1.5 w-1.5 rounded-full ${
+										passwordRequirements.hasSymbol
+											? 'bg-green-500'
+											: 'bg-gray-300'
+									}`}
+								/>
+								<span className="text-xs">One symbol</span>
+							</div>
+						</div>
+					</div>
+				)}
 			</div>
 
 			{/* Confirm Password Field */}
@@ -274,8 +376,12 @@ function RegisterForm() {
 			)}
 
 			{/* Register Button */}
-			<Button type="submit" className="w-full h-9 text-sm">
-				Register
+			<Button
+				type="submit"
+				className="w-full h-9 text-sm"
+				disabled={isRegistering}
+			>
+				{isRegistering ? 'Registering...' : 'Register'}
 			</Button>
 		</form>
 	);

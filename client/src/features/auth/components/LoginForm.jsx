@@ -5,7 +5,7 @@ import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Link, useNavigate } from 'react-router-dom'; // Import Link for navigation
 import { Eye, EyeOff } from 'lucide-react'; // Eye icons for password visibility
-import { userAuthStore } from "@/store/userAuth";
+import { userAuthStore } from '@/store/userAuth';
 
 function LoginForm() {
 	const [usernameOrEmail, setUsernameOrEmail] = useState('');
@@ -14,6 +14,7 @@ function LoginForm() {
 	const [rememberMe, setRememberMe] = useState(false);
 	const [errors, setErrors] = useState({ usernameOrEmail: '', password: '' });
 	const [loginError, setLoginError] = useState('');
+	const [isLogging, setIsLogging] = useState(false); // loading state
 
 	// Track focus state for input fields
 	const [isUsernameFocused, setIsUsernameFocused] = useState(false);
@@ -23,9 +24,7 @@ function LoginForm() {
 	const navigate = useNavigate();
 
 	// Setup zustand auth store
-	const {
-		fetchLogin,
-	} = userAuthStore();
+	const { fetchLogin } = userAuthStore();
 
 	// Form Validation
 	const validateForm = () => {
@@ -58,6 +57,9 @@ function LoginForm() {
 
 		// Validate Form
 		if (!validateForm()) return;
+
+		setIsLogging(true); // set loading state to true
+		await new Promise((resolve) => setTimeout(resolve, 2000)); // Simulate network delay
 
 		// Auth logic
 		try {
@@ -94,6 +96,8 @@ function LoginForm() {
 			await navigate('/dashboard');
 		} catch (error) {
 			setLoginError(error.message || 'An error occurred during login');
+		} finally {
+			setIsLogging(false); // set loading state to false
 		}
 	};
 
@@ -189,8 +193,8 @@ function LoginForm() {
 			)}
 
 			{/* Login Button */}
-			<Button type="submit" className="w-full h-9 text-sm">
-				Login
+			<Button type="submit" className="w-full h-9 text-sm" disabled={isLogging}>
+				{isLogging ? 'Logging in...' : 'Login'}
 			</Button>
 		</form>
 	);

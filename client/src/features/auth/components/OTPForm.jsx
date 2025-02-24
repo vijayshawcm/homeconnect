@@ -1,11 +1,12 @@
-import React, { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import Lottie from 'lottie-react'; // Import Lottie
 import successAnimation from '@/assets/lottie/success-checkmark.json'; // Import successful checkmark animation
-import { userRegistrationStore } from '@/store/userRegistration';
-import { userAuthStore } from "@/store/userAuth";
+import { userRegistrationStore } from '@/features/auth/store/userRegistration';
+import { userAuthStore } from '@/store/userAuth';
 import { useNavigate } from 'react-router-dom';
+import { forgotPasswordStore } from '@/features/auth/store/forgotPassword';
 
 function OTPForm({ mode = 'verify', onVerificationSuccess, successMessage }) {
 	const [otp, setOtp] = useState(['', '', '', '', '', '']); // Array to hold 6 digits
@@ -16,6 +17,8 @@ function OTPForm({ mode = 'verify', onVerificationSuccess, successMessage }) {
 	const [shake, setShake] = useState(false); // Track shake animation
 	const [fadeOut, setFadeOut] = useState(false); // Track fade-out animation
 	const [animateBoxes, setAnimateBoxes] = useState(false); // Track simultaneous animations (green border + jump)
+	const [countdown, setCountdown] = useState(60);
+	const [isResendDisabled, setIsResendDisabled] = useState(false);
 
 	// Setup redirect
 	const navigate = useNavigate();
@@ -32,15 +35,19 @@ function OTPForm({ mode = 'verify', onVerificationSuccess, successMessage }) {
 
 	// Get user registration info from zustand store
 	const {
-		username,
-		email,
-		password
+		email: registrationEmail,
+		username: registrationUsername,
+		password: registrationPassword,
 	} = userRegistrationStore();
 
+	const { email: forgotPasswordEmail } = forgotPasswordStore();
+
+	const email = mode === 'verify' ? registrationEmail : forgotPasswordEmail;
+	const username = mode === 'verify' ? registrationUsername : null; // Handle username for different modes
+	const password = mode === 'verify' ? registrationPassword : null; // Handle password for different modes
+
 	// Prepare auth store to fetch user login
-	const {
-		fetchLogin,
-	} = userAuthStore();
+	const { fetchLogin } = userAuthStore();
 
 	// Handle OTP input change
 	const handleInputChange = (index, value) => {
@@ -86,19 +93,21 @@ function OTPForm({ mode = 'verify', onVerificationSuccess, successMessage }) {
 
 	// User registration
 	const registerUser = async (e) => {
-		console.log("registering user: " + username + "\n" + email + "\n" + password)
+		console.log(
+			'registering user: ' + username + '\n' + email + '\n' + password
+		);
 		const response = await fetch('server/users/register', {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({ username, email, password }),
 		});
 
-		if(!response.ok) {
+		if (!response.ok) {
 			throw new Error('Invalid user details entered!');
 		}
 
 		// alert('Account succesfully registered!');
-	}
+	};
 
 	// Handle OTP Verification
 	const handleVerify = async (e) => {
@@ -110,6 +119,7 @@ function OTPForm({ mode = 'verify', onVerificationSuccess, successMessage }) {
 
 		try {
 			setIsVerifying(true); // Show loading state
+			await new Promise((resolve) => setTimeout(resolve, 1000)); // Simulate network delay
 			console.log('Verifying OTP:', otp.join(''));
 			// OTP verification
 			const response = await fetch('server/users/verifyOTP', {
@@ -119,31 +129,34 @@ function OTPForm({ mode = 'verify', onVerificationSuccess, successMessage }) {
 			});
 
 			// Logic for incorrect OTP
-			if(!response.ok) {
+			if (!response.ok) {
 				setShake(true); // Trigger shake animation
 				setTimeout(() => setShake(false), 500); // Reset shake after animation
 				throw new Error('Incorrect OTP');
 			}
 
-			
-
 			// Step 1: Trigger green border and jumping animation simultaneously
 			setAnimateBoxes(true);
 			setTimeout(() => {
-				// Step 2: Fade out OTP fields
-				setFadeOut(true);
-				setTimeout(async () => {
-					registerUser(); // Register user if email verification is successful
-					await fetchLogin() // Fetch user login status
-					setTimeout(() => {
-						// ! We don't question this it just works, changing this breaks everything
-						window.location.replace('/dashboard'); // Redirect to dashboard
-					}, 2000);
-					// Step 3: Show success animation
-					setVerificationSuccess(true);
+				if (mode === 'verify') {
+					// Step 2: Fade out OTP fields
+					setFadeOut(true);
+					setTimeout(async () => {
+						registerUser(); // Register user if email verification is successful
+						await fetchLogin(); // Fetch user login status
+						setTimeout(() => {
+							// ! We don't question this it just works, changing this breaks everything
+							window.location.replace('/dashboard'); // Redirect to dashboard
+						}, 2000);
+						// Step 3: Show success animation
+						setVerificationSuccess(true);
+						// Notify parent component about successful verification
+						if (onVerificationSuccess) onVerificationSuccess();
+					}, 500); // Match with fade-out animation
+				} else if (mode === 'reset-password') {
 					// Notify parent component about successful verification
 					if (onVerificationSuccess) onVerificationSuccess();
-				}, 500); // Match with fade-out animation
+				}
 			}, 500); // Match with border/jump animation
 
 			// Remove focus from all OTP inputs to clear borders
@@ -155,21 +168,54 @@ function OTPForm({ mode = 'verify', onVerificationSuccess, successMessage }) {
 		}
 	};
 
+	// Call otp mailing api
+	const sendOTP = async (e) => {
+		console.log('email submitted:', email);
+
+		// Send OTP to user
+		const response = await fetch('server/users/sendOTP', {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({ email }),
+		});
+
+		if (!response.ok) {
+			throw new Error('Failed to send OTP. Please try again.');
+		}
+
+		//alert('OTP sent to your email!'); otp sent animation or whatever
+	};
+
 	// Handle Resend OTP
 	const handleResend = async (e) => {
 		e.preventDefault(); // Prevent form submission
 		try {
 			setIsResending(true); // Show loading state
+			setIsResendDisabled(true); // Disable the resend button
+			setCountdown(60); // Reset countdown
 			console.log('Resending OTP...');
-			// Replace this part with actual API call
+			await sendOTP();
 			await new Promise((resolve) => setTimeout(resolve, 2000)); // Simulate network delay
-			alert('A new OTP has been sent to your email.'); // Notify the user
+			// alert here for debugging ye
 		} catch (error) {
-			alert(error.message || 'An error occurred while resending the OTP.');
+			console.error('An error occurred while resending the OTP:', error);
 		} finally {
 			setIsResending(false); // Hide loading state
 		}
 	};
+
+	useEffect(() => {
+		let timer;
+		if (isResendDisabled && countdown > 0) {
+			timer = setInterval(() => {
+				setCountdown((prevCountdown) => prevCountdown - 1);
+			}, 1000);
+		} else if (countdown === 0) {
+			setIsResendDisabled(false);
+			setCountdown(60);
+		}
+		return () => clearInterval(timer);
+	}, [isResendDisabled, countdown]);
 
 	// Render Success Animation
 	if (verificationSuccess) {
@@ -185,12 +231,6 @@ function OTPForm({ mode = 'verify', onVerificationSuccess, successMessage }) {
 				<p className="text-gray-600">
 					{successMessage || 'Your account has been verified.'}
 				</p>
-				<Button
-					onClick={() => (window.location.href = '/login')}
-					className="w-full h-10 text-sm"
-				>
-					Go to Login
-				</Button>
 			</div>
 		);
 	}
@@ -242,13 +282,19 @@ function OTPForm({ mode = 'verify', onVerificationSuccess, successMessage }) {
 			{/* Resend Code Link */}
 			<div className="text-center text-xs text-gray-600">
 				Didn't receive the code?{' '}
-				<button
-					onClick={(e) => handleResend(e)} // Pass event object
-					disabled={isResending}
-					className="text-blue-500 hover:underline cursor-pointer"
-				>
-					{isResending ? 'Resending...' : 'Resend'}
-				</button>
+				{isResending ? (
+					<span className="text-gray-400">Resending...</span>
+				) : isResendDisabled ? (
+					<span className="text-gray-400">Resend in {countdown}s</span>
+				) : (
+					<button
+						onClick={(e) => handleResend(e)}
+						disabled={isResendDisabled}
+						className="text-blue-500 hover:underline cursor-pointer"
+					>
+						Resend
+					</button>
+				)}
 			</div>
 		</form>
 	);
