@@ -1,11 +1,26 @@
-import { Avatar, AvatarImage } from "@radix-ui/react-avatar";
+import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import sampleAvatar from "../../assets/sampleAvatar.png";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 const HeaderAvatar = () => {
   return (
-    <Avatar className="aspect-square w-14">
-      <AvatarImage src={sampleAvatar}></AvatarImage>
-    </Avatar>
+    <DropdownMenu>
+      <DropdownMenuTrigger>
+        <Avatar>
+          <AvatarImage src={sampleAvatar}></AvatarImage>
+        </Avatar>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent>
+        <DropdownMenuLabel>My Account</DropdownMenuLabel>
+        <DropdownMenuSeparator/>
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 };
 

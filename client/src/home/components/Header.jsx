@@ -1,12 +1,10 @@
 import { SidebarTrigger } from "@/components/ui/sidebar";
-import CustomSideBarTrigger from "./CustomSideBarTrigger";
 import { HeaderInput } from "./HeaderInput";
-import { Avatar } from "@/components/ui/avatar";
 import HeaderAvatar from "./HeaderAvatar";
 
 const Header = () => {
   return (
-    <div className="flex p-6 justify-between bg-[#FFFFFF]">
+    <div className="flex py-6 px-4 justify-between bg-[#FFFFFF]">
       <div className="flex items-center gap-2">
         <SidebarTrigger />
         <h1 className="text-3xl font-bold">Dashboard</h1>
