@@ -1,4 +1,4 @@
-import { AppSidebar } from "@/components/app-sidebar";
+import { AppSidebar } from "@/features/sidebar/app-sidebar";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import Header from "./components/Header";
 import DashboardCarousel from "./components/DashboardCarousel";
