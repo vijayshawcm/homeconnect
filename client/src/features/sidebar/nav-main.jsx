@@ -22,7 +22,6 @@ import {
 } from "@/components/ui/collapsible";
 import {
   SidebarGroup,
-  SidebarGroupLabel,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
@@ -43,7 +42,7 @@ import {
 
 import { useSidebar } from "@/components/ui/sidebar";
 import { useHomeStore } from "@/store/home";
-import { useEffect } from "react";
+import { Link } from "react-router-dom";
 
 const buttonClass = "text-xl font-light h-12 transition-all duration-500";
 
@@ -61,7 +60,7 @@ export function NavMain({ items }) {
   const { ownedHomes, dwelledHomes } = homes;
 
   return (
-    <SidebarGroup className="font-['Inter'] gap-4">
+    <SidebarGroup className="gap-4">
       <SidebarMenu>
         <SidebarMenuItem>
           <DropdownMenu>
@@ -71,7 +70,7 @@ export function NavMain({ items }) {
                 className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground h-16 transition-all duration-500"
               >
                 <div className="grid flex-1 text-left text-sm leading-tight">
-                  <span className="truncate font-normal text-2xl font-['Inter']">
+                  <span className="truncate font-normal text-2xl">
                     {currentHome ? currentHome.name : "Select a Home"}
                   </span>
                 </div>
@@ -99,6 +98,15 @@ export function NavMain({ items }) {
                   Switch Homes
                 </DropdownMenuLabel>
                 {ownedHomes.map((home) => (
+                  <DropdownMenuItem
+                    key={home._id}
+                    className="gap-2 p-2"
+                    onClick={() => setCurrentHome(home._id)}
+                  >
+                    {home.name}
+                  </DropdownMenuItem>
+                ))}
+                {dwelledHomes.map((home) => (
                   <DropdownMenuItem
                     key={home._id}
                     className="gap-2 p-2"
@@ -138,18 +146,21 @@ export function NavMain({ items }) {
                       const IconComponent = roomTypeIcons[subItem.type] || Home;
                       return (
                         <SidebarMenuSubItem key={subItem.title}>
-                          <SidebarMenuSubButton
-                            className="navRooms transition-all duration-500 h-9"
-                            style={{ "--delay": `${index * 0.2}s` }}
-                          >
-                            <a
-                              href={subItem.url}
-                              className="flex items-center gap-3"
+                          <Link>
+                            <SidebarMenuSubButton
+                              className="navRooms transition-all duration-500 h-9 select-none"
+                              style={{ "--delay": `${index * 0.2}s` }}
+                              key={subItem.name}
                             >
-                              <IconComponent />
-                              <span>{subItem.name}</span>
-                            </a>
-                          </SidebarMenuSubButton>
+                              <a
+                                href={subItem.url}
+                                className="flex items-center gap-3"
+                              >
+                                <IconComponent />
+                                <span>{subItem.name}</span>
+                              </a>
+                            </SidebarMenuSubButton>
+                          </Link>
                         </SidebarMenuSubItem>
                       );
                     })}

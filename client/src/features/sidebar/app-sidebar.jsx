@@ -20,34 +20,13 @@ import {
   SidebarHeader,
   SidebarRail,
 } from "@/components/ui/sidebar";
-import { useHomeStore } from "@/store/home";
+import { useHomeStore } from "../../store/home";
 import { useEffect, useState } from "react";
 import { userAuthStore } from "@/store/userAuth";
 
 export function AppSidebar({ ...props }) {
   const { homes, currentHome, fetchHomeByUserId, setCurrentHome } =
     useHomeStore();
-
-  const { user, isAuthenticated } = userAuthStore();
-
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    async function fetchData() {
-      await fetchHomeByUserId("67ad62846b0327d660ea0494");
-      await setCurrentHome("67b318f5d25d38aa0439d87a");
-      setLoading(false); // Mark data as ready
-    }
-
-    fetchData();
-  }, [fetchHomeByUserId, setCurrentHome]);
-
-  if (loading) {
-    return <div>Loading...</div>; // Or a skeleton UI
-  }
-
-  console.log(currentHome.rooms);
-
   // This is sample data.
   const data = {
     user: {
