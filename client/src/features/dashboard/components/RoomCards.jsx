@@ -6,7 +6,7 @@ const RoomCards = ({ room }) => {
   return (
     <Link>
       <Card
-        className="bg-[#C2E03A] h-40 rounded-3xl font-['Inter'] relative transition-transform duration-300 ease-in-out hover:scale-105 active:scale-95 
+        className="bg-[#A288E3] w-80 h-40 rounded-3xl relative transition-transform duration-300 ease-in-out hover:scale-105 active:scale-95 
       select-none"
       >
         <CardHeader className=" text-xl font-semibold">
@@ -20,9 +20,9 @@ const RoomCards = ({ room }) => {
               className="absolute object-fit top-0 right-[5%]"
             />
           )}
-          <div className="flex">
+          <div className="flex items-center">
             <BsFillLightningChargeFill />
-            {room.percentage}
+            20%
           </div>
         </CardContent>
       </Card>

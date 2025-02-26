@@ -123,7 +123,19 @@
       "profiles profiles weather weather"
       "summary summary weather weather"
       "summary summary suggestion suggestion"
+      "summary summary suggestion suggestion"
+      "summary summary suggestion suggestion"
       "summary summary suggestion suggestion";
+  }
+
+  @media (max-width: 1024px) {
+    .grid-template-area {
+      grid-template-areas:
+        "profiles"
+        "weather"
+        "summary"
+        "suggestion";
+    }
   }
 
   @keyframes slideOut {
@@ -146,9 +158,9 @@
   }
 }
 .scrollbar-hide::-webkit-scrollbar {
-	display: none;
+  display: none;
 }
 .scrollbar-hide {
-	-ms-overflow-style: none; /* IE and Edge */
-	scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
 }
