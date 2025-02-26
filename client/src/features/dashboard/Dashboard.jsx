@@ -32,7 +32,7 @@ export default function Dashboard() {
   return (
     <SidebarProvider>
       <AppSidebar />
-      <main className="bg-[#EFEFEF] overflow-hidden">
+      <main className="bg-[#EFEFEF] overflow-hidden w-full">
         <Header />
         <WelcomeUser user={user} />
         <RoomScrollArea rooms={currentHome.rooms} />
