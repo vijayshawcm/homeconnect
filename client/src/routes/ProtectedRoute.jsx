@@ -3,7 +3,6 @@ import { Navigate, Outlet } from 'react-router-dom';
 import { userAuthStore } from '@/store/userAuth';
 
 export default function ProtectedRoute() {
-	console.log('protected route hi');
 	const { isAuthenticated } = userAuthStore();
 
 	if (isAuthenticated) {
@@ -12,3 +11,4 @@ export default function ProtectedRoute() {
 		return <Navigate to="/login" />; //Re-route user to login page if they are not authenticated
 	}
 }
+ 
