@@ -13,7 +13,7 @@ import {
 } from "lucide-react";
 
 import { NavMain } from "@/features/sidebar/nav-main";
-import { HomeSwitcher } from "@/features/sidebar/home-switcher";
+import { SidebarLogo } from "./SidebarLogo";
 import {
   Sidebar,
   SidebarContent,
@@ -25,8 +25,7 @@ import { useEffect, useState } from "react";
 import { userAuthStore } from "@/store/userAuth";
 
 export function AppSidebar({ ...props }) {
-  const { homes, currentHome, fetchHomeByUserId, setCurrentHome } =
-    useHomeStore();
+  const { homes, currentHome } = useHomeStore();
   // This is sample data.
   const data = {
     user: {
@@ -64,7 +63,7 @@ export function AppSidebar({ ...props }) {
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
-        <HomeSwitcher />
+        <SidebarLogo />
       </SidebarHeader>
       <SidebarContent>
         <NavMain items={data.navMain} />

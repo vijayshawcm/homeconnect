@@ -1,26 +1,14 @@
-import * as React from "react";
-import { ChevronsUpDown, Home, Plus } from "lucide-react";
 
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuShortcut,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+
 import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-  useSidebar,
 } from "@/components/ui/sidebar";
 import HomeLogo from "../../assets/homeconnect-logo-icon.svg";
 import HomeText from "../../assets/homeconnect-logo-text.svg";
-import { useHomeStore } from "@/store/home";
 
-export function HomeSwitcher() {
+export function SidebarLogo() {
   return (
     <SidebarMenu>
       <SidebarMenuItem className="flex justify-center items-center">

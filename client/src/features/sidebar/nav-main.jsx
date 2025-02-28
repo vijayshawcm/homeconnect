@@ -4,12 +4,7 @@ import { ChevronRight } from "lucide-react";
 import "../../styles/index.css";
 
 import {
-  BadgeCheck,
-  Bell,
   ChevronsUpDown,
-  CreditCard,
-  LogOut,
-  Sparkles,
   Home,
   Sofa,
   BedDouble,
@@ -54,7 +49,7 @@ const roomTypeIcons = {
 };
 
 export function NavMain({ items }) {
-  const { currentHome, homes } = useHomeStore();
+  const { currentHome, homes, setCurrentHome } = useHomeStore();
   const { state, setOpen } = useSidebar();
   const { isMobile } = useSidebar();
   const { ownedHomes, dwelledHomes } = homes;
