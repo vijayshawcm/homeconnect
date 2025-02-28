@@ -6,7 +6,7 @@ const RoomCards = ({ room }) => {
   return (
     <Link>
       <Card
-        className="bg-[#A288E3] w-80 h-40 rounded-3xl relative transition-transform duration-300 ease-in-out hover:scale-105 active:scale-95 
+        className="bg-[#C2E03A] w-80 h-40 rounded-3xl relative transition-transform duration-300 ease-in-out hover:scale-105 active:scale-95 
       select-none"
       >
         <CardHeader className=" text-xl font-semibold">
