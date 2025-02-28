@@ -1,6 +1,6 @@
 import { SidebarTrigger } from "@/components/ui/sidebar";
-import { HeaderInput } from "./HeaderInput";
-import HeaderAvatar from "./HeaderAvatar";
+import { HeaderInput } from "./components/HeaderInput";
+import HeaderAvatar from "./components/HeaderAvatar";
 
 const Header = () => {
   return (
