@@ -44,7 +44,7 @@ const getRoomsByHome = async (req, res) => {
         .status(404)
         .json({ success: false, message: "Home not found" });
     }
-    return res.status(200).json({ success: true, appliances: home.rooms });
+    return res.status(200).json({ success: true, data: home.rooms });
   } catch (error) {
     res.status(500).json({ success: false, message: "Server Error" });
     console.log(error.message);
