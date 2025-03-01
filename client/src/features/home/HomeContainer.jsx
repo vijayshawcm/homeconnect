@@ -4,17 +4,18 @@ import Dashboard from "../dashboard/Dashboard";
 import RoomPage from "../rooms/RoomPage";
 import { useEffect, useState } from "react";
 import Header from "../header/Header";
+import { useHomeStore } from "@/store/home";
 
 const HomeContainer = ({ mode }) => {
-  const [loaded, setLoaded] = useState(false);
   const [currentMode, setCurrentMode] = useState(mode); // Track current mode
+  const {isLoading} = useHomeStore()
 
   useEffect(() => {
     setCurrentMode(mode);
     
   }, [setCurrentMode, mode]);
 
-  if (!loaded) {
+  if (!isLoading) {
     return <div>Loading...</div>;
   }
   return (
