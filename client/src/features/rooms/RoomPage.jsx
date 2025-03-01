@@ -1,7 +1,8 @@
-const RoomPage = ({room}) => {
-  return (
-    <div>{room.name}</div>
-  )
-}
+import { useRoomStore } from "@/store/room";
 
-export default RoomPage
+const RoomPage = () => {
+  const { currentRoom } = useRoomStore();
+  return <div>{currentRoom.name}</div>;
+};
+
+export default RoomPage;

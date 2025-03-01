@@ -17,12 +17,14 @@ import { SidebarLogo } from "./SidebarLogo";
 import {
   Sidebar,
   SidebarContent,
+  SidebarFooter,
   SidebarHeader,
   SidebarRail,
 } from "@/components/ui/sidebar";
 import { useHomeStore } from "../../store/home";
 import { useEffect, useState } from "react";
 import { userAuthStore } from "@/store/userAuth";
+import Footer from "./Footer";
 
 export function AppSidebar({ ...props }) {
   const { homes, currentHome } = useHomeStore();
@@ -37,24 +39,25 @@ export function AppSidebar({ ...props }) {
     navMain: [
       {
         title: "Dashboard",
-        url: "#",
+        url: "/dashboard",
         icon: LayoutDashboard,
         isActive: true,
       },
       {
         title: "Rooms",
-        url: "#",
+        url: "",
         icon: Home,
         items: currentHome.rooms,
+        isActive: false,
       },
       {
         title: "Energy",
-        url: "#",
+        url: "/energy",
         icon: Zap,
       },
       {
         title: "Settings",
-        url: "#",
+        url: "/settings",
         icon: Settings2,
       },
     ],
@@ -62,13 +65,16 @@ export function AppSidebar({ ...props }) {
 
   return (
     <Sidebar collapsible="icon" {...props}>
-      <SidebarHeader>
+      <SidebarHeader className="group-data-[state=collapsed]:!p-0 group-data-[state=collapsed]:mb-10 transition-all duration-500">
         <SidebarLogo />
       </SidebarHeader>
       <SidebarContent>
         <NavMain items={data.navMain} />
       </SidebarContent>
       <SidebarRail />
+      <SidebarFooter>
+        <Footer />
+      </SidebarFooter>
     </Sidebar>
   );
 }

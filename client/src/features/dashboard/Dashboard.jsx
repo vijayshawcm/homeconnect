@@ -10,11 +10,10 @@ import { useEffect, useState } from "react";
 
 export default function Dashboard() {
   const { user } = userAuthStore();
-  const { currentHome } = useHomeStore();
+  const { currentHome } = useHomeStore()
 
   return (
     <div>
-      <Header />
       <WelcomeUser user={user} />
       <RoomScrollArea rooms={currentHome.rooms} />
       <BentoGrid />

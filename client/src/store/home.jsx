@@ -3,13 +3,16 @@ import { create } from "zustand";
 export const useHomeStore = create((set) => ({
   homes: [],
   currentHome: null,
+  isLoading: false,
   setCurrentHome: async (id) => {
+    set({ isLoading: false });
     const res = await fetch(`/server/homes/${id}`);
     const data = await res.json();
     if (!data.success) {
       return { success: false, message: data.message };
     }
     set({ currentHome: data.data });
+    set({ isLoading: true });
   },
   fetchHomeByUserId: async (id) => {
     const res = await fetch(`/server/homes/forUser/${id}`);
