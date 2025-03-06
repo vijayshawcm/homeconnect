@@ -8,6 +8,8 @@ import { useHomeStore } from "@/store/home";
 import HomeContainer from "../features/home/HomeContainer";
 
 function AppRoutes() {
+
+  //!! Temporary Hard Coded Values Remove Later On
   const { currentHome, fetchHomeByUserId, setCurrentHome } = useHomeStore();
 
   useEffect(() => {
