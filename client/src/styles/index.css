@@ -138,6 +138,37 @@
     }
   }
 
+  .roomLight {
+    grid-area: lights;
+  }
+
+  .roomAirConditioner {
+    grid-area: airCon;
+  }
+
+  .roomFan {
+    grid-area: fans;
+  }
+
+  .roomEnergy {
+    grid-area: energy;
+  }
+
+  .roomAdd{
+    grid-area: addAppliance
+  }
+
+  .room-template-area {
+    grid-template-areas:
+      "lights airCon airCon energy"
+      "lights airCon airCon energy"
+      "lights airCon airCon energy"
+      "lights fans fans energy"
+      "lights fans fans energy"
+      "lights fans fans energy"
+      "addAppliance fans fans energy";
+  }
+
   @keyframes slideOut {
     0% {
       opacity: 0;
