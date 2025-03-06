@@ -37,10 +37,11 @@ function AppRoutes() {
               element={<HomeContainer mode="dashboard" />}
             />
             {currentHome.rooms.map((room) => {
+              const formattedName = room.name.replace(/\s+/g, ""); // Remove spaces
               return (
                 <Route
                   key={room._id}
-                  path={`/${room.name}`}
+                  path={`/${formattedName}`}
                   element={<HomeContainer mode="room" />}
                 />
               );

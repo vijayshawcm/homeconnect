@@ -1,17 +1,19 @@
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { HeaderInput } from "./components/HeaderInput";
 import HeaderAvatar from "./components/HeaderAvatar";
+import DashboardHeader from "./components/DashboardHeader";
+import RoomsHeader from "./components/RoomsHeader";
 
-const Header = () => {
+const Header = ({ mode }) => {
   return (
-    <div className="flex py-6 px-4 justify-between bg-[#FFFFFF]">
-      <div className="flex items-center gap-2">
+    <div className="flex py-6 px-4 bg-[#FFFFFF]">
+      <div className="flex items-center gap-2 w-full">
         <SidebarTrigger />
-        <h1 className="text-3xl font-bold">Dashboard</h1>
-      </div>
-      <div className="flex items-center justify-center gap-6">
-        <HeaderInput />
-        <HeaderAvatar />
+        {mode === "dashboard" ? (
+          <DashboardHeader />
+        ) : mode === "room" ? (
+          <RoomsHeader />
+        ) : null}
       </div>
     </div>
   );

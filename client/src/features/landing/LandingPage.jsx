@@ -3,7 +3,6 @@ import Header from '@/features/landing/components/Header';
 import ScrollProgress from '@/features/landing/components/ScrollProgress';
 import HeroSection from '@/features/landing/components/HeroSection';
 import FeaturesSection from '@/features/landing/components/FeaturesSection';
-import FeaturesSection2 from '@/features/landing/components/FeaturesSection2';
 import DashboardSection from '@/features/landing/components/DashboardSection';
 import CTASection from '@/features/landing/components/CTASection';
 import Footer from '@/features/landing/components/Footer';

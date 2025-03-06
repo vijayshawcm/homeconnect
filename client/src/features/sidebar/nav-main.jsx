@@ -24,6 +24,7 @@ import {
   SidebarMenuSub,
   SidebarMenuSubButton,
   SidebarMenuSubItem,
+  useSidebar,
 } from "@/components/ui/sidebar";
 
 import {
@@ -39,6 +40,7 @@ import {
 import { useHomeStore } from "@/store/home";
 import { Link } from "react-router-dom";
 import { useRoomStore } from "@/store/room";
+import { useNavigate } from "react-router-dom";
 
 const buttonClass = "text-xl font-light h-12 transition-all duration-500";
 
@@ -50,9 +52,16 @@ const roomTypeIcons = {
 };
 
 export function NavMain({ items }) {
+  const navigate = useNavigate(); // Initialize navigate
   const { currentHome, homes, setCurrentHome } = useHomeStore();
   const { ownedHomes, dwelledHomes } = homes;
   const { currentRoom, setCurrentRoom } = useRoomStore();
+  const { open, setOpen } = useSidebar();
+
+  const handleSwitchHome = (homeId) => {
+    setCurrentHome(homeId);
+    navigate("/dashboard");
+  };
 
   return (
     <SidebarGroup className="gap-6">
@@ -62,15 +71,16 @@ export function NavMain({ items }) {
             <DropdownMenuTrigger asChild>
               <SidebarMenuButton
                 size="lg"
-                className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground h-16 transition-all duration-500 justify-center"
+                className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground h-16 transition-all justify-center "
+                tooltip="Home"
               >
-                <div className="flex flex-1 text-left text-sm leading-tight items-center justify-between group-data-[state=collapsed]:hidden">
+                <div className="flex flex-1 text-left text-sm leading-tight items-center justify-between transition-opacity group-data-[state=collapsed]:opacity-0 group-data-[state=collapsed]:duration-100 group-data-[state=collapsed]:delay-0 delay-300 duration-300">
                   <span className="truncate font-light text-2xl">
                     {currentHome ? currentHome.name : "Select a Home"}
                   </span>
                   <ChevronsUpDown className="size-4" />
                 </div>
-                <Home className="group-data-[state=collapsed]:opacity-100 group-data-[state=expanded]:duration-0 opacity-0 size-4 transition-all duration-500 absolute" />
+                <Home className="group-data-[state=collapsed]:opacity-100 opacity-0 size-4 absolute transition-opacity duration-300" />
               </SidebarMenuButton>
             </DropdownMenuTrigger>
             <DropdownMenuContent
@@ -99,7 +109,7 @@ export function NavMain({ items }) {
                     <DropdownMenuItem
                       key={home._id}
                       className="gap-2 p-2"
-                      onClick={() => setCurrentHome(home._id)}
+                      onClick={() => handleSwitchHome(home._id)}
                     >
                       {home.name}
                     </DropdownMenuItem>
@@ -110,7 +120,7 @@ export function NavMain({ items }) {
                     <DropdownMenuItem
                       key={home._id}
                       className="gap-2 p-2"
-                      onClick={() => setCurrentHome(home._id)}
+                      onClick={() => handleSwitchHome(home._id)}
                     >
                       {home.name}
                     </DropdownMenuItem>
@@ -130,6 +140,11 @@ export function NavMain({ items }) {
                     tooltip={item.title}
                     className={buttonClass}
                     key={item.title}
+                    onClick={() => {
+                      if (!open) {
+                        setOpen("expanded");
+                      }
+                    }}
                   >
                     {/* Switch between open and closed door icons */}
                     <span className="transition-transform duration-300 ">
@@ -144,9 +159,10 @@ export function NavMain({ items }) {
                   <SidebarMenuSub className="overflow-hidden gap-3">
                     {item.items?.map((subItem, index) => {
                       const IconComponent = roomTypeIcons[subItem.type] || Home;
+                      const formattedName = subItem.name.replace(/\s+/g, ""); // Replace spaces with dashes
                       return (
                         <SidebarMenuSubItem key={subItem.title}>
-                          <Link to={`/${subItem.name}`}>
+                          <Link to={`/${formattedName}`}>
                             <SidebarMenuSubButton
                               className="navRooms transition-all duration-500 h-9 select-none"
                               style={{ "--delay": `${index * 0.2}s` }}

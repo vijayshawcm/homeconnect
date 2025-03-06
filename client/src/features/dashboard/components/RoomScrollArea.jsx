@@ -22,7 +22,7 @@ const RoomScrollArea = ({ rooms }) => {
   return (
     <ScrollArea className="w-full whitespace-nowrap">
       <div
-        className={`w-max flex ${gapClass} py-4 shrink-0 pl-4 transition-all duration-500`}
+        className={`w-max flex ${gapClass} py-4 shrink-0 pl-4 transition-all duration-500 mb-4`}
       >
         {rooms.map((room) => (
           <RoomCards key={room.name} room={room} />

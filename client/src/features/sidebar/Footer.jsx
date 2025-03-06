@@ -5,7 +5,7 @@ import { LogOut } from "lucide-react";
 const Footer = () => {
   const { logoutUser } = userAuthStore();
   return (
-    <SidebarMenuItem>
+    <SidebarMenuItem className = 'list-none'>
       <SidebarMenuButton
         className="text-xl font-light h-16 transition-all duration-500"
         onClick={logoutUser}

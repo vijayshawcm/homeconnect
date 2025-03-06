@@ -22,7 +22,7 @@ const HomeContainer = ({ mode }) => {
     <SidebarProvider>
       <AppSidebar />
       <main className="bg-[#EFEFEF] overflow-hidden w-full">
-        <Header />
+        <Header mode={currentMode}/>
         {currentMode === "dashboard" ? (
           <Dashboard />
         ) : currentMode === "room" ? (

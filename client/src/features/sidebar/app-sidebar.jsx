@@ -65,13 +65,12 @@ export function AppSidebar({ ...props }) {
 
   return (
     <Sidebar collapsible="icon" {...props}>
-      <SidebarHeader className="group-data-[state=collapsed]:!p-0 group-data-[state=collapsed]:mb-10 transition-all duration-500">
+      <SidebarHeader className="group-data-[state=collapsed]:!p-0 group-data-[state=collapsed]:mb-7 transition-all duration-500">
         <SidebarLogo />
       </SidebarHeader>
       <SidebarContent>
         <NavMain items={data.navMain} />
       </SidebarContent>
-      <SidebarRail />
       <SidebarFooter>
         <Footer />
       </SidebarFooter>

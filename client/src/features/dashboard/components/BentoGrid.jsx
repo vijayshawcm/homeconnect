@@ -1,4 +1,5 @@
 import ProfileCard from "./ProfileCard";
+import SummaryCard from "./SummaryCard";
 import WeatherCard from "./WeatherCard";
 
 const BentoGrid = () => {
@@ -10,7 +11,9 @@ const BentoGrid = () => {
       <div className=" bentoWeather">
         <WeatherCard />
       </div>
-      <div className="bg-blue-800 bentoSummary"></div>
+      <div className="bentoSummary">
+        <SummaryCard/>
+      </div>
       <div className="bg-blue-800 bentoSuggestion"></div>
     </div>
   );

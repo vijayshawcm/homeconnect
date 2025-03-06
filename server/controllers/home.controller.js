@@ -28,7 +28,14 @@ const getHomes = async (req, res) => {
 const getHomeById = async (req, res) => {
   const { id } = req.params;
   try {
-    const home = await Home.findById(id).populate("rooms");
+    const home = await Home.findById(id)
+      .populate({
+        path: "rooms",
+        populate: [{ path: "appliances" }, { path: "energyProfile" }],
+      })
+      .populate("owner")
+      .populate("dwellers")
+      .populate("energyProfile");
     res.status(200).json({ success: true, data: home });
   } catch (error) {
     console.log("Error in fetching home:", error.message);
