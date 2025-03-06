@@ -21,7 +21,7 @@ const HomeContainer = ({ mode }) => {
   return (
     <SidebarProvider>
       <AppSidebar />
-      <main className="bg-[#EFEFEF] overflow-hidden w-full">
+      <main className="bg-[#EFEFEF] overflow-hidden w-full flex flex-col">
         <Header mode={currentMode}/>
         {currentMode === "dashboard" ? (
           <Dashboard />

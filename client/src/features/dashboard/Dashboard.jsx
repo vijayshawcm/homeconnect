@@ -9,7 +9,7 @@ export default function Dashboard() {
   const { currentHome } = useHomeStore()
 
   return (
-    <div>
+    <div className="flex-1">
       <WelcomeUser user={user} />
       <RoomScrollArea rooms={currentHome.rooms} />
       <BentoGrid />

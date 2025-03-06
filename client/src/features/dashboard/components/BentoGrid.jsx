@@ -8,7 +8,7 @@ const BentoGrid = () => {
       <div className="bentoProfile">
         <ProfileCard />
       </div>
-      <div className=" bentoWeather">
+      <div className="bentoWeather">
         <WeatherCard />
       </div>
       <div className="bentoSummary">
