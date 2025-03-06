@@ -8,6 +8,7 @@ import { userRegistrationStore } from '@/features/auth/store/userRegistration';
 
 function RegisterForm({ onRegisterSuccess }) {
 	const [username, setUsername] = useState('');
+	const [fullName, setFullName] = useState('');
 	const [email, setEmail] = useState('');
 	const [password, setPassword] = useState('');
 	const [confirmPassword, setConfirmPassword] = useState('');
@@ -19,6 +20,7 @@ function RegisterForm({ onRegisterSuccess }) {
 
 	// Track focus state for input fields
 	const [isUsernameFocused, setIsUsernameFocused] = useState(false);
+	const [isFullNameFocused, setIsFullNameFocused] = useState(false);
 	const [isEmailFocused, setIsEmailFocused] = useState(false);
 	const [isPasswordFocused, setIsPasswordFocused] = useState(false);
 	const [isConfirmPasswordFocused, setIsConfirmPasswordFocused] =
@@ -38,6 +40,7 @@ function RegisterForm({ onRegisterSuccess }) {
 	// Initialise zustand store modification methods
 	const {
 		setUsername: setUsernameStore,
+		setFullName: setFullNameStore,
 		setEmail: setEmailStore,
 		setPassword: setPasswordStore,
 	} = userRegistrationStore();
@@ -49,6 +52,13 @@ function RegisterForm({ onRegisterSuccess }) {
 		// Validate Username
 		if (!username) {
 			newErrors.username = 'Username is required';
+			setErrors(newErrors); // Update errors state
+			return false; // Stop further validation
+		}
+
+		// Validate Full Name
+		if (!fullName) {
+			newErrors.fullName = 'Full Name is required';
 			setErrors(newErrors); // Update errors state
 			return false; // Stop further validation
 		}
@@ -133,10 +143,11 @@ function RegisterForm({ onRegisterSuccess }) {
 
 		// Auth logic here
 		try {
-			console.log('Registering with:', { username, email, password });
+			console.log('Registering with:', { username, fullName, email, password });
 
 			// Store user data in zustand store
 			setUsernameStore(username);
+			setFullNameStore(fullName);
 			setEmailStore(email);
 			setPasswordStore(password);
 
@@ -185,6 +196,33 @@ function RegisterForm({ onRegisterSuccess }) {
 					required
 					className={`w-full border border-gray-300 focus:border-black focus-visible:ring-0 focus:outline-none transition-colors duration-150 ${
 						errors.username && !isUsernameFocused ? 'border-red-500' : ''
+					}`}
+				/>
+			</div>
+
+			{/* Full Name Field */}
+			<div className="space-y-1">
+				<div className="flex items-center space-x-1">
+					<Label htmlFor="fullName" className="text-sm">
+						Full Name
+					</Label>
+					<span className="text-red-500">*</span>
+					{errors.fullName && (
+						<span className="text-red-500 text-xs ml-auto">
+							- {errors.fullName}
+						</span>
+					)}
+				</div>
+				<Input
+					id="fullName"
+					type="text"
+					value={fullName}
+					onChange={(e) => setFullName(e.target.value)}
+					onFocus={() => setIsFullNameFocused(true)}
+					onBlur={() => setIsFullNameFocused(false)}
+					required
+					className={`w-full border border-gray-300 focus:border-black focus-visible:ring-0 focus:outline-none transition-colors duration-150 ${
+						errors.fullName && !isFullNameFocused ? 'border-red-500' : ''
 					}`}
 				/>
 			</div>
