@@ -18,7 +18,6 @@ export const useRoomStore = create((set, get) => ({
         const homeStore = useHomeStore.getState();
         if (homeStore.currentHome?._id === data.data.home) {
           await homeStore.updateHome();
-          console.log(homeStore.currentHome)
         }
       }
     } catch (error) {
