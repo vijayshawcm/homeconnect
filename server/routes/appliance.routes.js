@@ -3,7 +3,8 @@ const express = require("express");
 const {
   createAppliance,
   getAppliancesByRoom,
-  toggleAppliance,
+  turnOnAppliance,
+  turnOffAppliance,
   disableAppliance,
   deleteAppliance,
 } = require("../controllers/appliance.controller");
@@ -11,7 +12,8 @@ const {
 const router = express.Router();
 router.post("/:id", createAppliance);
 router.get("/:id", getAppliancesByRoom);
-router.patch("/:id", toggleAppliance);
+router.patch("/turnOff/:id", turnOffAppliance);
+router.patch("/turnOn/:id", turnOnAppliance)
 router.patch("/disable/:id", disableAppliance);
 router.delete("/:id", deleteAppliance);
 

@@ -85,31 +85,62 @@ const modifyAppliance = async (req, res) => {
   }
 };
 
-const toggleAppliance = async (req, res) => {
+const turnOnAppliance = async (req, res) => {
   const { id } = req.params;
   try {
     const appliance = await Appliance.findById(id);
     if (!appliance) {
       return res
         .status(404)
-        .json({ success: false, message: "Applaince not found" });
+        .json({ success: false, message: "Appliance not found" });
     }
 
-    switch (appliance.status) {
-      case "on":
-        appliance.status = "off";
-        break;
-      case "off":
-        appliance.status = "on";
-      case "disabled":
-        return res
-          .status(500)
-          .json({ success: false, message: "Appliance is disabled." });
+    if (appliance.status === "disabled") {
+      return res
+        .status(400)
+        .json({
+          success: false,
+          message: "Appliance is disabled and cannot be turned on.",
+        });
     }
-    await appliance.save();
-    res.status(201).json({ success: true, data: appliance });
+
+    if (appliance.status === "off") {
+      appliance.status = "on";
+      await appliance.save();
+    }
+
+    res.status(200).json({ success: true, data: appliance });
   } catch (error) {
-    console.error("Error in toggling appliance: ", error.message);
+    console.error("Error in turning on appliance: ", error.message);
+    res.status(500).json({ success: false, message: "Server Error" });
+  }
+};
+
+const turnOffAppliance = async (req, res) => {
+  const { id } = req.params;
+  try {
+    const appliance = await Appliance.findById(id);
+    if (!appliance) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Appliance not found" });
+    }
+
+    if (appliance.status === "disabled") {
+      return res.status(400).json({
+        success: false,
+        message: "Appliance is disabled and cannot be turned off.",
+      });
+    }
+
+    if (appliance.status === "on") {
+      appliance.status = "off";
+      await appliance.save();
+    }
+
+    res.status(200).json({ success: true, data: appliance });
+  } catch (error) {
+    console.error("Error in turning on appliance: ", error.message);
     res.status(500).json({ success: false, message: "Server Error" });
   }
 };
@@ -170,7 +201,8 @@ const deleteAppliance = async (req, res) => {
 module.exports = {
   createAppliance,
   getAppliancesByRoom,
-  toggleAppliance,
+  turnOnAppliance,
+  turnOffAppliance,
   disableAppliance,
   deleteAppliance,
 };

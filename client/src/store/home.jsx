@@ -1,6 +1,6 @@
 import { create } from "zustand";
 
-export const useHomeStore = create((set) => ({
+export const useHomeStore = create((set, get) => ({
   homes: [],
   currentHome: null,
   isLoading: false,
@@ -13,6 +13,20 @@ export const useHomeStore = create((set) => ({
     }
     set({ currentHome: data.data });
     set({ isLoading: true });
+  },
+  updateHome: async () => {
+    const { currentHome } = get();
+    if (!currentHome) return;
+
+    try {
+      const res = await fetch(`/server/homes/${currentHome._id}`);
+      const data = await res.json();
+      if (data.success) {
+        set({ currentHome: data.data });
+      }
+    } catch (error) {
+      console.error("Failed to update home data:", error);
+    }
   },
   fetchHomeByUserId: async (id) => {
     const res = await fetch(`/server/homes/forUser/${id}`);

@@ -27,15 +27,15 @@ const RoomPage = () => {
           <AddApplianceCard/>
         </div>
       </div>
-      <div className="border-2 border-[#184C85]"></div>
+      <div className="border-2 border-[#184C85] rounded-lg"></div>
       <Card className="w-96 rounded-3xl p-8 font-semibold text-3xl flex flex-col relative">
         <span>Electricity</span>
-        <span>for</span>
+        <span>for</span> 
         <span>{`${currentRoom.name}`}</span>
         <ArrowRight className="size-12 absolute top-[50%] right-2"/>
       </Card>
     </div>
-  );
+  ); 
 };
 
 export default RoomPage;

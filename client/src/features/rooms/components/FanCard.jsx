@@ -3,7 +3,7 @@ import { Switch } from "@/components/ui/switch";
 import { useRoomStore } from "@/store/room";
 
 const FanCard = () => {
-  const { currentRoom } = useRoomStore();
+  const { currentRoom, updateRoom, turnOnAll, turnOffAll } = useRoomStore();
   // Extract fans from the room's appliances list
   const fans =
     currentRoom?.appliances?.filter(
@@ -12,15 +12,34 @@ const FanCard = () => {
 
   // Count total and active fans
   const totalFans = fans.length;
-  const activeFans = fans.filter(
-    (ac) => ac.status === "on"
-  ).length;
+  const activeFans = fans.filter((ac) => ac.status === "on").length;
+
+  // Determine if all fan are ON
+  const isAllFansOn = totalFans > 0 && activeFans === totalFans;
+
+  // Handle Switch Toggle
+  const toggleFans = async () => {
+    try {
+      // Update each fans in the backend
+      if (!isAllFansOn) {
+        await turnOnAll("Fan");
+      } else {
+        await turnOffAll("Fan");
+      }
+      // Update frontend state (refetch or update room store)
+      updateRoom();
+    } catch (error) {
+      console.error("Failed to update Fans:", error);
+    }
+  };
   return (
     <Card className="flex-1 rounded-3xl flex flex-col">
       <div className="px-6 pt-6 flex flex-1">
         <div className="flex flex-1 justify-between relative">
           <h1 className="text-3xl font-semibold">Fan</h1>
-          <Switch />
+          <div>
+            <Switch checked={isAllFansOn} onCheckedChange={toggleFans} />
+          </div>
           <img
             src="src/assets/fan.svg"
             className="absolute top-0 right-20"
