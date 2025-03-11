@@ -80,6 +80,7 @@
     animation: slideUp 500ms ease-in-out;
   }
 
+  /* Slide down animation for the rooms in the sidebar */
   @keyframes slideDown {
     from {
       opacity: 0%;
@@ -87,10 +88,24 @@
     }
   }
 
+  /* Slide up animation for the rooms in the sidebar */
   @keyframes slideUp {
     to {
       opacity: 0%;
       transform: translateY(-1rem);
+    }
+  }
+
+  /* Slide out animation for the rooms in the sidebar */
+  @keyframes slideOut {
+    0% {
+      opacity: 0;
+      transform: translateX(-2rem);
+    }
+
+    100% {
+      opacity: 1;
+      transform: translateX(0);
     }
   }
 
@@ -154,31 +169,18 @@
     grid-area: energy;
   }
 
-  .roomAdd{
-    grid-area: addAppliance
+  .roomAddAppliance {
+    grid-area: addAppliance;
   }
 
   .room-template-area {
     grid-template-areas:
-      "lights airCon airCon energy"
-      "lights airCon airCon energy"
-      "lights airCon airCon energy"
-      "lights fans fans energy"
-      "lights fans fans energy"
-      "lights fans fans energy"
-      "addAppliance fans fans energy";
-  }
-
-  @keyframes slideOut {
-    0% {
-      opacity: 0;
-      transform: translateX(-2rem);
-    }
-
-    100% {
-      opacity: 1;
-      transform: translateX(0);
-    }
+      "lights lights lights lights lights airCon airCon airCon airCon airCon airCon airCon airCon airCon"
+      "lights lights lights lights lights airCon airCon airCon airCon airCon airCon airCon airCon airCon"
+      "lights lights lights lights lights airCon airCon airCon airCon airCon airCon airCon airCon airCon"
+      "lights lights lights lights lights fans fans fans fans fans fans fans fans fans"
+      "lights lights lights lights lights fans fans fans fans fans fans fans fans fans"
+      "addAppliance addAppliance addAppliance addAppliance addAppliance fans fans fans fans fans fans fans fans fans";
   }
 
   * {
