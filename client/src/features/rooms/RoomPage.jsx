@@ -7,35 +7,103 @@ import { Card } from "@/components/ui/card";
 import { AddApplianceCard } from "./components/AddApplianceCard";
 import FanCard from "./components/FanCard";
 import { ArrowRight } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 
 const RoomPage = () => {
-  const { currentExpanded, setExpanded } = useState("");
+  const { currentExpanded, setExpanded } = useState(null);
+  const [hovered, setHovered] = useState(null);
   const { currentRoom } = useRoomStore();
+  const applianceGrid = [
+    {
+      className: "roomLight",
+      key: "light",
+      component: <LightCard key={"light"} />,
+    },
+    {
+      className: "roomAirConditioner",
+      key: "aircon",
+      component: <AirConCard key={"aircon"} />,
+    },
+    {
+      className: "roomFan",
+      key: "fan",
+      component: <FanCard key={"fan"} />,
+    },
+    {
+      className: "roomAddAppliance",
+      key: "add",
+      component: <AddApplianceCard key={"add"} />,
+    },
+  ];
   return (
-    <div className="py-16 px-12 flex-1 flex gap-5">
-      <div className="grid auto-cols-[1fr] auto-rows-[1fr] room-template-area gap-6 flex-1">
-        <div className="roomLight flex">
-          <LightCard />
+    <div className="py-10 px-12 flex-1 flex gap-5">
+      {/* Dimming background effect */}
+      <AnimatePresence>
+        {hovered && (
+          <motion.div
+            className="absolute inset-0 bg-black/40 backdrop-blur-sm pointer-events-none w-full h-full"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.3 }}
+          />
+        )}
+      </AnimatePresence>
+      {currentExpanded ? null : (
+        <div className="grid auto-cols-[1fr] auto-rows-[1fr] room-template-area gap-6 flex-1">
+          {applianceGrid.map(({ className, key, component }) => (
+            <motion.div
+              key={className}
+              className={`${className} flex rounded-3xl`}
+              layoutId="hoveredCard"
+              initial={{ scale: 1, opacity: 1, filter: "blur(0px)" }}
+              animate={{
+                scale: hovered === key ? 1.02 : 1,
+                filter: hovered && hovered !== key ? "blur(4px)" : "blur(0px)",
+                opacity: hovered && hovered !== key ? 0.4 : 1,
+                boxShadow: "0px 0px 8px rgb(255,255,255)",
+              }}
+              transition={{ type: "spring", stiffness: 250, damping: 20 }}
+              onHoverStart={() => setHovered(key)}
+              onHoverEnd={() => setHovered(null)}
+            >
+              {component}
+            </motion.div>
+          ))}
         </div>
-        <div className="roomAirConditioner flex">
-          <AirConCard />
-        </div>
-        <div className="roomFan flex">
-          <FanCard/>
-        </div>
-        <div className="roomAddAppliance flex">
-          <AddApplianceCard/>
-        </div>
-      </div>
+      )}
       <div className="border-2 border-[#184C85] rounded-lg"></div>
-      <Card className="w-96 rounded-3xl p-8 font-semibold text-3xl flex flex-col relative">
-        <span>Electricity</span>
-        <span>for</span> 
-        <span>{`${currentRoom.name}`}</span>
-        <ArrowRight className="size-12 absolute top-[50%] right-2"/>
-      </Card>
+      <motion.div
+        className="flex justify-center rounded-3xl"
+        initial={{ scale: 1, opacity: 0, filter: "blur(0px)", x: 50 }}
+        animate={{
+          x: 0,
+          scale: hovered === "electricity" ? 1.02 : 1,
+          filter:
+            hovered && hovered !== "electricity" ? "blur(4px)" : "blur(0px)",
+          opacity: hovered && hovered !== "electricity" ? 0.4 : 1,
+          boxShadow: "0px 0px 8px rgb(255,255,255)",
+        }}
+        transition={{ type: "spring", stiffness: 250, damping: 20 }}
+        onHoverStart={() => setHovered("electricity")}
+        onHoverEnd={() => setHovered(null)}
+      >
+        <Card className="w-96 rounded-3xl p-8 font-semibold text-3xl flex flex-col relative">
+          <span>Electricity</span>
+          <span>for</span>
+          <span>{`${currentRoom.name}`}</span>
+          {/* Animated Arrow */}
+          <motion.div
+            className="absolute top-[50%] right-2"
+            animate={{ x: hovered === "electricity" ? [0, 5, 0] : 0 }} // Subtle left-right motion
+            transition={{ repeat: Infinity, duration: 0.8, ease: "easeInOut" }}
+          >
+            <ArrowRight className="size-12" />
+          </motion.div>
+        </Card>
+      </motion.div>
     </div>
-  ); 
+  );
 };
 
 export default RoomPage;
