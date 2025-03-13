@@ -6,9 +6,9 @@ import ProtectedRoute from "@/routes/ProtectedRoute";
 import NotFound from "@/pages/NotFound";
 import { useHomeStore } from "@/store/home";
 import HomeContainer from "../features/home/HomeContainer";
+import WelcomeContainer from "@/features/welcome/WelcomeContainer";
 
 function AppRoutes() {
-
   //!! Temporary Hard Coded Values Remove Later On
   const { currentHome, fetchHomeByUserId, setCurrentHome } = useHomeStore();
 
@@ -29,9 +29,14 @@ function AppRoutes() {
         {/* Public Routes */}
         <Route path="/login" element={<AuthContainer mode="login" />} />
         <Route path="/register" element={<AuthContainer mode="register" />} />
-        {/* prettier-ignore */}
-        <Route path="/forgot-password" element={<AuthContainer mode="forgot-password" />} />
+        <Route
+          path="/forgot-password"
+          element={<AuthContainer mode="forgot-password" />}
+        />
         {/* Protected Routes */}
+        <Route element={<ProtectedRoute />}>
+          <Route path="/welcome" element={<WelcomeContainer />} />
+        </Route>
         {currentHome && (
           <Route element={<ProtectedRoute />}>
             <Route

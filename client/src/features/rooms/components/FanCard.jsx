@@ -1,8 +1,9 @@
 import { Card } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
 import { useRoomStore } from "@/store/room";
+import { motion } from "framer-motion";
 
-const FanCard = () => {
+const FanCard = ({hovered}) => {
   const { currentRoom, updateRoom, turnOnAll, turnOffAll } = useRoomStore();
   // Extract fans from the room's appliances list
   const fans =
@@ -33,7 +34,7 @@ const FanCard = () => {
     }
   };
   return (
-    <Card className="flex-1 rounded-3xl flex flex-col">
+    <Card className="flex-1 rounded-3xl flex flex-col relative">
       <div className="px-6 pt-6 flex flex-1">
         <div className="flex flex-1 justify-between relative">
           <h1 className="text-3xl font-semibold">Fan</h1>
@@ -42,8 +43,17 @@ const FanCard = () => {
           </div>
           <img
             src="src/assets/fan.svg"
-            className="absolute top-0 right-20"
+            className="absolute top-0 right-20 z-10"
           ></img>
+          <motion.div
+            className="absolute bg-[rgb(151,151,151)] size-48 blur-2xl top-[25%] right-[8rem] -z-0 rounded-3xl"
+            initial={{ opacity: 0, scale: 0.5 }}
+            animate={{
+              opacity: hovered ? 1 : 0,
+              scale: hovered ? 1.1 : 0.8,
+            }}
+            transition={{ duration: 0.3, ease: "easeInOut" }}
+          ></motion.div>
         </div>
       </div>
       <div className="px-6 pb-6 ">

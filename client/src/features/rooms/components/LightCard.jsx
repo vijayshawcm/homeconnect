@@ -1,8 +1,9 @@
 import { Card } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
 import { useRoomStore } from "@/store/room";
+import { motion } from "framer-motion";
 
-const LightCard = () => {
+const LightCard = ({ hovered }) => {
   const { currentRoom, turnOnAll, turnOffAll, updateRoom } = useRoomStore();
   // Extract fans from the room's appliances list
   const lights =
@@ -21,10 +22,10 @@ const LightCard = () => {
   const toggleLights = async () => {
     try {
       // Update each light in the backend
-      if(!isAllLightsOn){
-      await turnOnAll("Light")
-      }else{
-        await turnOffAll("Light")
+      if (!isAllLightsOn) {
+        await turnOnAll("Light");
+      } else {
+        await turnOffAll("Light");
       }
       // Update frontend state (refetch or update room store)
       updateRoom();
@@ -33,7 +34,7 @@ const LightCard = () => {
     }
   };
   return (
-    <Card className="flex flex-1 flex-col rounded-3xl">
+    <Card className="flex flex-1 flex-col rounded-3xl relative">
       <div className="flex justify-between items-center w-full px-6 pt-6">
         <h1 className="text-3xl font-semibold">Lights</h1>
         <div>
@@ -41,7 +42,16 @@ const LightCard = () => {
         </div>
       </div>
       <div className="flex-1 relative">
-        <img src="src/assets/light.svg" className="absolute right-0"></img>
+        <img src="src/assets/light.svg" className="absolute right-0 z-10"></img>
+        <motion.div
+          className="absolute bg-[#fffb18] size-32 blur-2xl top-[55%] right-[4.6rem] -z-0"
+          initial={{ opacity: 0, scale: 0.5 }}
+          animate={{
+            opacity: hovered ? 1 : 0,
+            scale: hovered ? 1.1 : 0.8,
+          }}
+          transition={{ duration: 0.3, ease: "easeInOut" }}
+        ></motion.div>
       </div>
       <div className="px-6 pb-6 ">
         <Card className="w-36 rounded-3xl bg-[#C2E03A] flex justify-center items-center py-1">

@@ -17,17 +17,17 @@ const RoomPage = () => {
     {
       className: "roomLight",
       key: "light",
-      component: <LightCard key={"light"} />,
+      component: <LightCard key={"light"} hovered={hovered === "light"} />,
     },
     {
       className: "roomAirConditioner",
       key: "aircon",
-      component: <AirConCard key={"aircon"} />,
+      component: <AirConCard key={"aircon"} hovered={hovered === "aircon"} />,
     },
     {
       className: "roomFan",
       key: "fan",
-      component: <FanCard key={"fan"} />,
+      component: <FanCard key={"fan"} hovered={hovered === "fan"} />,
     },
     {
       className: "roomAddAppliance",
@@ -45,7 +45,7 @@ const RoomPage = () => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.3 }}
+            transition={{ duration: 0.4 }}
           />
         )}
       </AnimatePresence>
@@ -58,7 +58,7 @@ const RoomPage = () => {
               layoutId="hoveredCard"
               initial={{ scale: 1, opacity: 1, filter: "blur(0px)" }}
               animate={{
-                scale: hovered === key ? 1.02 : 1,
+                scale: hovered === key ? 1.03 : 1,
                 filter: hovered && hovered !== key ? "blur(4px)" : "blur(0px)",
                 opacity: hovered && hovered !== key ? 0.4 : 1,
                 boxShadow: "0px 0px 8px rgb(255,255,255)",
@@ -88,15 +88,19 @@ const RoomPage = () => {
         onHoverStart={() => setHovered("electricity")}
         onHoverEnd={() => setHovered(null)}
       >
-        <Card className="w-96 rounded-3xl p-8 font-semibold text-3xl flex flex-col relative">
-          <span>Electricity</span>
+        <Card className="w-96 rounded-3xl p-8 font-semibold text-3xl flex flex-col relative bg-gradient-to-r from-white from-90% to-[rgb(217,217,217,66)]">
+          <span>Energy Profile</span>
           <span>for</span>
           <span>{`${currentRoom.name}`}</span>
           {/* Animated Arrow */}
           <motion.div
-            className="absolute top-[50%] right-2"
-            animate={{ x: hovered === "electricity" ? [0, 5, 0] : 0 }} // Subtle left-right motion
-            transition={{ repeat: Infinity, duration: 0.8, ease: "easeInOut" }}
+            className="absolute top-[50%] right-3"
+            animate={{ x: hovered === "electricity" ? [0, 15, 0] : 0 }} // Subtle left-right motion
+            transition={
+              hovered === "electricity"
+                ? { repeat: Infinity, duration: 0.8, ease: "easeInOut" }
+                : {}
+            }
           >
             <ArrowRight className="size-12" />
           </motion.div>
