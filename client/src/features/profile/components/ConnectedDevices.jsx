@@ -62,7 +62,7 @@ function ConnectedDevices() {
 	];
 
 	return (
-		<Card className="border-border">
+		<Card className="border-border mt-6">
 			<CardHeader>
 				<CardTitle>Connected Devices</CardTitle>
 			</CardHeader>
