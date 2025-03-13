@@ -30,7 +30,7 @@ function ProfileStats() {
 	];
 
 	return (
-		<div className="grid gap-4 md:grid-cols-3">
+		<div className="grid gap-4 md:grid-cols-2">
 			{stats.map((stat, index) => (
 				<Card key={index}>
 					<CardHeader className="flex flex-row items-center justify-between pb-2">
