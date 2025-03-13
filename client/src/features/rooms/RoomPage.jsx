@@ -41,7 +41,7 @@ const RoomPage = () => {
       <AnimatePresence>
         {hovered && (
           <motion.div
-            className="absolute inset-0 bg-black/40 backdrop-blur-sm pointer-events-none w-full h-full"
+            className="absolute inset-0 backdrop-blur-[2px] pointer-events-none w-full h-full"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -54,12 +54,11 @@ const RoomPage = () => {
           {applianceGrid.map(({ className, key, component }) => (
             <motion.div
               key={className}
-              className={`${className} flex rounded-3xl`}
+              className={`${className} flex rounded-3xl cursor-pointer`}
               layoutId="hoveredCard"
               initial={{ scale: 1, opacity: 1, filter: "blur(0px)" }}
               animate={{
                 scale: hovered === key ? 1.03 : 1,
-                filter: hovered && hovered !== key ? "blur(4px)" : "blur(0px)",
                 opacity: hovered && hovered !== key ? 0.4 : 1,
                 boxShadow: "0px 0px 8px rgb(255,255,255)",
               }}
@@ -79,8 +78,6 @@ const RoomPage = () => {
         animate={{
           x: 0,
           scale: hovered === "electricity" ? 1.02 : 1,
-          filter:
-            hovered && hovered !== "electricity" ? "blur(4px)" : "blur(0px)",
           opacity: hovered && hovered !== "electricity" ? 0.4 : 1,
           boxShadow: "0px 0px 8px rgb(255,255,255)",
         }}
@@ -88,7 +85,7 @@ const RoomPage = () => {
         onHoverStart={() => setHovered("electricity")}
         onHoverEnd={() => setHovered(null)}
       >
-        <Card className="w-96 rounded-3xl p-8 font-semibold text-3xl flex flex-col relative bg-gradient-to-r from-white from-90% to-[rgb(217,217,217,66)]">
+        <Card className="w-96 rounded-3xl p-8 font-semibold text-3xl flex flex-col relative bg-gradient-to-r from-white from-90% to-[rgb(217,217,217,66)] cursor-pointer">
           <span>Energy Profile</span>
           <span>for</span>
           <span>{`${currentRoom.name}`}</span>

@@ -1,8 +1,9 @@
 import { Card } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
 import { useRoomStore } from "@/store/room";
+import { motion } from "framer-motion";
 
-const AirConCard = () => {
+const AirConCard = ({ hovered }) => {
   const { currentRoom, updateRoom, turnOnAll, turnOffAll } = useRoomStore();
   // Extract air conditioners from the room's appliances list
   const airConditioners =
@@ -35,7 +36,7 @@ const AirConCard = () => {
     }
   };
   return (
-    <Card className="flex flex-1 flex-col rounded-3xl">
+    <Card className="flex flex-1 flex-col rounded-3xl relative">
       <div className="flex justify-between items-center w-full px-6 pt-6">
         <h1 className="text-3xl font-semibold">Air Conditioner</h1>
         <div>
@@ -45,8 +46,17 @@ const AirConCard = () => {
       <div className="flex-1 relative">
         <img
           src="src/assets/aircon.svg"
-          className="absolute right-24 top-2"
+          className="absolute right-24 top-2 z-10"
         ></img>
+        <motion.div
+          className="absolute bg-[rgb(191,230,255)] size-56 blur-2xl top-[25%] right-[9rem] -z-0 rounded-3xl"
+          initial={{ opacity: 0, scale: 0.5 }}
+          animate={{
+            opacity: hovered ? 1 : 0,
+            scale: hovered ? 1.1 : 0.8,
+          }}
+          transition={{ duration: 0.3, ease: "easeInOut" }}
+        ></motion.div>
       </div>
       <div className="px-6 pb-6 ">
         <Card className="w-36 rounded-3xl bg-[#C2E03A] flex justify-center items-center py-1">
