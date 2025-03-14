@@ -4,6 +4,7 @@ import LandingPage from '@/features/landing/LandingPage';
 import AuthContainer from '@/features/auth/AuthContainer'; // Import AuthContainer
 import ProtectedRoute from '@/routes/ProtectedRoute';
 import Profile from '@/features/profile/Profile';
+import Settings from '@/features/settings/Settings';
 import NotFound from '@/pages/NotFound';
 import { useHomeStore } from '@/store/home';
 import HomeContainer from '../features/home/HomeContainer';
@@ -37,6 +38,7 @@ function AppRoutes() {
 				{/* Protected Routes */}
 				<Route element={<ProtectedRoute />}>
 					<Route path="/profile" element={<Profile />} />
+					<Route path="/settings" element={<Settings />} />
 					<Route path="/welcome" element={<WelcomeContainer />} />
 				</Route>
 				{currentHome && (
