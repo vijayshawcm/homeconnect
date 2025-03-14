@@ -107,17 +107,19 @@ const loginStatus = async (req, res) => {
   try {
     const verifyToken = jwt.verify(token, jwtSecret);
     const decodedToken = jwtDecode(token);
+    // TODO : Remember to change zustand state
+    const user = await User.find({username: decodedToken.username});
     if (verifyToken) {
-      return res.status(200).json(decodedToken);
+      return res.status(200).json(user);
     }
   } catch (err) {
-    return res.status(401).json("Invalid token!");
+    return res.status(401).json(err.message);
   }
 
   return res
     .status(401)
     .json(
-      "Unauthorised access, please create or sign in to an existing account."
+      "Unauthorised access, please create or sign in t an existing account."
     );
 };
 
