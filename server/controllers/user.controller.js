@@ -92,6 +92,7 @@ const verifyOTP = async (req, res) => {
 };
 
 // Check if a user is currently authenticated to the system
+// TODO: maybe check database for existence of user too
 const loginStatus = async (req, res) => {
   const token = req.cookies["JWTAuth"];
   console.log(token);
@@ -148,6 +149,7 @@ const registerUser = async (req, res) => {
   try {
     const user = await User.create({
       username: req.body.username,
+      displayName: req.body.displayName,
       email: req.body.email,
       passwordHash: req.body.password,
     });

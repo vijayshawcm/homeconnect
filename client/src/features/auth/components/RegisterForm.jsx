@@ -40,7 +40,7 @@ function RegisterForm({ onRegisterSuccess }) {
 	// Initialise zustand store modification methods
 	const {
 		setUsername: setUsernameStore,
-		setFullName: setFullNameStore,
+		setDisplayName: SetDisplayNameStore,
 		setEmail: setEmailStore,
 		setPassword: setPasswordStore,
 	} = userRegistrationStore();
@@ -58,7 +58,7 @@ function RegisterForm({ onRegisterSuccess }) {
 
 		// Validate Full Name
 		if (!fullName) {
-			newErrors.fullName = 'Full Name is required';
+			newErrors.fullName = 'Preferred Name is required';
 			setErrors(newErrors); // Update errors state
 			return false; // Stop further validation
 		}
@@ -147,7 +147,7 @@ function RegisterForm({ onRegisterSuccess }) {
 
 			// Store user data in zustand store
 			setUsernameStore(username);
-			setFullNameStore(fullName);
+			SetDisplayNameStore(fullName);
 			setEmailStore(email);
 			setPasswordStore(password);
 
@@ -204,7 +204,7 @@ function RegisterForm({ onRegisterSuccess }) {
 			<div className="space-y-1">
 				<div className="flex items-center space-x-1">
 					<Label htmlFor="fullName" className="text-sm">
-						Full Name
+						Preferred Name
 					</Label>
 					<span className="text-red-500">*</span>
 					{errors.fullName && (
