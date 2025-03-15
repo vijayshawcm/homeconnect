@@ -10,7 +10,7 @@ export default function Dashboard() {
   console.log(user);
   return (
     <div className="flex-1">
-      <WelcomeUser user={user} />
+      <WelcomeUser user={user.username} />
       <RoomScrollArea rooms={currentHome.rooms} />
       <BentoGrid />
     </div>

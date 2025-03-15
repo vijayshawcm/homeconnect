@@ -1,12 +1,21 @@
 const mongoose = require("mongoose");
 const bcrypt = require("bcryptjs")
 
-var userSchema = new mongoose.Schema({
-  username: String,
-  username_lower: String,
-  email: String,
-  passwordHash: String,
-});
+var userSchema = new mongoose.Schema(
+  {
+    username: String,
+    usernameLower: String,
+    displayName: String,
+    email: String,
+    passwordHash: String,
+    aboutMe: String,
+    location: String,
+    //TODO: make settings schema ***settings: Schema.ObjectID, 
+  }, 
+  {
+    timestamps: true 
+  }
+);
 
 // Generates password hash and lowercase username on save
 userSchema.pre("save", async function (next) {

@@ -38,12 +38,14 @@ function OTPForm({ mode = 'verify', onVerificationSuccess, successMessage }) {
 		email: registrationEmail,
 		username: registrationUsername,
 		password: registrationPassword,
+		displayName: registrationDisplayName,
 	} = userRegistrationStore();
 
 	const { email: forgotPasswordEmail } = forgotPasswordStore();
 
 	const email = mode === 'verify' ? registrationEmail : forgotPasswordEmail;
 	const username = mode === 'verify' ? registrationUsername : null; // Handle username for different modes
+	const displayName = mode === 'verify' ? registrationDisplayName : null; // Handle display name (full name) for different modes
 	const password = mode === 'verify' ? registrationPassword : null; // Handle password for different modes
 
 	// Prepare auth store to fetch user login
@@ -99,7 +101,7 @@ function OTPForm({ mode = 'verify', onVerificationSuccess, successMessage }) {
 		const response = await fetch('server/users/register', {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({ username, email, password }),
+			body: JSON.stringify({ username, displayName, email, password }),
 		});
 
 		if (!response.ok) {
