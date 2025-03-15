@@ -25,7 +25,7 @@ const jwtSecret = process.env.JWT_SECRET;
 async function generateJWT(res, user) {
   let data = {
     username: user.username,
-    login: true,
+    loggedIn: true,
   };
 
   // Create JWT
@@ -107,11 +107,19 @@ const loginStatus = async (req, res) => {
 
   try {
     const verifyToken = jwt.verify(token, jwtSecret);
-    const decodedToken = jwtDecode(token);
-    // TODO : Remember to change zustand state
-    const user = await User.find({username: decodedToken.username});
+
     if (verifyToken) {
-      return res.status(200).json(user);
+      const decodedToken = jwtDecode(token);
+      const user = await User.findOne({ username: decodedToken.username}); // Query user again to prevent storing sensitive data in jwt.
+      const response = {
+        username: user.username,
+        displayName: user.displayName,
+        email: user.email,
+        aboutMe: user.aboutMe,
+        location: user.location,
+        loggedIn: true
+      }
+      return res.status(200).json(response);
     }
   } catch (err) {
     return res.status(401).json(err.message);
