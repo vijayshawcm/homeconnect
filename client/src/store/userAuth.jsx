@@ -6,7 +6,7 @@ export const userAuthStore = create((set) => ({
 
   // Fetch user session
   fetchLogin: async () => {
-    const response = await fetch("server/users/loginStatus", {
+    const response = await fetch("server/auth/loginStatus", {
       method: "GET",
       headers: { "Content-Type": "application/json" },
       credentials: "include",
@@ -21,7 +21,16 @@ export const userAuthStore = create((set) => ({
     }
   },
 
-  logoutUser: () => set({ user: null, isAuthenticated: false }),
+  logoutUser: async () => {
+    const response = await fetch("server/auth/logout", {
+      method: "GET",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+    });
+
+    set({ user: null, isAuthenticated: false });
+  }
+
 }));
 
 // Fetch user login on app load

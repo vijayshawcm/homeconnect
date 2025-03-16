@@ -20,6 +20,6 @@ router.post("/register", upload.none(), registerUser);
 router.post("/login", loginUser);
 router.post("/sendOTP", sendOTP);
 router.post("/verifyOTP", verifyOTP);
-router.post("/modifyPassword", modifyPassword);
+router.patch("/modifyPassword", modifyPassword);
 
 module.exports = router;

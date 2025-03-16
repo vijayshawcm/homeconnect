@@ -71,7 +71,7 @@ function LoginForm() {
 			});
 
 			// Api call
-			const response = await fetch('server/users/login', {
+			const response = await fetch('server/auth/login', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({ usernameOrEmail, password }),
