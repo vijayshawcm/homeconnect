@@ -6,7 +6,7 @@ export const userAuthStore = create((set) => ({
 
   // Fetch user session
   fetchLogin: async () => {
-    const response = await fetch("server/users/loginStatus", {
+    const response = await fetch("server/auth/loginStatus", {
       method: "GET",
       headers: { "Content-Type": "application/json" },
       credentials: "include",

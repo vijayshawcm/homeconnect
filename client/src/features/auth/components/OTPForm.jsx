@@ -98,7 +98,7 @@ function OTPForm({ mode = 'verify', onVerificationSuccess, successMessage }) {
 		console.log(
 			'registering user: ' + username + '\n' + email + '\n' + password
 		);
-		const response = await fetch('server/users/register', {
+		const response = await fetch('server/auth/register', {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({ username, displayName, email, password }),
@@ -124,7 +124,7 @@ function OTPForm({ mode = 'verify', onVerificationSuccess, successMessage }) {
 			await new Promise((resolve) => setTimeout(resolve, 1000)); // Simulate network delay
 			console.log('Verifying OTP:', otp.join(''));
 			// OTP verification
-			const response = await fetch('server/users/verifyOTP', {
+			const response = await fetch('server/auth/verifyOTP', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({ OTP: otp.join('') }),
@@ -175,7 +175,7 @@ function OTPForm({ mode = 'verify', onVerificationSuccess, successMessage }) {
 		console.log('email submitted:', email);
 
 		// Send OTP to user
-		const response = await fetch('server/users/sendOTP', {
+		const response = await fetch('server/auth/sendOTP', {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({ email }),

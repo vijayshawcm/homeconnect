@@ -39,6 +39,13 @@ async function generateJWT(res, user) {
 
 // Send OTP to provided email
 const sendOTP = async (req, res) => {
+  if(req.body.status == 'modifyPassword') {
+    const user = await User.findOne({ 'userInfo.email': req.body.email });
+    if(!user) {
+      return res.status(404).json("User not found,");
+    }
+  }
+
   var otp = randInt(100000, 999999);
   console.log("New OTP generated: " + otp);
 
@@ -139,7 +146,7 @@ const modifyPassword = async (req, res) => {
   const validUser = await User.findOneAndUpdate({ 'userInfo.email': req.body.email }, { 'userInfo.passwordHash': req.body.password });
 
   if(!validUser) {
-    return res.status(500).json("How did you even get past OTP verification?");
+    return res.status(500).json("User could not be found! (Account deleted?)");
   }
   
   return res.status(200).json("Password updated successfully.");
@@ -179,7 +186,7 @@ const loginUser = async (req, res) => {
   const validUser = await User.findOne({
     'userInfo.usernameLower': req.body.usernameOrEmail.toLowerCase(),
   });
-  
+
   if (!validUser) {
     return res.status(401).json("Invalid credentials!");
   }

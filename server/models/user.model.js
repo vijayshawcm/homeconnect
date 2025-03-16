@@ -53,7 +53,7 @@ userSchema.pre("save", async function (next) {
 userSchema.pre("findOneAndUpdate", async function (next) {
   try {
     const update = this.getUpdate(); // Get update object containing updated fields.
-    update.userInfo.passwordHash = await bcrypt.hash(update.userInfo.passwordHash, 10);
+    update['userInfo.passwordHash'] = await bcrypt.hash(update['userInfo.passwordHash'], 10);
 
     this.setUpdate(update); // Pass hashed password to document.
   } catch (err) {
