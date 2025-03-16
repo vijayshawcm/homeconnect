@@ -7,7 +7,6 @@ import { useHomeStore } from "@/store/home";
 export default function Dashboard() {
   const { user } = userAuthStore();
   const { currentHome } = useHomeStore();
-  console.log(user);
   return (
     <div className="flex-1">
       <WelcomeUser user={user.username} />
