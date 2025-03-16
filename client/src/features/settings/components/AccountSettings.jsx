@@ -644,7 +644,7 @@ function AccountSettings() {
 				open={showEmailVerification}
 				onOpenChange={setShowEmailVerification}
 			>
-				<DialogContent className="sm:max-w-[425px]">
+				<DialogContent className="sm:max-w-[425px] w-[90%] max-h-[90vh] rounded-lg shadow-lg">
 					<DialogHeader>
 						<DialogTitle className="text-xl">Verify Your Email</DialogTitle>
 						<DialogDescription className="text-sm mt-1.5">
@@ -716,7 +716,7 @@ function AccountSettings() {
 				open={showDeactivateDialog}
 				onOpenChange={setShowDeactivateDialog}
 			>
-				<DialogContent className="sm:max-w-[425px]">
+				<DialogContent className="sm:max-w-[425px] w-[90%] max-h-[90vh] rounded-lg shadow-lg">
 					<DialogHeader>
 						<DialogTitle className="flex items-center gap-2 text-amber-600">
 							<AlertCircle className="h-5 w-5" />
@@ -778,7 +778,7 @@ function AccountSettings() {
 
 			{/* Delete Account Dialog */}
 			<Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
-				<DialogContent className="sm:max-w-[425px]">
+				<DialogContent className="sm:max-w-[425px] w-[90%] max-h-[90vh] rounded-lg shadow-lg">
 					<DialogHeader>
 						<DialogTitle className="flex items-center gap-2 text-red-600">
 							<UserX className="h-5 w-5" />

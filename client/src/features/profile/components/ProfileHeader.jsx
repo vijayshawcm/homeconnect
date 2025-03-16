@@ -77,10 +77,10 @@ function ProfileHeader({ user, onProfileUpdate }) {
 							</h1>
 							<p className="text-muted-foreground">@{userData?.username}</p>
 
-							<div className="mt-3 flex flex-wrap gap-4">
+							<div className="mt-3 flex flex-wrap gap-3">
 								<div className="flex items-center text-sm text-muted-foreground">
 									<Calendar className="h-4 w-4 mr-1" />
-									Joined {userData?.joinDate || 'January 2023'}
+									Joined {userData?.joinDate || 'March 2025'}
 								</div>
 								<div className="flex items-center text-sm text-muted-foreground">
 									<MapPin className="h-4 w-4 mr-1" />
