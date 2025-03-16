@@ -40,10 +40,12 @@ import {
 	PopoverContent,
 	PopoverTrigger,
 } from '@/components/ui/popover';
+import { userAuthStore } from '@/store/userAuth';
 
 function AccountSettings() {
+	const { user } = userAuthStore(); // access user from store
 	// email change state
-	const [email, setEmail] = useState('john.doe@example.com');
+	const [email, setEmail] = useState(user?.email || '');
 	const [newEmail, setNewEmail] = useState('');
 	const [isEmailFocused, setIsEmailFocused] = useState(false);
 	const [emailErrors, setEmailErrors] = useState({});
