@@ -62,7 +62,7 @@ function ForgotPassword({
 		const response = await fetch('server/auth/sendOTP', {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({ email }),
+			body: JSON.stringify({ email, status: 'modifyPassword' }),
 		});
 
 		if (!response.ok) {
@@ -83,7 +83,6 @@ function ForgotPassword({
 			// Simulate API call
 			console.log('Sending password reset email to:', email);
 			await sendOTP();
-			await new Promise((resolve) => setTimeout(resolve, 2000)); // Simulate network delay
 			setIsOTPSent(true); // Proceed to OTP verification
 			onOTPSent(); // Notify AuthContainer about OTP sent
 		} catch (error) {
@@ -129,11 +128,14 @@ function ForgotPassword({
 			return;
 		}
 		setIsUpdatingPassword(true); // set loading state to true
-		await new Promise((resolve) => setTimeout(resolve, 2000)); // Simulate network delay
 		try {
 			console.log('Updating password:', password);
-			// Simulate API call to update password
-			await new Promise((resolve) => setTimeout(resolve, 2000));
+			// API call to update password
+			const response = await fetch('server/auth/modifyPassword', {
+				method: 'PATCH',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ email, password }),
+			});
 			if (onPasswordChangeSuccess) onPasswordChangeSuccess(); // Notify parent component about successful password change
 			setPasswordChangeSuccess(true); // Show success animation
 			setTimeout(() => {
