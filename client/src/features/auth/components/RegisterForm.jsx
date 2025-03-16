@@ -114,7 +114,7 @@ function RegisterForm({ onRegisterSuccess }) {
 		console.log('email submitted:', email);
 
 		// Send OTP to user
-		const response = await fetch('server/users/sendOTP', {
+		const response = await fetch('server/auth/sendOTP', {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({ email }),
