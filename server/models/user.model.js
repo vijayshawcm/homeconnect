@@ -3,14 +3,28 @@ const bcrypt = require("bcryptjs")
 
 var userSchema = new mongoose.Schema(
   {
-    username: String,
-    usernameLower: String,
-    displayName: String,
-    email: String,
-    passwordHash: String,
-    aboutMe: String,
-    location: String,
-    //TODO: make settings schema ***settings: Schema.ObjectID, 
+    userInfo: {
+      username: String,
+      usernameLower: String,
+      displayName: String,
+      email: String,
+      passwordHash: String,
+      aboutMe: String,
+      location: String,
+    },
+    settings:  {
+      accountStatus: { type: String, enum: ['active', 'inactive'], default: 'active' },
+      theme: { type: String, enum: ['light', 'dark', 'system'], default: 'system' },
+      twoFactorAuthentication: Boolean,
+      notification: {
+        channels: { type: [String], enum: ['email', 'push', 'sms'], default: ['email'] },
+        types: { type: [String], enum: ['marketing', 'security', 'update', 'reminder', 'billing'], default: ['security', 'reminder']}
+      },
+    },
+    sessions: [{
+        platform: String,
+        lastActive: Date,
+      }]
   }, 
   {
     timestamps: true 
@@ -21,12 +35,12 @@ var userSchema = new mongoose.Schema(
 userSchema.pre("save", async function (next) {
   // Check if field is modified to prevent presave function running twice on same field
   try {
-    if(this.isModified("passwordHash")) {
-      this.passwordHash = await bcrypt.hash(this.passwordHash, 10);
+    if(this.isModified("userInfo.passwordHash")) {
+      this.userInfo.passwordHash = await bcrypt.hash(this.userInfo.passwordHash, 10);
     }
     
-    if(this.isModified("username")) {
-      this.username_lower = this.username.toLowerCase();
+    if(this.isModified("userInfo.username")) {
+      this.userInfo.usernameLower = this.userInfo.username.toLowerCase();
     }
 
     next();
@@ -39,7 +53,7 @@ userSchema.pre("save", async function (next) {
 userSchema.pre("findOneAndUpdate", async function (next) {
   try {
     const update = this.getUpdate(); // Get update object containing updated fields.
-    update.passwordHash = await bcrypt.hash(update.passwordHash, 10);
+    update.userInfo.passwordHash = await bcrypt.hash(update.userInfo.passwordHash, 10);
 
     this.setUpdate(update); // Pass hashed password to document.
   } catch (err) {
