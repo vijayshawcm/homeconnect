@@ -12,7 +12,6 @@ import {
 } from "@/components/ui/select";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useHomeStore } from "@/store/home";
-import { Card } from "@/components/ui/card";
 import { Label } from "@radix-ui/react-label";
 import { Check } from "lucide-react";
 
@@ -41,13 +40,12 @@ const WelcomeContainer = () => {
   ];
 
   useEffect(() => {
-    // const timer = setTimeout(() => {
-    //   setHomeSetupStep(1);
-    // }, 8000);
-    // return () => clearTimeout(timer);
-    setHomeSetupStep(2);
-    console.log(user.displayName);
-  }, []);
+    const timer = setTimeout(() => {
+      setHomeSetupStep(1);
+    }, 8000);
+    return () => clearTimeout(timer);
+  }, [user]);
+
 
   const addRoom = () => {
     if (newRoom.name && newRoom.type) {
@@ -70,21 +68,24 @@ const WelcomeContainer = () => {
           >
             Hello,{" "}
             <motion.span className="font-normal text-[#2BB673]">
-              {user.displayName.split("").map((char, index) => (
-                <motion.div
-                  key={index}
-                  initial={{ opacity: 0, x: 10 }} // Start slightly below
-                  animate={{ opacity: 1, x: 0 }} // Moves up (-10), then settles (0)
-                  transition={{
-                    delay: 2 + index * 0.1,
-                    duration: 0.4,
-                    ease: "easeInOut",
-                  }}
-                  className="inline-block"
-                >
-                  {char === " " ? "\u00A0" : char} {/* Keeps spaces visible */}
-                </motion.div>
-              ))}
+              {user?.fullName?.split("").map((char, index) => {
+                return (
+                  <motion.div
+                    key={index}
+                    initial={{ opacity: 0, x: 10 }} // Start slightly below
+                    animate={{ opacity: 1, x: 0 }} // Moves up (-10), then settles (0)
+                    transition={{
+                      delay: 2 + index * 0.1,
+                      duration: 0.4,
+                      ease: "easeInOut",
+                    }}
+                    className="inline-block"
+                  >
+                    {char === " " ? "\u00A0" : char}{" "}
+                    {/* Keeps spaces visible */}
+                  </motion.div>
+                );
+              })}
             </motion.span>
           </motion.span>
           <motion.span
@@ -92,7 +93,7 @@ const WelcomeContainer = () => {
             animate={{ opacity: 1 }}
             transition={{
               duration: 1,
-              delay: 3.4 + (user.displayName.length - 1) * 0.1,
+              delay: 3.4 + (user?.fullName?.length - 1) * 0.1,
             }}
           >
             Welcome to{" "}
@@ -103,7 +104,7 @@ const WelcomeContainer = () => {
               transition={{
                 duration: 1.5,
                 ease: "easeOut",
-                delay: 4.4 + (user.displayName.length - 1) * 0.1,
+                delay: 4.4 + (user?.fullName?.length - 1) * 0.1,
               }}
             >
               <span className="bg-clip-text text-transparent bg-gradient-to-r from-[#2BB673] to-[#C2E03A]">
