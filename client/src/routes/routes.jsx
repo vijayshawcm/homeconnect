@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import LandingPage from '@/features/landing/LandingPage';
 import AuthContainer from '@/features/auth/AuthContainer'; // Import AuthContainer
+import PublicRoute from '@/routes/PublicRoute';
 import ProtectedRoute from '@/routes/ProtectedRoute';
 import Profile from '@/features/profile/Profile';
 import Settings from '@/features/settings/Settings';
@@ -29,12 +30,14 @@ function AppRoutes() {
 				{/* Root Route */}
 				<Route path="/" element={<LandingPage />} />
 				{/* Public Routes */}
-				<Route path="/login" element={<AuthContainer mode="login" />} />
-				<Route path="/register" element={<AuthContainer mode="register" />} />
-				<Route
-					path="/forgot-password"
-					element={<AuthContainer mode="forgot-password" />}
-				/>
+				<Route element={<PublicRoute />}>
+					<Route path="/login" element={<AuthContainer mode="login" />} />
+					<Route path="/register" element={<AuthContainer mode="register" />} />
+					<Route
+						path="/forgot-password"
+						element={<AuthContainer mode="forgot-password" />}
+					/>
+				</Route>
 				{/* Protected Routes */}
 				<Route element={<ProtectedRoute />}>
 					<Route path="/profile" element={<Profile />} />
