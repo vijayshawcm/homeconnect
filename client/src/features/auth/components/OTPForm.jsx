@@ -148,7 +148,7 @@ function OTPForm({ mode = 'verify', onVerificationSuccess, successMessage }) {
 						await fetchLogin(); // Fetch user login status
 						setTimeout(() => {
 							// ! We don't question this it just works, changing this breaks everything
-							window.location.replace('/dashboard'); // Redirect to dashboard
+							window.location.replace('/welcome'); // Redirect to dashboard
 						}, 2000);
 						// Step 3: Show success animation
 						setVerificationSuccess(true);
