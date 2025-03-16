@@ -123,7 +123,7 @@ function EditProfileModal({ isOpen, onClose, user, onSave }) {
 
 	return (
 		<Dialog open={isOpen} onOpenChange={onClose}>
-			<DialogContent className="sm:max-w-[500px]">
+			<DialogContent className="sm:max-w-[500px] w-[90%] max-h-[90vh] rounded-lg shadow-lg">
 				<form onSubmit={handleSubmit} noValidate>
 					<DialogHeader>
 						<DialogTitle>Edit Profile</DialogTitle>
@@ -153,7 +153,7 @@ function EditProfileModal({ isOpen, onClose, user, onSave }) {
 						</div>
 					</div>
 
-					<div className="grid gap-4 py-4">
+					<div className="grid gap-4 pb-4">
 						{/* Full Name Field */}
 						<div className="space-y-1">
 							<div className="flex items-center space-x-1">
