@@ -228,7 +228,7 @@ function AccountSettings() {
 		e.preventDefault();
 
 		if (!dobDay || !dobMonth || !dobYear) {
-			setDobErrors({ dob: 'Complete date of birth is required' });
+			setDobErrors({ dob: 'Complete date of birth required' });
 			return;
 		}
 
@@ -335,9 +335,9 @@ function AccountSettings() {
 			<CardContent className="space-y-8 pb-8">
 				{/* Email Change Section */}
 				<div className="space-y-6">
-					<div className="flex items-start gap-3">
-						<div className="mt-0.5 h-10 w-10 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center shadow-sm">
-							<Mail className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+					<div className="flex items-center gap-3">
+						<div className="h-10 w-10 aspect-square rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center shadow-sm">
+							<Mail className="h-1/2 w-1/2 text-blue-600 dark:text-blue-400" />
 						</div>
 						<div>
 							<h3 className="text-base font-medium leading-tight">
@@ -360,7 +360,7 @@ function AccountSettings() {
 								value={email}
 								disabled
 								readOnly
-								className="bg-muted/50 text-muted-foreground cursor-not-allowed font-medium"
+								className="bg-muted/50 text-muted-foreground cursor-not-allowed"
 							/>
 						</div>
 
@@ -370,14 +370,14 @@ function AccountSettings() {
 							noValidate
 						>
 							<div className="space-y-2.5">
-								<div className="flex justify-between items-center">
+								<div className="flex items-center space-x-1">
 									<Label htmlFor="newEmail" className="text-sm font-medium">
-										New Email <span className="text-red-500">*</span>
+										New Email
 									</Label>
-									{emailErrors.newEmail && !isEmailFocused && (
-										<span className="text-xs text-red-500 flex items-center gap-1">
-											<AlertCircle className="h-3 w-3" />
-											{emailErrors.newEmail}
+									<span className="text-red-500">*</span>
+									{emailErrors.newEmail && (
+										<span className="text-red-500 text-xs ml-auto">
+											- {emailErrors.newEmail}
 										</span>
 									)}
 								</div>
@@ -388,10 +388,10 @@ function AccountSettings() {
 									onChange={handleEmailChange}
 									onFocus={() => setIsEmailFocused(true)}
 									onBlur={() => setIsEmailFocused(false)}
-									placeholder="Enter your new email address"
-									className={`w-full transition-colors duration-150 ${
+									required
+									className={`w-full border border-gray-300 focus:border-black focus-visible:ring-0 focus:outline-none dark:focus:border-white transition-colors duration-150 ${
 										emailErrors.newEmail && !isEmailFocused
-											? 'border-red-500 focus-visible:ring-red-500'
+											? 'border-red-500'
 											: ''
 									}`}
 								/>
@@ -421,12 +421,12 @@ function AccountSettings() {
 
 				{/* DOB Section */}
 				<div className="space-y-6">
-					<div className="flex items-start gap-4">
-						<div className="mt-0.5 h-10 w-10 rounded-full bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center shadow-sm">
-							<Calendar className="h-5 w-5 text-purple-600 dark:text-purple-400" />
+					<div className="flex items-center gap-4">
+						<div className="h-10 w-10 aspect-square rounded-full bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center shadow-sm">
+							<Calendar className="h-1/2 w-1/2 text-purple-600 dark:text-purple-400" />
 						</div>
 						<div>
-							<h3 className="text-lg font-medium leading-tight">
+							<h3 className="text-base font-medium leading-tight">
 								Date of Birth
 							</h3>
 							<p className="text-sm text-muted-foreground mt-1">
@@ -452,13 +452,14 @@ function AccountSettings() {
 							<PopoverContent className="w-full p-5" align="start">
 								<form onSubmit={handleUpdateDob} className="space-y-6">
 									<div className="space-y-4">
-										<div className="flex justify-between items-center">
+										<div className="flex items-center space-x-1">
 											<Label className="text-sm font-medium">
-												Date of Birth <span className="text-red-500">*</span>
+												Date of Birth
 											</Label>
+											<span className="text-red-500">*</span>
 											{dobErrors.dob && (
 												<span className="text-xs text-red-500 flex items-center gap-1">
-													<AlertCircle className="h-3 w-3" /> {dobErrors.dob}
+													- {dobErrors.dob}
 												</span>
 											)}
 										</div>
@@ -567,12 +568,12 @@ function AccountSettings() {
 
 				{/* Account Management Section */}
 				<div className="space-y-6">
-					<div className="flex items-start gap-4">
-						<div className="mt-0.5 h-10 w-10 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center shadow-sm">
-							<UserX className="h-5 w-5 text-red-600 dark:text-red-400" />
+					<div className="flex items-center gap-4">
+						<div className="h-10 w-10 aspect-square rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center shadow-sm">
+							<UserX className="h-1/2 w-1/2 text-red-600 dark:text-red-400" />
 						</div>
 						<div>
-							<h3 className="text-lg font-medium leading-tight">
+							<h3 className="text-base font-medium leading-tight">
 								Account Management
 							</h3>
 							<p className="text-sm text-muted-foreground mt-1">
@@ -663,7 +664,7 @@ function AccountSettings() {
 									value={verificationCode}
 									onChange={(e) => setVerificationCode(e.target.value)}
 									placeholder="Enter 6-digit code"
-									className="text-center text-lg tracking-widest max-w-[220px] font-mono"
+									className="text-center text-base tracking-widest max-w-[220px] font-mono"
 									maxLength={6}
 								/>
 							</div>
@@ -791,7 +792,7 @@ function AccountSettings() {
 					<div className="grid gap-5 py-5">
 						<div className="rounded-md border border-red-200 bg-red-50 dark:bg-red-950/20 dark:border-red-900/50 p-3">
 							<div className="flex gap-2">
-								<AlertCircle className="h-4 w-4 text-red-600 dark:text-red-500 mt-0.5 flex-shrink-0" />
+								<AlertCircle className="h-4 w-4 text-red-600 dark:text-red-500 flex-shrink-0" />
 								<div className="text-xs text-red-700 dark:text-red-400">
 									<p className="font-medium">
 										Warning: This action cannot be reversed

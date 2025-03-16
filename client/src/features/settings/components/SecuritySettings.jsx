@@ -113,18 +113,28 @@ function SecuritySettings() {
 
 		if (!passwordData.currentPassword) {
 			newErrors.currentPassword = 'Current password is required';
+			setErrors(newErrors); // Update errors state
+			return false; // Stop further validation
 		}
 
 		if (!passwordData.newPassword) {
 			newErrors.newPassword = 'New password is required';
+			setErrors(newErrors); // Update errors state
+			return false; // Stop further validation
 		} else if (passwordStrength < 60) {
 			newErrors.newPassword = 'Password is not strong enough';
+			setErrors(newErrors); // Update errors state
+			return false; // Stop further validation
 		}
 
 		if (!passwordData.confirmPassword) {
 			newErrors.confirmPassword = 'Please confirm your password';
+			setErrors(newErrors); // Update errors state
+			return false; // Stop further validation
 		} else if (passwordData.newPassword !== passwordData.confirmPassword) {
 			newErrors.confirmPassword = 'Passwords do not match';
+			setErrors(newErrors); // Update errors state
+			return false; // Stop further validation
 		}
 
 		setErrors(newErrors);
@@ -196,9 +206,9 @@ function SecuritySettings() {
 			<CardContent className="space-y-8 pb-8">
 				{/* Password Change Section */}
 				<div className="space-y-6">
-					<div className="flex items-start gap-3">
-						<div className="mt-0.5 h-10 w-10 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center shadow-sm">
-							<KeyRound className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+					<div className="flex items-center gap-3">
+						<div className="h-10 w-10 aspect-square rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center shadow-sm">
+							<KeyRound className="h-1/2 w-1/2 text-blue-600 dark:text-blue-400" />
 						</div>
 						<div>
 							<h3 className="text-base font-medium leading-tight">
@@ -217,17 +227,17 @@ function SecuritySettings() {
 					>
 						<div className="space-y-5">
 							<div className="space-y-2.5">
-								<div className="flex justify-between items-center">
+								<div className="flex items-center space-x-1">
 									<Label
 										htmlFor="currentPassword"
 										className="text-sm font-medium"
 									>
-										Current Password <span className="text-red-500">*</span>
+										Current Password
 									</Label>
-									{errors.currentPassword && !isCurrentPasswordFocused && (
-										<span className="text-xs text-red-500 flex items-center gap-1">
-											<AlertCircle className="h-3 w-3" />
-											{errors.currentPassword}
+									<span className="text-red-500">*</span>
+									{errors.currentPassword && (
+										<span className="text-red-500 text-xs ml-auto">
+											- {errors.currentPassword}
 										</span>
 									)}
 								</div>
@@ -240,9 +250,9 @@ function SecuritySettings() {
 										onChange={handlePasswordChange}
 										onFocus={() => setIsCurrentPasswordFocused(true)}
 										onBlur={() => setIsCurrentPasswordFocused(false)}
-										className={`pr-10 transition-colors duration-150 ${
+										className={`w-full border border-gray-300 focus:border-black focus-visible:ring-0 focus:outline-none dark:focus:border-white transition-colors duration-150 ${
 											errors.currentPassword && !isCurrentPasswordFocused
-												? 'border-red-500 focus-visible:ring-red-500'
+												? 'border-red-500'
 												: ''
 										}`}
 									/>
@@ -250,13 +260,13 @@ function SecuritySettings() {
 										type="button"
 										variant="ghost"
 										size="icon"
-										className="absolute right-0 top-0 h-full px-3 text-muted-foreground hover:text-foreground"
+										className="absolute right-0 top-0 h-full px-3 text-muted-foreground hover:text-foreground hover:bg-transparent"
 										onClick={() => setShowCurrentPassword(!showCurrentPassword)}
 									>
 										{showCurrentPassword ? (
-											<EyeOff className="h-4 w-4" />
-										) : (
 											<Eye className="h-4 w-4" />
+										) : (
+											<EyeOff className="h-4 w-4" />
 										)}
 										<span className="sr-only">
 											{showCurrentPassword ? 'Hide password' : 'Show password'}
@@ -266,14 +276,14 @@ function SecuritySettings() {
 							</div>
 
 							<div className="space-y-2.5">
-								<div className="flex justify-between items-center">
+								<div className="flex items-center space-x-1">
 									<Label htmlFor="newPassword" className="text-sm font-medium">
-										New Password <span className="text-red-500">*</span>
+										New Password
 									</Label>
-									{errors.newPassword && !isNewPasswordFocused && (
-										<span className="text-xs text-red-500 flex items-center gap-1">
-											<AlertCircle className="h-3 w-3" />
-											{errors.newPassword}
+									<span className="text-red-500">*</span>
+									{errors.newPassword && (
+										<span className="text-red-500 text-xs ml-auto">
+											- {errors.newPassword}
 										</span>
 									)}
 								</div>
@@ -286,7 +296,7 @@ function SecuritySettings() {
 										onChange={handlePasswordChange}
 										onFocus={() => setIsNewPasswordFocused(true)}
 										onBlur={() => setIsNewPasswordFocused(false)}
-										className={`pr-10 transition-colors duration-150 ${
+										className={`h-9 pr-10 border border-gray-300 focus:border-black focus-visible:ring-0 focus:outline-none dark:focus:border-white transition-colors duration-150 ${
 											errors.newPassword && !isNewPasswordFocused
 												? 'border-red-500 focus-visible:ring-red-500'
 												: ''
@@ -296,13 +306,13 @@ function SecuritySettings() {
 										type="button"
 										variant="ghost"
 										size="icon"
-										className="absolute right-0 top-0 h-full px-3 text-muted-foreground hover:text-foreground"
+										className="absolute right-0 top-0 h-full px-3 text-muted-foreground hover:text-foreground hover:bg-transparent"
 										onClick={() => setShowNewPassword(!showNewPassword)}
 									>
 										{showNewPassword ? (
-											<EyeOff className="h-4 w-4" />
-										) : (
 											<Eye className="h-4 w-4" />
+										) : (
+											<EyeOff className="h-4 w-4" />
 										)}
 										<span className="sr-only">
 											{showNewPassword ? 'Hide password' : 'Show password'}
@@ -423,17 +433,17 @@ function SecuritySettings() {
 							</div>
 
 							<div className="space-y-2.5">
-								<div className="flex justify-between items-center">
+								<div className="flex items-center space-x-1">
 									<Label
 										htmlFor="confirmPassword"
 										className="text-sm font-medium"
 									>
-										Confirm New Password <span className="text-red-500">*</span>
+										Confirm New Password
 									</Label>
+									<span className="text-red-500">*</span>
 									{errors.confirmPassword && !isConfirmPasswordFocused && (
-										<span className="text-xs text-red-500 flex items-center gap-1">
-											<AlertCircle className="h-3 w-3" />
-											{errors.confirmPassword}
+										<span className="text-red-500 text-xs ml-auto">
+											- {errors.confirmPassword}
 										</span>
 									)}
 								</div>
@@ -446,9 +456,9 @@ function SecuritySettings() {
 										onChange={handlePasswordChange}
 										onFocus={() => setIsConfirmPasswordFocused(true)}
 										onBlur={() => setIsConfirmPasswordFocused(false)}
-										className={`pr-10 transition-colors duration-150 ${
+										className={`h-9 pr-10 border border-gray-300 focus:border-black focus-visible:ring-0 focus:outline-none dark:focus:border-white transition-colors duration-150 ${
 											errors.confirmPassword && !isConfirmPasswordFocused
-												? 'border-red-500 focus-visible:ring-red-500'
+												? 'border-red-500'
 												: ''
 										}`}
 									/>
@@ -456,13 +466,13 @@ function SecuritySettings() {
 										type="button"
 										variant="ghost"
 										size="icon"
-										className="absolute right-0 top-0 h-full px-3 text-muted-foreground hover:text-foreground"
+										className="absolute right-0 top-0 h-full px-3 text-muted-foreground hover:text-foreground hover:bg-transparent"
 										onClick={() => setShowConfirmPassword(!showConfirmPassword)}
 									>
 										{showConfirmPassword ? (
-											<EyeOff className="h-4 w-4" />
-										) : (
 											<Eye className="h-4 w-4" />
+										) : (
+											<EyeOff className="h-4 w-4" />
 										)}
 										<span className="sr-only">
 											{showConfirmPassword ? 'Hide password' : 'Show password'}
@@ -495,12 +505,12 @@ function SecuritySettings() {
 
 				{/* 2FA Section */}
 				<div className="space-y-6">
-					<div className="flex items-start gap-4">
-						<div className="mt-0.5 h-10 w-10 rounded-full bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center shadow-sm">
-							<Fingerprint className="h-5 w-5 text-purple-600 dark:text-purple-400" />
+					<div className="flex items-center gap-4">
+						<div className="h-10 w-10 aspect-square rounded-full bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center shadow-sm">
+							<Fingerprint className="h-1/2 w-1/2 text-purple-600 dark:text-purple-400" />
 						</div>
 						<div>
-							<h3 className="text-lg font-medium leading-tight">
+							<h3 className="text-base font-medium leading-tight">
 								Two-Factor Authentication
 							</h3>
 							<p className="text-sm text-muted-foreground mt-1">
@@ -532,12 +542,12 @@ function SecuritySettings() {
 
 				{/* Active Sessions Section */}
 				<div className="space-y-6">
-					<div className="flex items-start gap-4">
-						<div className="mt-0.5 h-10 w-10 rounded-full bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center shadow-sm">
-							<Smartphone className="h-5 w-5 text-amber-600 dark:text-amber-400" />
+					<div className="flex items-center gap-4">
+						<div className="h-10 w-10 aspect-square rounded-full bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center shadow-sm">
+							<Smartphone className="h-1/2 w-1/2 text-amber-600 dark:text-amber-400" />
 						</div>
 						<div>
-							<h3 className="text-lg font-medium leading-tight">
+							<h3 className="text-base font-medium leading-tight">
 								Active Sessions
 							</h3>
 							<p className="text-sm text-muted-foreground mt-1">
@@ -548,8 +558,8 @@ function SecuritySettings() {
 
 					<div className="space-y-4 pl-14">
 						<div className="flex justify-between items-center bg-muted/50 p-4 rounded-lg hover:bg-muted/70 transition-colors duration-200">
-							<div className="flex items-start gap-3">
-								<div className="mt-0.5 h-10 w-10 rounded-full bg-background flex items-center justify-center shadow-sm">
+							<div className="flex items-center gap-3">
+								<div className="h-10 w-10 aspect-square rounded-full bg-background flex items-center justify-center shadow-sm">
 									<svg
 										xmlns="http://www.w3.org/2000/svg"
 										width="20"
@@ -568,10 +578,10 @@ function SecuritySettings() {
 									</svg>
 								</div>
 								<div>
-									<p className="font-medium">Chrome on Windows</p>
+									<p className="text-sm font-medium">Chrome on Windows</p>
 									<div className="flex items-center mt-1">
-										<div className="h-2 w-2 rounded-full bg-green-500 mr-2"></div>
-										<p className="text-sm text-muted-foreground">
+										<div className="h-2 w-2 rounded-full bg-green-500 mr-1.5"></div>
+										<p className="text-xs text-muted-foreground">
 											Current session
 										</p>
 									</div>
@@ -587,8 +597,8 @@ function SecuritySettings() {
 						</div>
 
 						<div className="flex justify-between items-center bg-muted/50 p-4 rounded-lg hover:bg-muted/70 transition-colors duration-200">
-							<div className="flex items-start gap-3">
-								<div className="mt-0.5 h-10 w-10 rounded-full bg-background flex items-center justify-center shadow-sm">
+							<div className="flex items-center gap-3">
+								<div className="h-10 w-10 aspect-square rounded-full bg-background flex items-center justify-center shadow-sm">
 									<svg
 										xmlns="http://www.w3.org/2000/svg"
 										width="20"
@@ -607,10 +617,10 @@ function SecuritySettings() {
 									</svg>
 								</div>
 								<div>
-									<p className="font-medium">Safari on MacBook</p>
+									<p className="text-sm font-medium">Safari on MacBook</p>
 									<div className="flex items-center mt-1">
-										<div className="h-2 w-2 rounded-full bg-amber-500 mr-2"></div>
-										<p className="text-sm text-muted-foreground">
+										<div className="h-2 w-2 rounded-full bg-amber-500 mr-1.5"></div>
+										<p className="text-xs text-muted-foreground">
 											Last active: 2 hours ago
 										</p>
 									</div>
@@ -626,8 +636,8 @@ function SecuritySettings() {
 						</div>
 
 						<div className="flex justify-between items-center bg-muted/50 p-4 rounded-lg hover:bg-muted/70 transition-colors duration-200">
-							<div className="flex items-start gap-3">
-								<div className="mt-0.5 h-10 w-10 rounded-full bg-background flex items-center justify-center shadow-sm">
+							<div className="flex items-center gap-3">
+								<div className="h-10 w-10 aspect-square rounded-full bg-background flex items-center justify-center shadow-sm">
 									<svg
 										xmlns="http://www.w3.org/2000/svg"
 										width="20"
@@ -645,10 +655,10 @@ function SecuritySettings() {
 									</svg>
 								</div>
 								<div>
-									<p className="font-medium">Safari on iPhone</p>
+									<p className="text-sm font-medium">Safari on iPhone</p>
 									<div className="flex items-center mt-1">
-										<div className="h-2 w-2 rounded-full bg-red-500 mr-2"></div>
-										<p className="text-sm text-muted-foreground">
+										<div className="h-2 w-2 rounded-full bg-red-500 mr-1.5"></div>
+										<p className="text-xs text-muted-foreground">
 											Last active: 2 days ago
 										</p>
 									</div>

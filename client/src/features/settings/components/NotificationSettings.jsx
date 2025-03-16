@@ -177,9 +177,9 @@ function NotificationSettings() {
 				</CardHeader>
 				<CardContent className="space-y-8 pb-8">
 					<div className="space-y-6">
-						<div className="flex items-start gap-3">
-							<div className="mt-0.5 h-10 w-10 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center shadow-sm">
-								<Bell className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+						<div className="flex items-center gap-3">
+							<div className="h-10 aspect-square rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center shadow-sm">
+								<Bell className="h-1/2 w-1/2 text-blue-600 dark:text-blue-400" />
 							</div>
 							<div>
 								<h3 className="text-base font-medium leading-tight">
@@ -199,11 +199,11 @@ function NotificationSettings() {
 										key={item.id}
 										className="flex items-center justify-between p-4 rounded-lg bg-muted/50 hover:bg-muted/70 transition-colors duration-200"
 									>
-										<div className="flex items-start gap-3">
+										<div className="flex items-center gap-3">
 											<div
-												className={`mt-0.5 h-10 w-10 rounded-full ${item.bgColor} flex items-center justify-center shadow-sm`}
+												className={`h-10 w-10 aspect-square rounded-full ${item.bgColor} flex items-center justify-center shadow-sm`}
 											>
-												<Icon className={`h-5 w-5 ${item.color}`} />
+												<Icon className={`h-1/2 w-1/2 ${item.color}`} />
 											</div>
 											<div>
 												<Label
@@ -229,12 +229,12 @@ function NotificationSettings() {
 					</div>
 
 					<div className="space-y-6">
-						<div className="flex items-start gap-4">
-							<div className="mt-0.5 h-10 w-10 rounded-full bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center shadow-sm">
-								<Bell className="h-5 w-5 text-purple-600 dark:text-purple-400" />
+						<div className="flex items-center gap-4">
+							<div className="h-10 w-10 aspect-square rounded-full bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center shadow-sm">
+								<Bell className="h-1/2 w-1/2 text-purple-600 dark:text-purple-400" />
 							</div>
 							<div>
-								<h3 className="text-lg font-medium leading-tight">
+								<h3 className="text-base font-medium leading-tight">
 									Notification Types
 								</h3>
 								<p className="text-sm text-muted-foreground mt-1">
@@ -253,9 +253,9 @@ function NotificationSettings() {
 									>
 										<div className="flex items-center gap-3">
 											<div
-												className={`h-10 w-10 rounded-full ${item.bgColor} flex items-center justify-center shadow-sm`}
+												className={`h-10 w-10 aspect-square rounded-full ${item.bgColor} flex items-center justify-center shadow-sm`}
 											>
-												<Icon className={`h-5 w-5 ${item.color}`} />
+												<Icon className={`h-1/2 w-1/2 ${item.color}`} />
 											</div>
 											<div>
 												<Label
