@@ -30,7 +30,7 @@ function Settings() {
 					</div>
 				</div>
 			</div>
-			<Toaster position="bottom-right" richColors closeButton />
+			<Toaster position="bottom-right" richColors />
 		</>
 	);
 }
