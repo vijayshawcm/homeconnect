@@ -5,21 +5,14 @@ import ProfileStats from '@/features/profile/components/ProfileStats';
 import RecentActivity from '@/features/profile/components/RecentActivity';
 import ConnectedDevices from '@/features/profile/components/ConnectedDevices';
 import { Toaster } from 'sonner';
+import { userAuthStore } from '@/store/userAuth';
 
 function Profile() {
 	useEffect(() => {
 		updatePageTitle('Profile');
 	}, []);
 
-	// Mock user data
-	const [user, setUser] = useState({
-		username: 'Test',
-		fullName: 'Test Test',
-		email: 'test@gmail.com',
-		bio: 'Smart home enthusiast and tech lover',
-		avatarUrl: '',
-		joinDate: 'March 2025',
-	});
+	const { user, setUser } = userAuthStore();
 
 	const handleProfileUpdate = (updatedUser) => {
 		setUser(updatedUser);

@@ -134,9 +134,9 @@ function AppearanceSettings() {
 				</CardHeader>
 				<CardContent className="pb-8">
 					<div className="space-y-6">
-						<div className="flex items-start gap-3">
-							<div className="mt-0.5 h-10 w-10 rounded-full bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center shadow-sm">
-								<Palette className="h-5 w-5 text-purple-600 dark:text-purple-400" />
+						<div className="flex items-center gap-3">
+							<div className="h-10 w-10 aspect-square rounded-full bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center shadow-sm">
+								<Palette className="h-1/2 w-1/2 text-purple-600 dark:text-purple-400" />
 							</div>
 							<div>
 								<h3 className="text-base font-medium leading-tight">Theme</h3>

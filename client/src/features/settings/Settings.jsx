@@ -14,7 +14,7 @@ function Settings() {
 			<div className="container mx-auto py-10 px-4 sm:px-6 max-w-4xl animate-in fade-in duration-500">
 				<div className="mb-10 flex items-center gap-5">
 					<div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center shadow-sm">
-						<Cog className="h-6 w-6 text-primary" />
+						<Cog className="h-1/2 w-1/2 text-primary" />
 					</div>
 					<div>
 						<h1 className="text-2xl font-semibold tracking-tight">Settings</h1>

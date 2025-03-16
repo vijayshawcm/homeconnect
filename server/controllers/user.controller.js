@@ -24,7 +24,7 @@ function randInt(min, max) {
 const jwtSecret = process.env.JWT_SECRET;
 async function generateJWT(res, user) {
   let data = {
-    username: user.username,
+    username: user.userInfo.username,
     loggedIn: true,
   };
 
@@ -92,10 +92,8 @@ const verifyOTP = async (req, res) => {
 };
 
 // Check if a user is currently authenticated to the system
-// TODO: maybe check database for existence of user too
 const loginStatus = async (req, res) => {
   const token = req.cookies["JWTAuth"];
-  console.log(token);
 
   if (!token) {
     return res
@@ -107,16 +105,20 @@ const loginStatus = async (req, res) => {
 
   try {
     const verifyToken = jwt.verify(token, jwtSecret);
-
     if (verifyToken) {
       const decodedToken = jwtDecode(token);
-      const user = await User.findOne({ username: decodedToken.username}); // Query user again to prevent storing sensitive data in jwt.
+      const user = await User.findOne({ 'userInfo.username': decodedToken.username}); // Query user
+
+      if(!user) {
+        return res.status(401).json("User not found! (Account deleted?)");
+      }
+
       const response = {
-        username: user.username,
-        displayName: user.displayName,
-        email: user.email,
-        aboutMe: user.aboutMe,
-        location: user.location,
+        username: user.userInfo.username,
+        displayName: user.userInfo.displayName,
+        email: user.userInfo.email,
+        aboutMe: user.userInfo.aboutMe,
+        location: user.userInfo.location,
         loggedIn: true
       }
       return res.status(200).json(response);
@@ -128,13 +130,13 @@ const loginStatus = async (req, res) => {
   return res
     .status(401)
     .json(
-      "Unauthorised access, please create or sign in t an existing account."
+      "Unauthorised access, please create or sign in to an existing account."
     );
 };
 
 // Change user password
 const modifyPassword = async (req, res) => {
-  const validUser = await User.findOneAndUpdate({ email: req.body.email }, { passwordHash: req.body.password });
+  const validUser = await User.findOneAndUpdate({ 'userInfo.email': req.body.email }, { 'userInfo.passwordHash': req.body.password });
 
   if(!validUser) {
     return res.status(500).json("How did you even get past OTP verification?");
@@ -150,16 +152,18 @@ const registerUser = async (req, res) => {
   I know this is super spaghetti rn just bear with me here
   It'll work for now
   */
-  if(await User.findOne({ email: req.body.email }) || await User.findOne({ username: req.body.username })) {
+  if(await User.findOne({ 'userInfo.email': req.body.email }) || await User.findOne({ 'userInfo.username': req.body.username })) {
     return res.status(409).json("Account or Email has already been registered!") // Woah 409 code!
   }
 
   try {
     const user = await User.create({
-      username: req.body.username,
-      displayName: req.body.displayName,
-      email: req.body.email,
-      passwordHash: req.body.password,
+      userInfo: {
+        username: req.body.username,
+        displayName: req.body.displayName,
+        email: req.body.email,
+        passwordHash: req.body.password,
+      }
     });
 
     generateJWT(res, user); // Generate JWT for user and save in cookie
@@ -173,8 +177,9 @@ const registerUser = async (req, res) => {
 const loginUser = async (req, res) => {
   // Check if user exists
   const validUser = await User.findOne({
-    username_lower: req.body.usernameOrEmail.toLowerCase(),
+    'userInfo.usernameLower': req.body.usernameOrEmail.toLowerCase(),
   });
+  
   if (!validUser) {
     return res.status(401).json("Invalid credentials!");
   }
@@ -182,7 +187,7 @@ const loginUser = async (req, res) => {
   // Check if password hash matches
   const validPassword = await bcrypt.compare(
     req.body.password,
-    validUser.passwordHash
+    validUser.userInfo.passwordHash
   );
 
   if (!validPassword) {

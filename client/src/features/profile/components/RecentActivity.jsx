@@ -67,9 +67,9 @@ function RecentActivity() {
 					{activities.slice(0, 4).map((activity, index) => (
 						<div key={index} className="flex items-start gap-4 group">
 							<div
-								className={`rounded-full p-2 ${activity.bgColor} group-hover:scale-110 transition-transform`}
+								className={`rounded-full w-8 h-8 aspect-square flex items-center justify-center ${activity.bgColor} group-hover:scale-110 transition-transform`}
 							>
-								<activity.icon className={`h-4 w-4 ${activity.color}`} />
+								<activity.icon className={`h-1/2 w-1/2 ${activity.color}`} />
 							</div>
 							<div className="flex-1 space-y-1">
 								<p className="font-medium leading-none">

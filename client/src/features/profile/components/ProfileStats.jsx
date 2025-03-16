@@ -46,8 +46,10 @@ function ProfileStats() {
 				>
 					<CardHeader className="flex flex-row items-center justify-between pb-2 pt-4 px-4">
 						<CardTitle className="text-sm font-medium">{stat.title}</CardTitle>
-						<div className={`p-1.5 rounded-full ${stat.bgColor}`}>
-							<stat.icon className={`h-4 w-4 ${stat.color}`} />
+						<div
+							className={`w-8 h-8 aspect-square rounded-full flex items-center justify-center ${stat.bgColor}`}
+						>
+							<stat.icon className={`h-1/2 w-1/2 ${stat.color}`} />
 						</div>
 					</CardHeader>
 					<CardContent className="px-4 pb-4 pt-0">
