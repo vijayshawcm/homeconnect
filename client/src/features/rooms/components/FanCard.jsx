@@ -34,19 +34,19 @@ const FanCard = ({hovered}) => {
     }
   };
   return (
-    <Card className="flex-1 rounded-3xl flex flex-col relative">
+    <Card className="flex-1 rounded-3xl flex flex-col relative overflow-hidden">
       <div className="px-6 pt-6 flex flex-1">
         <div className="flex flex-1 justify-between relative">
-          <h1 className="text-3xl font-semibold">Fan</h1>
+          <h1 className="text-2xl font-semibold">Fan</h1>
           <div>
             <Switch checked={isAllFansOn} onCheckedChange={toggleFans} />
           </div>
           <img
             src="src/assets/fan.svg"
-            className="absolute top-0 right-20 z-10"
+            className="absolute top-0 right-20 z-10 aspect-auto h-[100%]"
           ></img>
           <motion.div
-            className="absolute bg-[rgb(151,151,151)] size-48 blur-2xl top-[25%] right-[8rem] -z-0 rounded-3xl"
+            className="absolute bg-[rgb(151,151,151)] aspect-square h-[60%] blur-2xl top-[30%] right-[25%] -z-0 rounded-3xl"
             initial={{ opacity: 0, scale: 0.5 }}
             animate={{
               opacity: hovered ? 1 : 0,
@@ -57,12 +57,14 @@ const FanCard = ({hovered}) => {
         </div>
       </div>
       <div className="px-6 pb-6 ">
-        <Card className="w-36 rounded-3xl bg-[#C2E03A] flex justify-center items-center py-1">
+        <Card className="aspect-[3.5] w-[50%] max-w-36 rounded-3xl bg-[#C2E03A] flex justify-center items-center py-1">
           <div className="flex justify-evenly">
             <h1 className="text-2xl font-light w-[50%] flex justify-center items-center text-center">
               {activeFans}/{totalFans}
             </h1>
-            <span className="flex-1 font-normal leading-5">Active Devices</span>
+            <span className="flex-1 font-normal leading-5 text-base">
+              Active Devices
+            </span>
           </div>
         </Card>
       </div>

@@ -36,7 +36,14 @@ const RoomPage = () => {
     },
   ];
   return (
-    <div className="py-10 px-12 flex-1 flex gap-5">
+    <motion.div
+      className="2xl:px-8 2xl:py-12 flex-1 flex gap-4"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 1 }}
+      key = {currentRoom.name}
+    >
       {/* Dimming background effect */}
       <AnimatePresence>
         {hovered && (
@@ -50,7 +57,7 @@ const RoomPage = () => {
         )}
       </AnimatePresence>
       {currentExpanded ? null : (
-        <div className="grid auto-cols-[1fr] auto-rows-[1fr] room-template-area gap-6 flex-1">
+        <div className="grid auto-cols-[1fr] auto-rows-[1fr] room-template-area gap-4 flex-1">
           {applianceGrid.map(({ className, key, component }) => (
             <motion.div
               key={className}
@@ -73,7 +80,7 @@ const RoomPage = () => {
       )}
       <div className="border-2 border-[#184C85] rounded-lg"></div>
       <motion.div
-        className="flex justify-center rounded-3xl"
+        className="flex justify-center rounded-3xl w-[25%]"
         initial={{ scale: 1, opacity: 0, filter: "blur(0px)", x: 50 }}
         animate={{
           x: 0,
@@ -85,7 +92,7 @@ const RoomPage = () => {
         onHoverStart={() => setHovered("electricity")}
         onHoverEnd={() => setHovered(null)}
       >
-        <Card className="w-96 rounded-3xl p-8 font-semibold text-3xl flex flex-col relative bg-gradient-to-r from-white from-90% to-[rgb(217,217,217,66)] cursor-pointer">
+        <Card className="w-full rounded-3xl p-8 font-semibold text-2xl flex flex-col relative bg-gradient-to-r from-white from-90% to-[rgb(217,217,217,66)] cursor-pointer">
           <span>Energy Profile</span>
           <span>for</span>
           <span>{`${currentRoom.name}`}</span>
@@ -103,7 +110,7 @@ const RoomPage = () => {
           </motion.div>
         </Card>
       </motion.div>
-    </div>
+    </motion.div>
   );
 };
 

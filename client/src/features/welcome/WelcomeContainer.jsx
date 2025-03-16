@@ -20,7 +20,7 @@ const WelcomeContainer = () => {
   const { user } = userAuthStore();
   const { createHome } = useHomeStore();
   const [HomeSetupStep, setHomeSetupStep] = useState(0);
-  const [userType, setuserType] = useState("");
+  const [userType, setuserType] = useState("homeowner");
   const [homeName, setHomeName] = useState("");
   const [rooms, setRooms] = useState([]);
   const [newRoom, setNewRoom] = useState({ name: "", type: "" });
@@ -43,9 +43,10 @@ const WelcomeContainer = () => {
   useEffect(() => {
     // const timer = setTimeout(() => {
     //   setHomeSetupStep(1);
-    // }, 7500);
+    // }, 8000);
     // return () => clearTimeout(timer);
-    setHomeSetupStep(0)
+    setHomeSetupStep(2);
+    console.log(user.displayName);
   }, []);
 
   const addRoom = () => {
@@ -72,16 +73,16 @@ const WelcomeContainer = () => {
               {user.displayName.split("").map((char, index) => (
                 <motion.div
                   key={index}
-                  initial={{ opacity: 0, y: 20 }} // Start slightly below
-                  animate={{ opacity: 1, y: [20, -10, 0] }} // Moves up (-10), then settles (0)
+                  initial={{ opacity: 0, x: 10 }} // Start slightly below
+                  animate={{ opacity: 1, x: 0 }} // Moves up (-10), then settles (0)
                   transition={{
-                    delay: 2.5 + index * 0.1,
-                    duration: 0.6,
-                    ease: "easeOut",
+                    delay: 2 + index * 0.1,
+                    duration: 0.4,
+                    ease: "easeInOut",
                   }}
                   className="inline-block"
                 >
-                  {char}
+                  {char === " " ? "\u00A0" : char} {/* Keeps spaces visible */}
                 </motion.div>
               ))}
             </motion.span>
@@ -89,14 +90,21 @@ const WelcomeContainer = () => {
           <motion.span
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ duration: 1, delay: 4 }}
+            transition={{
+              duration: 1,
+              delay: 3.4 + (user.displayName.length - 1) * 0.1,
+            }}
           >
             Welcome to{" "}
             <motion.span
               className="inline-block"
               initial={{ opacity: 0, clipPath: "inset(0% 100% 0% 0%)" }}
               animate={{ opacity: 1, clipPath: "inset(0% 0% 0% 0%)" }}
-              transition={{ duration: 2, ease: "easeOut", delay: 5 }}
+              transition={{
+                duration: 1.5,
+                ease: "easeOut",
+                delay: 4.4 + (user.displayName.length - 1) * 0.1,
+              }}
             >
               <span className="bg-clip-text text-transparent bg-gradient-to-r from-[#2BB673] to-[#C2E03A]">
                 HomeConnect
@@ -169,6 +177,24 @@ const WelcomeContainer = () => {
           </Button>
         </motion.div>
       ) : userType === "homeowner" && HomeSetupStep === 2 ? (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 1.5 }}
+          className="p-8 bg-white rounded-2xl shadow-xl text-center flex flex-col items-center gap-4"
+        >
+          <h2 className="text-2xl font-semibold">Let's set up your home</h2>
+          <p className="text-gray-600">
+            What would you like to name your home?
+          </p>
+          <input
+            type="text"
+            placeholder="Enter home name"
+            className="border rounded-lg p-2 w-full focus:outline-none focus:ring-2 focus:ring-[#C2E03A]"
+          />
+          <Button className="">Continue</Button>
+        </motion.div>
+      ) : userType === "homeowner" && HomeSetupStep === 3 ? (
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}

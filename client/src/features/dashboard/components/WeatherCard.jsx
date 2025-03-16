@@ -20,7 +20,7 @@ const WeatherCard = () => {
             className="aspect-square size-64"
           />
         </motion.div>
-        <div className="flex-1 flex justify-start items-center ml-20">
+        <div className="flex-1 flex justify-start items-center ml-10">
           <div className="flex flex-col gap-4 items-start min-h-52">
             <div className="font-semibold text-4xl">
               {/* To be replaced with weather API */}

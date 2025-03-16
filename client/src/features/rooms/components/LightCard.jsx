@@ -34,17 +34,17 @@ const LightCard = ({ hovered }) => {
     }
   };
   return (
-    <Card className="flex flex-1 flex-col rounded-3xl relative">
+    <Card className="flex flex-1 flex-col rounded-3xl relative overflow-hidden">
       <div className="flex justify-between items-center w-full px-6 pt-6">
-        <h1 className="text-3xl font-semibold">Lights</h1>
+        <h1 className="text-2xl font-semibold">Lights</h1>
         <div>
           <Switch checked={isAllLightsOn} onCheckedChange={toggleLights} />
         </div>
       </div>
       <div className="flex-1 relative">
-        <img src="src/assets/light.svg" className="absolute right-0 z-10"></img>
+        <img src="src/assets/light.svg" className="absolute right-0 z-10 aspect-auto h-[60%]"></img>
         <motion.div
-          className="absolute bg-[#fffb18] size-32 blur-2xl top-[55%] right-[4.6rem] -z-0"
+          className="absolute bg-[#fffb18] size-[30%] blur-2xl top-[50%] right-[17%] -z-0"
           initial={{ opacity: 0, scale: 0.5 }}
           animate={{
             opacity: hovered ? 1 : 0,
@@ -54,7 +54,7 @@ const LightCard = ({ hovered }) => {
         ></motion.div>
       </div>
       <div className="px-6 pb-6 ">
-        <Card className="w-36 rounded-3xl bg-[#C2E03A] flex justify-center items-center py-1">
+        <Card className="aspect-[3.5] w-[50%] max-w-36 rounded-3xl bg-[#C2E03A] flex justify-center items-center py-1">
           <div className="flex justify-evenly">
             <h1 className="text-2xl font-light w-[50%] flex justify-center items-center text-center">
               {activeLight}/{totalLight}

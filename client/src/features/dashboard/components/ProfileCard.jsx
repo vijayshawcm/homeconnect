@@ -9,16 +9,16 @@ const ProfileCard = () => {
       <h1 className="font-semibold text-2xl">Profiles</h1>
       <ScrollArea className="w-full whitespace-nowrap">
         <div className="flex flex-1 gap-10 selection:items-center w-full ">
-          <Avatar className="size-20 lg:size-28">
+          <Avatar className="size-14 lg:size-28">
             <AvatarImage src={sampleAvatar}></AvatarImage>
           </Avatar>
-          <Avatar className="size-20 lg:size-28">
+          <Avatar className="size-14 lg:size-28">
             <AvatarImage src={sampleAvatar}></AvatarImage>
           </Avatar>
-          <Avatar className="size-20 lg:size-28">
+          <Avatar className="size-14 lg:size-28">
             <AvatarImage src={sampleAvatar}></AvatarImage>
           </Avatar>
-          <Avatar className="size-20 lg:size-28">
+          <Avatar className="size-14 lg:size-28">
             <AvatarImage src={sampleAvatar}></AvatarImage>
           </Avatar>
         </div>

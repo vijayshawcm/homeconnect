@@ -135,7 +135,7 @@ export function NavMain({ items }) {
           item.title.toLowerCase() === "rooms" ? (
             <Collapsible key={item.title} asChild className="group/collapsible">
               <SidebarMenuItem key={item.title}>
-                <CollapsibleTrigger asChild>
+                <CollapsibleTrigger asChild key={item.title}>
                   <SidebarMenuButton
                     tooltip={item.title}
                     className={buttonClass}
@@ -162,7 +162,7 @@ export function NavMain({ items }) {
                       const formattedName = subItem.name.replace(/\s+/g, ""); // Replace spaces with dashes
                       return (
                         <SidebarMenuSubItem key={subItem.title}>
-                          <Link to={`/${formattedName}`}>
+                          <Link key={subItem.name} to={`/${formattedName}`}>
                             <SidebarMenuSubButton
                               className="navRooms transition-all duration-500 h-9 select-none"
                               style={{ "--delay": `${index * 0.2}s` }}
@@ -186,7 +186,7 @@ export function NavMain({ items }) {
             </Collapsible>
           ) : (
             <SidebarMenuItem key={item.title}>
-              <Link to={item.url}>
+              <Link key={item.title} to={item.url}>
                 <SidebarMenuButton
                   key={item.title}
                   className={buttonClass}

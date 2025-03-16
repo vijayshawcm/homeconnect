@@ -36,9 +36,9 @@ const AirConCard = ({ hovered }) => {
     }
   };
   return (
-    <Card className="flex flex-1 flex-col rounded-3xl relative">
+    <Card className="flex flex-1 flex-col rounded-3xl relative overflow-hidden">
       <div className="flex justify-between items-center w-full px-6 pt-6">
-        <h1 className="text-3xl font-semibold">Air Conditioner</h1>
+        <h1 className="lg:text-2xl font-semibold">Air Conditioner</h1>
         <div>
           <Switch checked={isAllAirConOn} onCheckedChange={toggleAirCons} />
         </div>
@@ -46,10 +46,10 @@ const AirConCard = ({ hovered }) => {
       <div className="flex-1 relative">
         <img
           src="src/assets/aircon.svg"
-          className="absolute right-24 top-2 z-10"
+          className="absolute right-24 top-2 z-10 aspect-auto h-[100%]"
         ></img>
         <motion.div
-          className="absolute bg-[rgb(191,230,255)] size-56 blur-2xl top-[25%] right-[9rem] -z-0 rounded-3xl"
+          className="absolute bg-[rgb(191,230,255)] size-[60%] blur-2xl top-[55%] right-[12%] -z-0 rounded-3xl"
           initial={{ opacity: 0, scale: 0.5 }}
           animate={{
             opacity: hovered ? 1 : 0,
@@ -59,7 +59,7 @@ const AirConCard = ({ hovered }) => {
         ></motion.div>
       </div>
       <div className="px-6 pb-6 ">
-        <Card className="w-36 rounded-3xl bg-[#C2E03A] flex justify-center items-center py-1">
+        <Card className="aspect-[3.5] w-[50%] max-w-36 rounded-3xl bg-[#C2E03A] flex justify-center items-center py-1">
           <div className="flex justify-evenly">
             <h1 className="text-2xl font-light w-[50%] flex justify-center items-center text-center">
               {activeAirCons}/{totalAirCons}
