@@ -117,14 +117,14 @@ function RegisterForm({ onRegisterSuccess }) {
 		const response = await fetch('server/auth/sendOTP', {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({ email }),
+			body: JSON.stringify({ email, username, status: "register" }),
 		});
 
-		if (!response.ok) {
+		if (response.status == 409) {
+			throw new Error(await response.text());
+		} else if (!response.ok) {
 			throw new Error('Failed to send OTP. Please try again.');
 		}
-
-		//alert('OTP sent to your email!'); otp sent animation or whatever
 	};
 
 	// Handle Registration

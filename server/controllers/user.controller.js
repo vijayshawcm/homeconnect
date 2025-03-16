@@ -39,11 +39,18 @@ async function generateJWT(res, user) {
 
 // Send OTP to provided email
 const sendOTP = async (req, res) => {
-  if(req.body.status == 'modifyPassword') {
-    const user = await User.findOne({ 'userInfo.email': req.body.email });
-    if(!user) {
-      return res.status(404).json("User not found,");
-    }
+  // Check if user exists for provided email
+  const userByEmail = await User.findOne({ 'userInfo.email': req.body.email });
+  if(req.body.status == 'modifyPassword' && !userByEmail) {
+      return res.status(404).json("User not found.");
+  }
+
+  // Check if username has already been registered
+  const userByName = await User.findOne({ 'userInfo.usernameLower': req.body.username.toLowerCase() });
+  if(req.body.status == 'register' && userByEmail) {
+    return res.status(409).json("The provided email has already been registered.");
+  } else if (req.body.status == 'register' && userByName) {
+    return res.status(409).json("The provided uername has already been registered.");
   }
 
   var otp = randInt(100000, 999999);
@@ -154,11 +161,6 @@ const modifyPassword = async (req, res) => {
 
 // Registers user
 const registerUser = async (req, res) => {
-  /* 
-  TODO: Probably should check for this before proceeding to otp page i guess 
-  I know this is super spaghetti rn just bear with me here
-  It'll work for now
-  */
   if(await User.findOne({ 'userInfo.email': req.body.email }) || await User.findOne({ 'userInfo.username': req.body.username })) {
     return res.status(409).json("Account or Email has already been registered!") // Woah 409 code!
   }
