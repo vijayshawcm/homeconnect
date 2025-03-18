@@ -53,11 +53,25 @@ userSchema.pre("save", async function (next) {
 userSchema.pre("findOneAndUpdate", async function (next) {
   try {
     const update = this.getUpdate(); // Get update object containing updated fields.
-    update['userInfo.passwordHash'] = await bcrypt.hash(update['userInfo.passwordHash'], 10);
 
-    this.setUpdate(update); // Pass hashed password to document.
+    // Check for appropriate updated field and handle update.
+    if(update['userInfo.passwordHash']) {
+      update['userInfo.passwordHash'] = await bcrypt.hash(update['userInfo.passwordHash'], 10);
+    }
+
+    if(update['userInfo.username']) {
+      update['userInfo.usernameLower'] = update['userInfo.username'].toLowerCase();
+    }
+
+    if(update['settings.accountStatus']) {
+      if(update['settings.accountStatus'] != 'active' && update['settings.accountStatus'] != 'inactive') {
+        throw new Error("Invalid input received"); // Throw error to be handled at api call.
+      }
+    }
+
+    this.setUpdate(update); // Pass updated values to document.
   } catch (err) {
-    next(err); //Pass error up the chain
+    next(err); // Pass error up the chain.
   }
 });
 
