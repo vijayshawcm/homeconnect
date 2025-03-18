@@ -10,7 +10,6 @@ const {
   logoutUser,
   sendOTP,
   verifyOTP,
-  modifyPassword
 } = require("../controllers/auth.controller");
 
 const router = express.Router();
@@ -20,6 +19,5 @@ router.post("/register", upload.none(), registerUser);
 router.post("/login", loginUser);
 router.post("/sendOTP", sendOTP);
 router.post("/verifyOTP", verifyOTP);
-router.patch("/modifyPassword", modifyPassword);
 
 module.exports = router;
