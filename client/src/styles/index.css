@@ -143,22 +143,6 @@
       "summary summary suggestion suggestion";
   }
 
-  @media (max-width: 1024px) {
-    .grid-template-area {
-      grid-template-areas:
-        "profiles"
-        "weather"
-        "weather"
-        "summary"
-        "summary"
-        "summary"
-        "summary"
-        "suggestion"
-        "suggestion"
-        "suggestion";
-    }
-  }
-
   .roomLight {
     grid-area: lights;
   }
@@ -187,6 +171,39 @@
       "lights lights lights lights lights fans fans fans fans fans fans fans fans fans"
       "lights lights lights lights lights fans fans fans fans fans fans fans fans fans"
       "addAppliance addAppliance addAppliance addAppliance addAppliance fans fans fans fans fans fans fans fans fans";
+  }
+
+  @media (max-width: 1024px) {
+    .grid-template-area {
+      grid-template-areas:
+        "profiles"
+        "weather"
+        "weather"
+        "summary"
+        "summary"
+        "summary"
+        "summary"
+        "suggestion"
+        "suggestion"
+        "suggestion";
+    }
+  }
+
+  @media (max-width: 1280px) {
+    .room-template-area {
+      grid-template-areas:
+        "lights"
+        "lights"
+        "lights"
+        "airCon"
+        "airCon"
+        "airCon"
+        "fans"
+        "fans"
+        "fans"
+        "addAppliance"
+        "addAppliance";
+    }
   }
 
   * {

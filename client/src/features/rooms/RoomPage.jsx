@@ -8,11 +8,14 @@ import { AddApplianceCard } from "./components/AddApplianceCard";
 import FanCard from "./components/FanCard";
 import { ArrowRight } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useSidebar } from "@/components/ui/sidebar";
+import ExpandedView from "./components/ExpandedView";
 
 const RoomPage = () => {
-  const { currentExpanded, setExpanded } = useState(null);
+  const [currentExpanded, setExpanded] = useState(null);
   const [hovered, setHovered] = useState(null);
   const { currentRoom } = useRoomStore();
+  const { isMobile } = useSidebar();
   const applianceGrid = [
     {
       className: "roomLight",
@@ -37,7 +40,7 @@ const RoomPage = () => {
   ];
   return (
     <motion.div
-      className="2xl:px-8 2xl:py-12 flex-1 flex gap-4"
+      className="xl:p-8 flex-1 flex xl:gap-4 gap-2 p-4 flex-col xl:flex-row"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
@@ -56,7 +59,9 @@ const RoomPage = () => {
           />
         )}
       </AnimatePresence>
-      {currentExpanded ? null : (
+      {currentExpanded ? (
+        <ExpandedView></ExpandedView>
+      ) : (
         <div className="grid auto-cols-[1fr] auto-rows-[1fr] room-template-area gap-4 flex-1">
           {applianceGrid.map(({ className, key, component }) => (
             <motion.div
@@ -72,15 +77,17 @@ const RoomPage = () => {
               transition={{ type: "spring", stiffness: 250, damping: 20 }}
               onHoverStart={() => setHovered(key)}
               onHoverEnd={() => setHovered(null)}
+              onClick={() => setExpanded(key)}
             >
               {component}
             </motion.div>
           ))}
         </div>
       )}
+
       <div className="border-2 border-[#184C85] rounded-lg"></div>
       <motion.div
-        className="flex justify-center rounded-3xl w-[25%]"
+        className="flex justify-center rounded-3xl xl:w-[25%] w-full"
         initial={{ scale: 1, opacity: 0, filter: "blur(0px)", x: 50 }}
         animate={{
           x: 0,
@@ -98,7 +105,7 @@ const RoomPage = () => {
           <span>{`${currentRoom.name}`}</span>
           {/* Animated Arrow */}
           <motion.div
-            className="absolute top-[50%] right-3"
+            className="absolute xl:top-[50%] xl:right-3 top-[40%] right-0"
             animate={{ x: hovered === "electricity" ? [0, 15, 0] : 0 }} // Subtle left-right motion
             transition={
               hovered === "electricity"

@@ -29,7 +29,7 @@ const RoomsHeader = () => {
   }, [carouselApi, currentRoom, currentHome.rooms]);
 
   return (
-    <div className="flex flex-1 items-center justify-between gap-1">
+    <div className="flex items-center justify-between gap-4 flex-1">
       <Carousel
         className="flex-1 px-8"
         opts={{ align: "start", loop: false }}
@@ -61,7 +61,7 @@ const RoomsHeader = () => {
         <CarouselPrevious />
         <CarouselNext />
       </Carousel>
-      <div className="flex">
+      <div className="flex gap-2">
         <HeaderInput />
         <HeaderAvatar />
       </div>
