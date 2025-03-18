@@ -4,6 +4,7 @@ const dotenv = require("dotenv");
 const cookieParser = require("cookie-parser");
 const {
   authRoutes,
+  userRoutes,
   applianceRoutes,
   homeRoutes,
   roomRoutes,
@@ -21,6 +22,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use("/server/auth", authRoutes);
+app.use("/server/users", userRoutes);
 app.use("/server/appliances", applianceRoutes);
 app.use("/server/rooms", roomRoutes);
 app.use("/server/homes", homeRoutes);
