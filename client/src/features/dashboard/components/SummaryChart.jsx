@@ -35,7 +35,10 @@ const SummaryChart = () => {
           tickMargin={10}
           axisLine={false}
         />
-        <YAxis tickLine={false} axisLine={false} />
+
+        <div className="lg:block hidden">
+          <YAxis tickLine={false} axisLine={false} />
+        </div>
         <ChartTooltip
           content={<ChartTooltipContent hideLabel className="w-44" />}
         />

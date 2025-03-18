@@ -2,7 +2,10 @@ const { Home, User } = require("../models");
 const mongoose = require("mongoose");
 
 const createHome = async (req, res) => {
-  const home = req.body;
+  const username = req.body.username;
+  const user = await User.findOne({ "userInfo.username": username });
+  const home = { name: req.body.homeName, owner: user._id };
+  console.log(home);
 
   const newHome = new Home(home);
 

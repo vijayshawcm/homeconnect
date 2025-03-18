@@ -4,10 +4,10 @@ import { motion } from "framer-motion";
 
 const WeatherCard = () => {
   return (
-    <Card className="bg-white rounded-3xl p-4">
+    <Card className="bg-white rounded-3xl p-4 flex-1 flex flex-col">
       <div className="font-semibold text-2xl">Weather Forecast</div>
-      <div className="flex justify-between items-center">
-        <motion.div>
+      <div className="flex-col sm:flex-row flex justify-between items-center flex-1">
+        <motion.div className="h-full flex justify-center items-center">
           <motion.img
             animate={{ y: [0, -8, 0] }}
             transition={{
@@ -17,11 +17,11 @@ const WeatherCard = () => {
             }}
             src={SunnyImage}
             alt="SunnyImage"
-            className="aspect-square size-64"
+            className="aspect-square sm:h-[90%] h-[100%]"
           />
         </motion.div>
-        <div className="flex-1 flex justify-start items-center ml-10">
-          <div className="flex flex-col gap-4 items-start min-h-52">
+        <div className="flex-1 flex justify-start items-center sm:ml-[15%]">
+          <div className="flex flex-col gap-2 sm:gap-4 items-center sm:items-start min-h-52 justify-center">
             <div className="font-semibold text-4xl">
               {/* To be replaced with weather API */}
               Kuala Lumpur

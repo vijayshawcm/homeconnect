@@ -4,17 +4,17 @@ import WeatherCard from "./WeatherCard";
 
 const BentoGrid = () => {
   return (
-    <div className="grid auto-cols-auto lg:auto-cols-[1fr] auto-rows-[1fr] gap-4 grid-template-area px-4 lg:p-4 ">
-      <div className="bentoProfile">
+    <div className="grid auto-cols-auto lg:auto-cols-[1fr] auto-rows-[1fr] gap-8 grid-template-area p-4 ">
+      <div className="bentoProfile flex">
         <ProfileCard />
       </div>
-      <div className="bentoWeather">
+      <div className="bentoWeather flex">
         <WeatherCard />
       </div>
-      <div className="bentoSummary">
+      <div className="bentoSummary flex">
         <SummaryCard/>
       </div>
-      <div className="bg-blue-800 bentoSuggestion"></div>
+      <div className="bg-blue-800 bentoSuggestion flex"></div>
     </div>
   );
 };

@@ -40,12 +40,12 @@ const WelcomeContainer = () => {
   ];
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setHomeSetupStep(1);
-    }, 8000);
-    return () => clearTimeout(timer);
+    // const timer = setTimeout(() => {
+    //   setHomeSetupStep(1);
+    // }, 8000);
+    // return () => clearTimeout(timer);
+    setHomeSetupStep(1);
   }, [user]);
-
 
   const addRoom = () => {
     if (newRoom.name && newRoom.type) {
@@ -188,12 +188,22 @@ const WelcomeContainer = () => {
           <p className="text-gray-600">
             What would you like to name your home?
           </p>
-          <input
+          <Input
             type="text"
             placeholder="Enter home name"
-            className="border rounded-lg p-2 w-full focus:outline-none focus:ring-2 focus:ring-[#C2E03A]"
+            className="border rounded-lg p-2 w-full"
+            onChange={(e) => {
+              setHomeName(e.target.value);
+            }}
           />
-          <Button className="">Continue</Button>
+          <Button
+            className=""
+            onClick={() => {
+              setHomeSetupStep(3);
+            }}
+          >
+            Continue
+          </Button>
         </motion.div>
       ) : userType === "homeowner" && HomeSetupStep === 3 ? (
         <motion.div
@@ -246,7 +256,7 @@ const WelcomeContainer = () => {
           <Button
             className="mt-4 px-4 py-2"
             onClick={() => {
-              createHome({ homeName, rooms });
+              console.log({ homeName, rooms, username: user.username });
             }}
           >
             Finish Setup

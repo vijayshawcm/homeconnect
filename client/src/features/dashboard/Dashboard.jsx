@@ -8,8 +8,8 @@ export default function Dashboard() {
   const { user } = userAuthStore();
   const { currentHome } = useHomeStore();
   return (
-    <div className="flex-1">
-      <WelcomeUser user={user.username} />
+    <div className="flex-1 py-4">
+      <WelcomeUser user={user.fullName} />
       <RoomScrollArea rooms={currentHome.rooms} />
       <BentoGrid />
     </div>

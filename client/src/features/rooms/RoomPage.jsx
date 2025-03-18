@@ -42,7 +42,7 @@ const RoomPage = () => {
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       transition={{ duration: 1 }}
-      key = {currentRoom.name}
+      key={currentRoom.name}
     >
       {/* Dimming background effect */}
       <AnimatePresence>

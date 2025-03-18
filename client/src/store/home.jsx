@@ -17,12 +17,15 @@ export const useHomeStore = create((set, get) => ({
   createHome: async (homeData) => {
     set({ isLoading: false });
     try {
-      const res = await fetch("/server/homes", {
+      const homeRes = await fetch("/server/homes", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(homeData),
+        body: JSON.stringify({
+          name: homeData.homeName,
+          username: homeData.username,
+        }),
       });
-      const data = await res.json();
+      const data = await homeRes.json();
       if (!data.success) {
         set({ isLoading: false });
         return { success: false, message: data.message };
@@ -31,7 +34,7 @@ export const useHomeStore = create((set, get) => ({
         currentHome: data.data,
         isLoading: true,
       });
-      console.log(data.data)
+      console.log(data.data);
       return {
         success: true,
         message: "Home created successfully",

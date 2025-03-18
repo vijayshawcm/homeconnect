@@ -148,7 +148,13 @@
       grid-template-areas:
         "profiles"
         "weather"
+        "weather"
         "summary"
+        "summary"
+        "summary"
+        "summary"
+        "suggestion"
+        "suggestion"
         "suggestion";
     }
   }
