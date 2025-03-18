@@ -188,7 +188,7 @@ const registerUser = async (req, res) => {
 	}
 };
 
-// TODO: make sign ins work with email too
+// TODO: make sign ins work with email too, also check account status!
 const loginUser = async (req, res) => {
 	// Check if user exists
 	const validUser = await User.findOne({
