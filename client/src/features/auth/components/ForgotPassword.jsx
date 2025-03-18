@@ -131,7 +131,7 @@ function ForgotPassword({
 		try {
 			console.log('Updating password:', password);
 			// API call to update password
-			const response = await fetch('server/auth/modifyPassword', {
+			const response = await fetch('server/users/updatePassword', {
 				method: 'PATCH',
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({ email, password }),
