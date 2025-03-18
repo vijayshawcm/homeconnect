@@ -160,20 +160,6 @@ const loginStatus = async (req, res) => {
 		);
 };
 
-// Change user password
-const modifyPassword = async (req, res) => {
-	const validUser = await User.findOneAndUpdate(
-		{ 'userInfo.email': req.body.email },
-		{ 'userInfo.passwordHash': req.body.password }
-	);
-
-	if (!validUser) {
-		return res.status(500).json('User could not be found! (Account deleted?)');
-	}
-
-	return res.status(200).json('Password updated successfully.');
-};
-
 // Registers user
 const registerUser = async (req, res) => {
 	if (
@@ -239,5 +225,4 @@ module.exports = {
 	logoutUser,
 	sendOTP,
 	verifyOTP,
-	modifyPassword,
 };
