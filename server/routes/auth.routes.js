@@ -11,7 +11,7 @@ const {
   sendOTP,
   verifyOTP,
   modifyPassword
-} = require("../controllers/user.controller");
+} = require("../controllers/auth.controller");
 
 const router = express.Router();
 router.get("/loginStatus", loginStatus);
