@@ -48,6 +48,9 @@ const applianceSchema = new Schema(
         },
       },
     ],
+    interface: { 
+      type: [String], // Stores information needed to interface with "hardware" [0] for on, [1] for off.
+    },
     methods: {},
   },
   {
