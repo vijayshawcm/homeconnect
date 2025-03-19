@@ -64,6 +64,55 @@ const updateDisplayName = async (req, res) => {
     return res.status(200).json("User display name updated successfully.");
 }
 
+// Change theme
+const updateTheme = async (req, res) => {
+    var user = new User();
+    try {
+        user = await User.findOneAndUpdate({ 'userInfo.usernameLower': req.body.username }, { 'settings.theme': req.body.theme });
+    } catch (err) {
+        return res.status(500).json("Invalid input received.");
+    }
+
+    if(!user) {
+        return res.status(404).json("User does not exist.");
+    }
+
+    return res.status(200).json("User display theme updated successfully.");
+}
+
+// Update notification channel
+const updateNotificationChannel = async (req, res) => {
+    var user = new User();
+    try {
+        user = await User.findOneAndUpdate({ 'userInfo.usernameLower': req.body.username }, { 'settings.notification.channels': req.body.channels });
+    } catch (err) {
+        return res.status(500).json("Invalid input received.");
+    }
+
+    if(!user) {
+        return res.status(404).json("User does not exist.");
+    }
+
+    return res.status(200).json("User notification channels updated successfully.");
+}
+
+// Update notification type
+const updateNotificationType = async (req, res) => {
+    var user = new User();
+    try {
+        user = await User.findOneAndUpdate({ 'userInfo.usernameLower': req.body.username }, { 'settings.notification.types': req.body.types });
+    } catch (err) {
+        return res.status(500).json("Invalid input received.");
+    }
+
+    if(!user) {
+        return res.status(404).json("User does not exist.");
+    }
+
+    return res.status(200).json("User notification type updated successfully.");
+}
+
+// Update account status
 const updateAccountStatus = async (req, res) => {
     var user = new User();
     try {
@@ -84,5 +133,8 @@ module.exports = {
     updatePassword,
     updateUsername,
     updateDisplayName,
+    updateTheme,
+    updateNotificationChannel,
+    updateNotificationType,
     updateAccountStatus
 }
