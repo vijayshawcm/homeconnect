@@ -55,14 +55,42 @@ userSchema.pre("findOneAndUpdate", async function (next) {
     const update = this.getUpdate(); // Get update object containing updated fields.
 
     // Check for appropriate updated field and handle update.
+    // Password update
     if(update['userInfo.passwordHash']) {
       update['userInfo.passwordHash'] = await bcrypt.hash(update['userInfo.passwordHash'], 10);
     }
 
+    // Username update
     if(update['userInfo.username']) {
       update['userInfo.usernameLower'] = update['userInfo.username'].toLowerCase();
     }
 
+    // Theme update
+    if(update['settings.theme']) {
+      if(update['settings.theme'] != 'light' && update['settings.theme'] != 'dark' && update['settings.theme'] != 'system') {
+        throw new Error("Invalid input received"); // Throw error to be handled at api call.
+      }
+    }
+
+    // Notification channel update
+    if(update['settings.notification.channels']) {
+      update['settings.notification.channels'].forEach(element => {
+        if(element!= 'email' && element != 'push' && element != 'sms') {
+          throw new Error("Invalid input received"); // Throw error to be handled at api call.
+        }
+      });
+    }
+
+    // Notification type update
+    if(update['settings.notification.types']) {
+      update['settings.notification.types'].forEach(element => {
+        if(element!= 'marketing' && element != 'security' && element != 'update' && element != 'reminder' && element != 'billing') {
+          throw new Error("Invalid input received"); // Throw error to be handled at api call.
+        }
+      });
+    }
+
+    // Account status update
     if(update['settings.accountStatus']) {
       if(update['settings.accountStatus'] != 'active' && update['settings.accountStatus'] != 'inactive') {
         throw new Error("Invalid input received"); // Throw error to be handled at api call.
