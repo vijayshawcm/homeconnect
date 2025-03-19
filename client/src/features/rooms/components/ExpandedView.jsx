@@ -1,7 +1,232 @@
+import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel";
+import { Slider } from "@/components/ui/slider";
+import { useRoomStore } from "@/store/room";
+import { motion } from "framer-motion";
+import { ChevronLeft, Power, PowerOff, Sun, SunDim } from "lucide-react";
+import { useCallback, useEffect, useState } from "react";
 
-const ExpandedView = ({ appliance }) => {
-  return <Card className="flex-1">{appliance === "light" ? null : null}</Card>;
+const ExpandedView = ({ appliance, onClose }) => {
+  const { currentRoom, turnOnAppliance, turnOffAppliance } = useRoomStore();
+
+  const getApplianceStats = useCallback(
+    (type) => {
+      const appliances =
+        currentRoom?.appliances?.filter(
+          (appliance) => appliance.applianceType === type
+        ) || [];
+      return {
+        appliances: appliances,
+        total: appliances.length,
+        active: appliances.filter((appliance) => appliance.status === "on")
+          .length,
+      };
+    },
+    [currentRoom] // Dependencies: Only re-create if currentRoom changes
+  );
+
+  // Initialize state with the computed stats
+  const initialStats = getApplianceStats(appliance);
+  const [getStats, setGetStats] = useState(initialStats);
+  const [currentAppliance, setCurrentAppliance] = useState(
+    initialStats.appliances.length > 0 ? initialStats.appliances[0] : null
+  );
+  const [brightness, setBrightness] = useState(
+    currentAppliance.brightness || 0
+  );
+
+  console.log(brightness)
+  // Update brightness when currentAppliance changes
+  useEffect(() => {
+    if (currentAppliance) {
+      setBrightness(currentAppliance.brightness); // Default to 50 if brightness is not set
+    }
+  }, [currentAppliance]);
+
+  useEffect(() => {
+    const stats = getApplianceStats(appliance);
+    setGetStats(stats);
+
+    // Ensure we set the current appliance if it's null
+    if (!currentAppliance && stats.appliances.length > 0) {
+      setCurrentAppliance(stats.appliances[0]);
+    }
+  }, [appliance, currentRoom, currentAppliance, getApplianceStats]);
+
+  const handleButton = (id) => {
+    setCurrentAppliance((prevAppliance) => {
+      if (!prevAppliance) return prevAppliance;
+
+      const newStatus = prevAppliance.status === "on" ? "off" : "on";
+
+      if (newStatus === "on") {
+        turnOnAppliance(id);
+      } else {
+        turnOffAppliance(id);
+      }
+
+      setGetStats((prevStats) => ({
+        ...prevStats,
+        active: prevStats.active + (newStatus === "on" ? 1 : -1),
+      }));
+
+      return { ...prevAppliance, status: newStatus };
+    });
+  };
+
+  const lightModes = [
+    { display: "Warm", value: "warm" },
+    { display: "Neutral", value: "neutral" },
+    { display: "Cool", value: "cool" },
+  ];
+
+  return (
+    <div className="flex flex-1 gap-4 h-full">
+      <Card className="flex flex-col p-4 lg:w-[20%] gap-8">
+        <div
+          className="flex justify-start items-center gap-2 cursor-pointer"
+          onClick={onClose}
+        >
+          <ChevronLeft className="shrink-0"></ChevronLeft>
+          <div className="flex justify-center items-center xl:text-lg font-semibold text-center">
+            {appliance === "Light"
+              ? "Lights"
+              : appliance === "AirConditioner"
+              ? "Air Conditioners"
+              : appliance === "Fan"
+              ? "Fans"
+              : null}
+          </div>
+        </div>
+        <div className="flex-1 flex justify-start items-center flex-col w-full">
+          <div className="flex flex-col items-center gap-10 w-full">
+            <div className="flex flex-col gap-2">
+              <div className="text-3xl font-normal">
+                <span
+                  className={`text-5xl ${
+                    getStats.active >= 1 ? "text-[#184C85]" : ""
+                  }`}
+                >
+                  {getStats.active}
+                </span>
+                /{getStats.total}
+              </div>
+              <div className="flex flex-col items-center font-semibold">
+                <span className="block">Active</span>
+                <span className="block">Devices</span>
+              </div>
+            </div>
+            <div className="flex flex-col gap-4 w-full px-2">
+              {getStats.appliances.map((appliance) => {
+                return (
+                  <Card
+                    key={appliance._id}
+                    className={`p-4 rounded-2xl text-balance text-center font-semibold cursor-pointer transition-all duration-150 ${
+                      appliance._id === currentAppliance._id
+                        ? "bg-[#C2E03A] scale-105"
+                        : "bg-white border-[#184C85] border-4"
+                    }`}
+                    onClick={() => {
+                      setCurrentAppliance(appliance);
+                    }}
+                  >
+                    {appliance.name}
+                  </Card>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+        <div className=""></div>
+      </Card>
+      <Card className="flex-1 flex flex-col justify-center items-center py-12 px-12">
+        {appliance === "Light" ? (
+          <div className="flex-1 flex flex-col justify-center items-center w-full relative gap-10">
+            <div className="flex-1 w-full flex justify-center items-center">
+              <div className="xl:w-[30%]">
+                <Carousel orientation="vertical" className="w-full">
+                  <CarouselContent className="h-[200px]">
+                    {lightModes.map(({ display, value }) => (
+                      <CarouselItem
+                        key={value}
+                        className="flex items-center justify-center"
+                      >
+                        <div className="text-2xl font-semibold">{display}</div>
+                      </CarouselItem>
+                    ))}
+                  </CarouselContent>
+                  <CarouselPrevious className="absolute top-2 left-1/2 transform -translate-x-1/2" />
+                  <CarouselNext className="absolute bottom-2 left-1/2 transform -translate-x-1/2" />
+                </Carousel>
+              </div>
+              <div className="relative flex-1 h-full">
+                <img
+                  src="src/assets/light.svg"
+                  className="absolute aspect-auto w-[40%] top-[10%] right-[20%] z-10"
+                ></img>
+                <motion.div
+                  className="absolute bg-[#fffb18] size-[30%] blur-2xl right-[25%] top-[65%] -z-0"
+                  animate={{
+                    scale: brightness / 100 + 0.5,
+                    opacity: currentAppliance.status === "on" ? 1 : 0,
+                  }} // Adjust scale dynamically
+                  transition={{ duration: 0.2 }}
+                ></motion.div>
+              </div>
+            </div>
+            <div className="w-full h-[25%] flex justify-center items-center gap-10">
+              <Button
+                className={`size-16 rounded-full relative p-0 ${
+                  currentAppliance.status === "on"
+                    ? "bg-[#C2E03A] hover:hover:bg-[#A5C32E]"
+                    : "bg-[#184C85] hover:bg-[#133A65]"
+                }`}
+                onClick={() => {
+                  handleButton(currentAppliance._id);
+                }}
+              >
+                <Power
+                  className={`absolute top-[50%] left-[50%] -translate-x-[50%] -translate-y-[50%] !size-10 transition-opacity duration-200 invert ${
+                    currentAppliance.status === "on" ? "opacity-1" : "opacity-0"
+                  }`}
+                ></Power>
+                <PowerOff
+                  className={`absolute top-[50%] left-[50%] -translate-x-[50%] -translate-y-[50%] !size-10 transition-opacity duration-200 ${
+                    currentAppliance.status === "off"
+                      ? "opacity-1"
+                      : "opacity-0"
+                  }`}
+                ></PowerOff>
+              </Button>
+              <div className="flex-1 flex items-center gap-4">
+                <SunDim className="size-12" />
+                <div className="flex-1">
+                  <Slider
+                    defaultValue={[brightness]}
+                    value={[brightness]} // Controlled value
+                    max={100}
+                    step={1}
+                    onValueChange={(value) => {
+                      setBrightness(value[0]);
+                    }}
+                    onValueCommit={() => {}}
+                  />
+                </div>
+                <Sun className="size-12" />
+              </div>
+            </div>
+          </div>
+        ) : null}
+      </Card>
+    </div>
+  );
 };
 
 export default ExpandedView;
