@@ -145,6 +145,7 @@ const loginStatus = async (req, res) => {
 					year: 'numeric',
 					month: 'long',
 				}), // format date
+				settings: user.settings,
 				loggedIn: true,
 			};
 			return res.status(200).json(response);
