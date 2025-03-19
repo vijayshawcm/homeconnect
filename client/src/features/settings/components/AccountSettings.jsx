@@ -13,11 +13,11 @@ import { Separator } from '@/components/ui/separator';
 import { toast } from 'sonner';
 import {
 	AlertCircle,
-	Calendar,
+	Compass,
 	Info,
 	Loader2,
 	Mail,
-	Shield,
+	MapPin,
 	UserX,
 } from 'lucide-react';
 import {
@@ -28,13 +28,6 @@ import {
 	DialogHeader,
 	DialogTitle,
 } from '@/components/ui/dialog';
-import {
-	Select,
-	SelectContent,
-	SelectItem,
-	SelectTrigger,
-	SelectValue,
-} from '@/components/ui/select';
 import {
 	Popover,
 	PopoverContent,
@@ -56,14 +49,21 @@ function AccountSettings() {
 	const [resendDisabled, setResendDisabled] = useState(false);
 	const [resendCountdown, setResendCountdown] = useState(60);
 
-	// DOB state
-	const [dobDay, setDobDay] = useState('');
-	const [dobMonth, setDobMonth] = useState('');
-	const [dobYear, setDobYear] = useState('');
-	const [dobErrors, setDobErrors] = useState({});
-	const [isUpdatingDob, setIsUpdatingDob] = useState(false);
-	const [showDobPicker, setShowDobPicker] = useState(false);
-	const [formattedDob, setFormattedDob] = useState('');
+	// location state
+	const [location, setLocation] = useState('');
+	const [locationDetails, setLocationDetails] = useState({
+		city: '',
+		state: '',
+		country: '',
+	});
+	const [locationErrors, setLocationErrors] = useState({});
+	const [usingDetectedLocation, setUsingDetectedLocation] = useState(false);
+	const [isUpdatingLocation, setIsUpdatingLocation] = useState(false);
+	const [isDetectingLocation, setIsDetectingLocation] = useState(false);
+	const [showLocationPicker, setShowLocationPicker] = useState(false);
+	const [locationInput, setLocationInput] = useState('');
+	const [autocompleteResults, setAutocompleteResults] = useState([]);
+	const [isLoadingAutocomplete, setIsLoadingAutocomplete] = useState(false);
 
 	// account management state
 	const [showDeactivateDialog, setShowDeactivateDialog] = useState(false);
@@ -88,29 +88,47 @@ function AccountSettings() {
 		return () => clearInterval(timer);
 	}, [resendDisabled, resendCountdown]);
 
-	// format DOB when values change
+	// location autocomplete
 	useEffect(() => {
-		if (dobDay && dobMonth && dobYear) {
-			const monthNames = [
-				'January',
-				'February',
-				'March',
-				'April',
-				'May',
-				'June',
-				'July',
-				'August',
-				'September',
-				'October',
-				'November',
-				'December',
-			];
-			const monthName = monthNames[Number.parseInt(dobMonth, 10) - 1];
-			setFormattedDob(`${monthName} ${dobDay}, ${dobYear}`);
-		} else {
-			setFormattedDob('');
+		if (usingDetectedLocation) {
+			setAutocompleteResults([]);
+			return; // skip autocomplete when location is set via detection
 		}
-	}, [dobDay, dobMonth, dobYear]);
+		const handleAutocomplete = async () => {
+			if (locationInput.length < 3) {
+				setAutocompleteResults([]);
+				return;
+			}
+			setIsLoadingAutocomplete(true);
+			try {
+				const response = await fetch(
+					`server/google/autocomplete?input=${encodeURIComponent(
+						locationInput
+					)}`
+				);
+				const data = await response.json();
+				if (data.status === 'OK') {
+					setAutocompleteResults(data.predictions);
+				} else {
+					console.error('Google Autocomplete error:', data.error_message);
+					toast.error('Failed to fetch location suggestions');
+				}
+			} catch (error) {
+				console.error('Error fetching autocomplete results:', error);
+				toast.error('Error fetching location suggestions');
+			} finally {
+				setIsLoadingAutocomplete(false);
+			}
+		};
+
+		const debounceTimeout = setTimeout(() => {
+			if (locationInput) {
+				handleAutocomplete();
+			}
+		}, 300);
+
+		return () => clearTimeout(debounceTimeout);
+	}, [locationInput, usingDetectedLocation]);
 
 	// email change handler(s)
 	const validateEmail = (email) => {
@@ -194,61 +212,123 @@ function AccountSettings() {
 		}, 800);
 	};
 
-	// DOB handlers
-	const validateDob = () => {
-		if (!dobDay || !dobMonth || !dobYear) return false;
+	// location handler(s)
+	const handleLocationSelect = (result) => {
+		setLocationInput(result.description);
 
-		const day = Number.parseInt(dobDay, 10);
-		const month = Number.parseInt(dobMonth, 10) - 1;
-		const year = Number.parseInt(dobYear, 10);
+		// parse location components
+		const parts = result.description.split(', ');
+		const country = parts.pop();
+		const state = parts.pop();
+		const city = parts.join(', ');
 
-		const dobDate = new Date(year, month, day);
-		const today = new Date();
+		setLocationDetails({
+			city,
+			state,
+			country,
+		});
 
-		// validate date
-		if (
-			dobDate.getDate() !== day ||
-			dobDate.getMonth() !== month ||
-			dobDate.getFullYear() !== year
-		) {
-			return false;
-		}
-
-		// check age restrictions
-		const minDate = new Date();
-		minDate.setFullYear(today.getFullYear() - 100); // max 100yo
-
-		const maxDate = new Date();
-		maxDate.setFullYear(today.getFullYear() - 13); // min 13yo
-
-		return dobDate >= minDate && dobDate <= maxDate;
+		setAutocompleteResults([]);
 	};
 
-	const handleUpdateDob = (e) => {
+	const handleUpdateLocation = (e) => {
 		e.preventDefault();
 
-		if (!dobDay || !dobMonth || !dobYear) {
-			setDobErrors({ dob: 'Complete date of birth required' });
+		if (!locationInput) {
+			setLocationErrors({ location: 'Location is required' });
 			return;
 		}
 
-		if (!validateDob()) {
-			setDobErrors({
-				dob: 'Please enter a valid date. You must be between 13 and 100 years old',
-			});
-			return;
-		}
-
-		setIsUpdatingDob(true);
+		setIsUpdatingLocation(true);
 
 		// simulate api call
 		setTimeout(() => {
-			setIsUpdatingDob(false);
-			setShowDobPicker(false);
-			toast.success('Date of birth updated', {
-				description: 'Your date of birth has been updated successfully',
+			setIsUpdatingLocation(false);
+			setShowLocationPicker(false);
+			setLocation(locationInput);
+			toast.success('Location updated', {
+				description: 'Your location has been updated successfully',
 			});
 		}, 1500);
+	};
+
+	const handleDetectLocation = () => {
+		if (!navigator.geolocation) {
+			toast.error('Geolocation not supported', {
+				description: 'Your browser does not support geolocation',
+			});
+			return;
+		}
+
+		setIsDetectingLocation(true);
+
+		navigator.geolocation.getCurrentPosition(
+			async (position) => {
+				try {
+					const { latitude, longitude } = position.coords;
+					const response = await fetch(
+						`server/google/geocode?lat=${latitude}&lng=${longitude}`
+					);
+					const data = await response.json();
+					if (data.status === 'OK' && data.results.length > 0) {
+						const result = data.results[0];
+						let city = '',
+							state = '',
+							country = '';
+						result.address_components.forEach((component) => {
+							if (component.types.includes('locality')) {
+								city = component.long_name;
+							}
+							if (component.types.includes('administrative_area_level_1')) {
+								state = component.long_name;
+							}
+							if (component.types.includes('country')) {
+								country = component.long_name;
+							}
+						});
+						setLocationInput(result.formatted_address);
+						setLocationDetails({
+							city: city || '-',
+							state: state || '-',
+							country: country || '-',
+						});
+						setUsingDetectedLocation(true); // flag to check if loc was set by detection
+						toast.success('Location detected', {
+							description: 'Your location has been detected successfully',
+						});
+					} else {
+						console.error('Geocoding error:', data.error_message);
+						toast.error('Failed to detect location');
+					}
+				} catch (error) {
+					console.error('Error during reverse geocoding:', error);
+					toast.error('Error detecting location');
+				} finally {
+					setIsDetectingLocation(false);
+				}
+			},
+			(error) => {
+				setIsDetectingLocation(false);
+				let errorMessage = 'Failed to detect location';
+				switch (error.code) {
+					case error.PERMISSION_DENIED:
+						errorMessage = 'Location permission denied';
+						break;
+					case error.POSITION_UNAVAILABLE:
+						errorMessage = 'Location information unavailable';
+						break;
+					case error.TIMEOUT:
+						errorMessage = 'Location request timed out';
+						break;
+					default:
+						errorMessage = 'An unknown error occurred';
+				}
+				toast.error('Location detection failed', {
+					description: errorMessage,
+				});
+			},
+			{ timeout: 10000, enableHighAccuracy: true }
+		);
 	};
 
 	// acct management handlers
@@ -298,25 +378,6 @@ function AccountSettings() {
 			}, 3000);
 		}, 1500);
 	};
-
-	// generate ddmmyy for select dropdowns
-	const days = Array.from({ length: 31 }, (_, i) => i + 1);
-	const months = [
-		{ value: '1', label: 'January' },
-		{ value: '2', label: 'February' },
-		{ value: '3', label: 'March' },
-		{ value: '4', label: 'April' },
-		{ value: '5', label: 'May' },
-		{ value: '6', label: 'June' },
-		{ value: '7', label: 'July' },
-		{ value: '8', label: 'August' },
-		{ value: '9', label: 'September' },
-		{ value: '10', label: 'October' },
-		{ value: '11', label: 'November' },
-		{ value: '12', label: 'December' },
-	];
-	const currentYear = new Date().getFullYear();
-	const years = Array.from({ length: 88 }, (_, i) => currentYear - 13 - i);
 
 	return (
 		<Card className="border-border/40 shadow-md hover:shadow-lg transition-shadow duration-300">
@@ -419,118 +480,139 @@ function AccountSettings() {
 
 				<Separator className="my-8" />
 
-				{/* DOB Section */}
+				{/* Location Section */}
 				<div className="space-y-6">
 					<div className="flex items-center gap-4">
 						<div className="h-10 w-10 aspect-square rounded-full bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center shadow-sm">
-							<Calendar className="h-1/2 w-1/2 text-purple-600 dark:text-purple-400" />
+							<MapPin className="h-1/2 w-1/2 text-purple-600 dark:text-purple-400" />
 						</div>
 						<div>
-							<h3 className="text-base font-medium leading-tight">
-								Date of Birth
-							</h3>
+							<h3 className="text-base font-medium leading-tight">Location</h3>
 							<p className="text-sm text-muted-foreground mt-1">
-								Set your date of birth. This information will not be publicly
-								visible.
+								Set your location for weather updates and energy efficiency
+								recommendations.
 							</p>
 						</div>
 					</div>
 
 					<div className="pl-14">
-						<Popover open={showDobPicker} onOpenChange={setShowDobPicker}>
+						<Popover
+							open={showLocationPicker}
+							onOpenChange={setShowLocationPicker}
+						>
 							<PopoverTrigger asChild>
 								<Button
 									variant="outline"
 									className={`w-full justify-start text-left font-normal h-10 ${
-										!formattedDob ? 'text-muted-foreground' : ''
+										!location ? 'text-muted-foreground' : ''
 									}`}
 								>
-									<Calendar className="mr-2 h-4 w-4" />
-									{formattedDob || 'Select your date of birth'}
+									<MapPin className="mr-2 h-4 w-4" />
+									{location || 'Set your location'}
 								</Button>
 							</PopoverTrigger>
 							<PopoverContent className="w-full p-5" align="start">
-								<form onSubmit={handleUpdateDob} className="space-y-6">
+								<form onSubmit={handleUpdateLocation} className="space-y-6">
 									<div className="space-y-4">
 										<div className="flex items-center space-x-1">
 											<Label className="text-sm font-medium">
-												Date of Birth
+												Your Location
 											</Label>
 											<span className="text-red-500">*</span>
-											{dobErrors.dob && (
+											{locationErrors.location && (
 												<span className="text-xs text-red-500 flex items-center gap-1">
-													- {dobErrors.dob}
+													- {locationErrors.location}
 												</span>
 											)}
 										</div>
 
+										<div className="space-y-2 relative">
+											<div className="flex gap-2">
+												<div className="flex-1">
+													<Input
+														placeholder="Enter your city, state, country"
+														value={locationInput}
+														onChange={(e) => {
+															setLocationInput(e.target.value);
+															setUsingDetectedLocation(false); // reset flag when user types manually
+															if (locationErrors.location) {
+																setLocationErrors({});
+															}
+														}}
+														className="w-full"
+													/>
+													{isLoadingAutocomplete && (
+														<div className="absolute right-[70px] top-[10px]">
+															<Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+														</div>
+													)}
+												</div>
+												<Button
+													type="button"
+													variant="outline"
+													size="icon"
+													disabled={isDetectingLocation}
+													onClick={handleDetectLocation}
+													title="Detect my location"
+												>
+													{isDetectingLocation ? (
+														<Loader2 className="h-4 w-4 animate-spin" />
+													) : (
+														<Compass className="h-4 w-4" />
+													)}
+												</Button>
+											</div>
+
+											{autocompleteResults.length > 0 && (
+												<div className="absolute z-10 mt-1 w-full bg-background border rounded-md shadow-md max-h-60 overflow-auto">
+													{autocompleteResults.map((result) => (
+														<div
+															key={result.id}
+															className="p-2 hover:bg-muted cursor-pointer"
+															onClick={() => handleLocationSelect(result)}
+														>
+															<div className="font-medium">
+																{result.structured_formatting.main_text}
+															</div>
+															<div className="text-xs text-muted-foreground">
+																{result.structured_formatting.secondary_text}
+															</div>
+														</div>
+													))}
+												</div>
+											)}
+										</div>
+
 										<div className="grid grid-cols-3 gap-3">
-											<div className="space-y-2">
-												<Label
-													htmlFor="dobDay"
-													className="text-xs text-muted-foreground"
-												>
-													Day
+											<div className="space-y-1">
+												<Label className="text-xs text-muted-foreground">
+													City
 												</Label>
-												<Select value={dobDay} onValueChange={setDobDay}>
-													<SelectTrigger id="dobDay" className="h-9">
-														<SelectValue placeholder="Day" />
-													</SelectTrigger>
-													<SelectContent className="max-h-60">
-														{days.map((day) => (
-															<SelectItem key={day} value={day.toString()}>
-																{day}
-															</SelectItem>
-														))}
-													</SelectContent>
-												</Select>
+												<div className="text-sm font-medium truncate">
+													{locationDetails.city || '-'}
+												</div>
 											</div>
-
-											<div className="space-y-2">
-												<Label
-													htmlFor="dobMonth"
-													className="text-xs text-muted-foreground"
-												>
-													Month
+											<div className="space-y-1">
+												<Label className="text-xs text-muted-foreground">
+													State/Province
 												</Label>
-												<Select value={dobMonth} onValueChange={setDobMonth}>
-													<SelectTrigger id="dobMonth" className="h-9">
-														<SelectValue placeholder="Month" />
-													</SelectTrigger>
-													<SelectContent className="max-h-60">
-														{months.map((month) => (
-															<SelectItem key={month.value} value={month.value}>
-																{month.label}
-															</SelectItem>
-														))}
-													</SelectContent>
-												</Select>
+												<div className="text-sm font-medium truncate">
+													{locationDetails.state || '-'}
+												</div>
 											</div>
-
-											<div className="space-y-2">
-												<Label
-													htmlFor="dobYear"
-													className="text-xs text-muted-foreground"
-												>
-													Year
+											<div className="space-y-1">
+												<Label className="text-xs text-muted-foreground">
+													Country
 												</Label>
-												<Select value={dobYear} onValueChange={setDobYear}>
-													<SelectTrigger id="dobYear" className="h-9">
-														<SelectValue placeholder="Year" />
-													</SelectTrigger>
-													<SelectContent className="max-h-60">
-														{years.map((year) => (
-															<SelectItem key={year} value={year.toString()}>
-																{year}
-															</SelectItem>
-														))}
-													</SelectContent>
-												</Select>
+												<div className="text-sm font-medium truncate">
+													{locationDetails.country || '-'}
+												</div>
 											</div>
 										</div>
 
 										<p className="text-xs text-muted-foreground pt-1">
-											You must be at least 13 years old to use this service.
+											Your location helps us provide weather data and energy
+											efficiency recommendations.
 										</p>
 									</div>
 
@@ -538,23 +620,23 @@ function AccountSettings() {
 										<Button
 											type="button"
 											variant="outline"
-											onClick={() => setShowDobPicker(false)}
+											onClick={() => setShowLocationPicker(false)}
 											className="h-9 text-sm font-medium"
 										>
 											Cancel
 										</Button>
 										<Button
 											type="submit"
-											disabled={isUpdatingDob}
+											disabled={isUpdatingLocation || !locationInput}
 											className="h-9 text-sm font-medium"
 										>
-											{isUpdatingDob ? (
+											{isUpdatingLocation ? (
 												<>
 													<Loader2 className="mr-2 h-4 w-4 animate-spin" />
 													Updating...
 												</>
 											) : (
-												'Update Date of Birth'
+												'Update Location'
 											)}
 										</Button>
 									</div>
