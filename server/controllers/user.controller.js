@@ -1,3 +1,4 @@
+const bcrypt = require('bcryptjs');
 const { User } = require('../models');
 
 // Change user email
@@ -20,6 +21,15 @@ const updateEmail = async (req, res) => {
 
 // Change user password
 const updatePassword = async (req, res) => {
+    if(req.body.currentPassword) {
+        const user = await User.findOne({ 'userInfo.email': req.body.email });
+        const validPassword = await bcrypt.compare(req.body.currentPassword, user.userInfo.passwordHash);
+
+        if(!validPassword) {
+            return res.status(401).json('Old password does not match.')
+        }
+    }
+
     const validUser = await User.findOneAndUpdate(
         { 'userInfo.email': req.body.email },
         { 'userInfo.passwordHash': req.body.password }
