@@ -64,7 +64,7 @@ const modifyAppliance = async (req, res) => {
     if (!appliance) {
       return res
         .status(404)
-        .json({ success: false, message: "Applaince not found" });
+        .json({ success: false, message: "Appliance not found" });
     }
 
     switch (appliance.applianceType) {
@@ -105,8 +105,18 @@ const turnOnAppliance = async (req, res) => {
     }
 
     if (appliance.status === "off") {
-      appliance.status = "on";
-      await appliance.save();
+      // Home I/O Appliance logic
+      const response = await fetch(appliance.interface[0], {
+				method: 'GET',
+				headers: { 'Content-Type': 'application/json' }
+			});
+
+      if(response.ok) {
+        appliance.status = "on";
+        await appliance.save();
+      } else {
+        return res.status(500).json({ success: false, message: "Home I/O has encountered an error." });
+      }
     }
 
     res.status(200).json({ success: true, data: appliance });
@@ -134,8 +144,18 @@ const turnOffAppliance = async (req, res) => {
     }
 
     if (appliance.status === "on") {
-      appliance.status = "off";
-      await appliance.save();
+      // Home I/O Appliance logic
+      const response = await fetch(appliance.interface[1], {
+				method: 'GET',
+				headers: { 'Content-Type': 'application/json' }
+			});
+
+      if(response.ok) {
+        appliance.status = "off";
+        await appliance.save();
+      } else {
+        return res.status(500).json({ success: false, message: "Home I/O has encountered an error." });
+      }
     }
 
     res.status(200).json({ success: true, data: appliance });
