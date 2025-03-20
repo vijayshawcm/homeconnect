@@ -5,6 +5,7 @@ const cookieParser = require('cookie-parser');
 const {
 	authRoutes,
 	userRoutes,
+	permissonRoutes,
 	applianceRoutes,
 	homeRoutes,
 	roomRoutes,
@@ -23,10 +24,12 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use('/server/auth', authRoutes);
 app.use('/server/users', userRoutes);
+app.use('/server/perms', permissonRoutes,)
 app.use('/server/appliances', applianceRoutes);
 app.use('/server/rooms', roomRoutes);
 app.use('/server/homes', homeRoutes);
 
+// TODO: move this to its own controller i guess
 app.get('/server/google/autocomplete', async (req, res) => {
 	const { input } = req.query;
 	if (!input) {
