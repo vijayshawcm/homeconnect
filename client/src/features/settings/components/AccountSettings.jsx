@@ -175,7 +175,7 @@ function AccountSettings() {
 		}, 1500);
 	};
 
-	const handleVerifyEmail = (e) => {
+	const handleVerifyEmail = async (e) => {
 		e.preventDefault();
 
 		if (!verificationCode) {
@@ -187,8 +187,14 @@ function AccountSettings() {
 
 		setIsVerifying(true);
 
-		// simulate api call
-		setTimeout(() => {
+		// api call
+		const response = await fetch("/server/users/updateEmail", {
+			method: "PATCH",
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({ user: user.username, email }),
+		})
+
+		if(response.ok) {
 			setIsVerifying(false);
 			setShowEmailVerification(false);
 			setEmail(newEmail);
@@ -196,7 +202,7 @@ function AccountSettings() {
 			toast.success('Email updated', {
 				description: 'Your email address has been updated successfully',
 			});
-		}, 1500);
+		}
 	};
 
 	const handleResendCode = () => {
