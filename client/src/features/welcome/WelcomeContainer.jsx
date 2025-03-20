@@ -14,6 +14,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useHomeStore } from "@/store/home";
 import { Label } from "@radix-ui/react-label";
 import { Check } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const WelcomeContainer = () => {
   const { user } = userAuthStore();
@@ -23,6 +24,7 @@ const WelcomeContainer = () => {
   const [homeName, setHomeName] = useState("");
   const [rooms, setRooms] = useState([]);
   const [newRoom, setNewRoom] = useState({ name: "", type: "" });
+  const navigate = useNavigate();
 
   const userTypeOptions = [
     {
@@ -40,11 +42,11 @@ const WelcomeContainer = () => {
   ];
 
   useEffect(() => {
-    // const timer = setTimeout(() => {
-    //   setHomeSetupStep(1);
-    // }, 8000);
-    // return () => clearTimeout(timer);
-    setHomeSetupStep(1);
+    const timer = setTimeout(() => {
+      setHomeSetupStep(1);
+    }, 8000);
+    return () => clearTimeout(timer);
+    // setHomeSetupStep(1);
   }, [user]);
 
   const addRoom = () => {
@@ -52,7 +54,6 @@ const WelcomeContainer = () => {
       setRooms([...rooms, newRoom]);
       setNewRoom({ name: "", type: newRoom.type });
     }
-    console.log(newRoom.type);
   };
 
   return (
@@ -228,11 +229,11 @@ const WelcomeContainer = () => {
                 <SelectValue placeholder="Select Room Type" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="Living Room">Living Room</SelectItem>
-                <SelectItem value="Kitchen">Kitchen</SelectItem>
-                <SelectItem value="Bedroom">Bedroom</SelectItem>
-                <SelectItem value="Bathroom">Bathroom</SelectItem>
-                <SelectItem value="Other">Other</SelectItem>
+                <SelectItem value="living_room">Living Room</SelectItem>
+                <SelectItem value="kitchen">Kitchen</SelectItem>
+                <SelectItem value="bedroom">Bedroom</SelectItem>
+                <SelectItem value="bathroom">Bathroom</SelectItem>
+                <SelectItem value="other">Other</SelectItem>
               </SelectContent>
             </Select>
             <Button className="mt-2 px-4 py-2" onClick={addRoom}>
@@ -257,6 +258,8 @@ const WelcomeContainer = () => {
             className="mt-4 px-4 py-2"
             onClick={() => {
               console.log({ homeName, rooms, username: user.username });
+              createHome({ homeName, rooms, username: user.username });
+              navigate("/dashboard");
             }}
           >
             Finish Setup

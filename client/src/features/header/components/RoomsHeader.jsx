@@ -31,7 +31,7 @@ const RoomsHeader = () => {
   return (
     <div className="flex items-center justify-between gap-4 flex-1">
       <Carousel
-        className="flex-1 px-8"
+        className="flex-1 px-12"
         opts={{ align: "start", loop: false }}
         setApi={setCarouselApi}
       >
@@ -41,7 +41,7 @@ const RoomsHeader = () => {
             return (
               <CarouselItem
                 key={room.name}
-                className={`md:basis-1/2 lg:basis-1/4 transition-opacity flex justify-center items-center font-semibold pl-0 pr-4 ${
+                className={`md:basis-1/2 lg:basis-1/4 transition-opacity flex justify-center items-center font-semibold pl-0 pr-6 ${
                   room.name === currentRoom.name
                     ? "opacity-100 font-semibold"
                     : "opacity-50"
@@ -58,8 +58,8 @@ const RoomsHeader = () => {
             );
           })}
         </CarouselContent>
-        <CarouselPrevious />
-        <CarouselNext />
+        <CarouselPrevious className = "absolute left-6"/>
+        <CarouselNext className = "absolute right-6"/>
       </Carousel>
       <div className="flex gap-2">
         <HeaderInput />

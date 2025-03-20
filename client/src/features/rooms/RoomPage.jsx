@@ -1,6 +1,6 @@
 import { useHomeStore } from "@/store/home";
 import { useRoomStore } from "@/store/room";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import LightCard from "./components/LightCard";
 import AirConCard from "./components/AirConCard";
 import { Card } from "@/components/ui/card";
@@ -10,12 +10,21 @@ import { ArrowRight } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useSidebar } from "@/components/ui/sidebar";
 import ExpandedView from "./components/ExpandedView";
+import { Popover, PopoverTrigger } from "@/components/ui/popover";
+import { PopoverContent } from "@radix-ui/react-popover";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 
 const RoomPage = () => {
   const [currentExpanded, setExpanded] = useState(null);
   const [hovered, setHovered] = useState(null);
-  const { currentRoom } = useRoomStore();
+  const { currentRoom, addAppliance} = useRoomStore();
   const { isMobile } = useSidebar();
+  const [isPopoverOpen, setIsPopoverOpen] = useState(false); // State for Popover
+  const [applianceType, setApplianceType] = useState(""); // State for appliance type
+  const [applianceName, setApplianceName] = useState(""); // State for appliance name
 
   // Function to get total and active appliances of a given type
   const getApplianceStats = (type) => {
@@ -29,10 +38,39 @@ const RoomPage = () => {
         .length,
     };
   };
+  // Track the current room ID
+  const [currentRoomId, setCurrentRoomId] = useState(currentRoom?._id);
+
+  // Reset expanded view only when the room ID changes (not when the room is updated)
+  useEffect(() => {
+    if (currentRoom?._id !== currentRoomId) {
+      setCurrentRoomId(currentRoom?._id); // Update the tracked room ID
+      setExpanded(null); // Reset expanded view
+    }
+  }, [currentRoom?._id]); // Trigger only when the room ID changes
 
   const lightStats = getApplianceStats("Light");
   const fansStats = getApplianceStats("Fan");
   const airConStats = getApplianceStats("AirConditioner");
+
+  // Handle form submission
+  const handleAddAppliance = () => {
+    if (!applianceType || !applianceName) {
+      alert("Please fill in all fields.");
+      return;
+    }
+
+    // Add the new appliance to the room
+    addAppliance({
+      applianceType: applianceType,
+      name: applianceName,
+    });
+
+    // Reset form fields and close the Popover
+    setApplianceType("");
+    setApplianceName("");
+    setIsPopoverOpen(false);
+  };
 
   const applianceGrid = [
     {
@@ -74,7 +112,55 @@ const RoomPage = () => {
     {
       className: "roomAddAppliance",
       key: "add",
-      component: <AddApplianceCard key={"add"} />,
+      component: (
+        <Popover open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
+          <PopoverTrigger asChild>
+            <div className="flex-1 flex justify-center items-center h-full">
+              <AddApplianceCard key={"add"} />
+            </div>
+          </PopoverTrigger>
+          <PopoverContent className="w-80 p-4 bg-white rounded-lg shadow-lg">
+            <h3 className="font-semibold text-lg mb-4">Add New Appliance</h3>
+            <div className="space-y-4">
+              {/* Appliance Type Dropdown */}
+              <div>
+                <Label htmlFor="applianceType">Appliance Type</Label>
+                <Select
+                  value={applianceType}
+                  onValueChange={(value) => setApplianceType(value)}
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Select type" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Light">Light</SelectItem>
+                    <SelectItem value="AirConditioner">
+                      Air Conditioner
+                    </SelectItem>
+                    <SelectItem value="Fan">Fan</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Appliance Name Input */}
+              <div>
+                <Label htmlFor="applianceName">Appliance Name</Label>
+                <Input
+                  id="applianceName"
+                  value={applianceName}
+                  onChange={(e) => setApplianceName(e.target.value)}
+                  placeholder="Enter appliance name"
+                />
+              </div>
+
+              {/* Submit Button */}
+              <Button onClick={handleAddAppliance} className="w-full">
+                Add Appliance
+              </Button>
+            </div>
+          </PopoverContent>
+        </Popover>
+      ),
     },
   ];
   return (
@@ -109,15 +195,19 @@ const RoomPage = () => {
                 initial={{ scale: 1, opacity: 1, filter: "blur(0px)" }}
                 animate={{
                   scale: hovered === key ? 1.03 : 1,
-                  opacity: hovered && hovered !== key ? 0.4 : 1,
+                  opacity: hovered && hovered !== key ? 0.6 : 1,
                   filter:
-                    hovered && hovered !== key ? "blur(1px)" : "blur(0px)",
+                    hovered && hovered !== key ? "blur(2px)" : "blur(0px)",
                   boxShadow: "0px 0px 8px rgb(255,255,255)",
                 }}
                 transition={{ type: "spring", stiffness: 250, damping: 20 }}
                 onHoverStart={() => setHovered(key)}
                 onHoverEnd={() => setHovered(null)}
                 onClick={(e) => {
+                  if (key === "add") {
+                    setIsPopoverOpen(true); // Open Popover for "Add Appliance"
+                    return; // Prevent setting expanded view
+                  }
                   if (e.target.closest(".switch-container")) return; // Prevent expansion if clicking switch
                   setHovered(null);
                   setExpanded(key);
