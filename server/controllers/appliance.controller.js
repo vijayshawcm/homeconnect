@@ -101,6 +101,12 @@ const modifyAppliance = async (req, res) => {
         if (req.body.temperature !== undefined) {
           appliance.temperature = req.body.temperature;
         }
+        if (req.body.swing !== undefined) {
+          appliance.swing = req.body.swing;
+        }
+        if (req.body.mode !== undefined) {
+          appliance.mode = req.body.mode;
+        }
         break;
 
       case "Sprinkler":
@@ -134,12 +140,10 @@ const turnOnAppliance = async (req, res) => {
     }
 
     if (appliance.status === "disabled") {
-      return res
-        .status(400)
-        .json({
-          success: false,
-          message: "Appliance is disabled and cannot be turned on.",
-        });
+      return res.status(400).json({
+        success: false,
+        message: "Appliance is disabled and cannot be turned on.",
+      });
     }
 
     if (appliance.status === "off") {
