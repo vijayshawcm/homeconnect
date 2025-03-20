@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import { useHomeStore } from "./home";
+import { update } from "lodash";
 
 export const useRoomStore = create((set, get) => ({
   currentRoom: null,
@@ -24,6 +25,29 @@ export const useRoomStore = create((set, get) => ({
       console.error("Failed to update room data:", error);
     }
   },
+  addAppliance: async (body) => {
+    const { currentRoom, updateRoom } = get();
+    if (!currentRoom) return;
+    try {
+      const res = await fetch(`/server/appliances/${currentRoom._id}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      });
+      const data = await res.json();
+      if (data.success) {
+        await updateRoom();
+        // Also update home if needed
+        const homeStore = useHomeStore.getState();
+        if (homeStore.currentHome?._id === data.data.home) {
+          await homeStore.updateHome();
+        }
+      }
+    } catch (error) {
+      console.error("Failed to add applaince:", error);
+    }
+  },
+
   turnOnAll: async (type) => {
     const { currentRoom, updateRoom } = get();
     if (!currentRoom) return;
@@ -72,6 +96,56 @@ export const useRoomStore = create((set, get) => ({
       await updateRoom();
     } catch (error) {
       console.error(`Failed to turn on all ${type}s:`, error);
+    }
+  },
+  turnOnAppliance: async (id) => {
+    try {
+      const { updateRoom } = get();
+      const appliance = await fetch(`/server/appliances/turnOn/${id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+      });
+      console.log(appliance);
+      await updateRoom();
+    } catch (error) {
+      console.error(`Failed to turn on`, error);
+    }
+  },
+  turnOffAppliance: async (id) => {
+    try {
+      const { updateRoom } = get();
+      const appliance = await fetch(`/server/appliances/turnOff/${id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+      });
+      console.log(appliance);
+      await updateRoom();
+    } catch (error) {
+      console.error(`Failed to turn off`, error);
+    }
+  },
+  modifyAppliance: async (id, updates) => {
+    try {
+      const { updateRoom } = get();
+
+      // Send the updates to the server
+      const response = await fetch(`/server/appliances/modify/${id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(updates),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to update appliance");
+      }
+
+      const data = await response.json();
+      console.log("Appliance updated:", data);
+
+      // Refresh the room data after updating
+      await updateRoom();
+    } catch (error) {
+      console.error("Failed to modify appliance:", error);
     }
   },
 }));

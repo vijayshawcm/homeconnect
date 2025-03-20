@@ -17,28 +17,55 @@ export const useHomeStore = create((set, get) => ({
   createHome: async (homeData) => {
     set({ isLoading: false });
     try {
+      // Step 1: Create the home
       const homeRes = await fetch("/server/homes", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          name: homeData.homeName,
+          homeName: homeData.homeName,
           username: homeData.username,
         }),
       });
-      const data = await homeRes.json();
-      if (!data.success) {
+      const homeDataResponse = await homeRes.json();
+
+      if (!homeDataResponse.success) {
         set({ isLoading: false });
-        return { success: false, message: data.message };
+        return { success: false, message: homeDataResponse.message };
       }
+
+      const newHome = homeDataResponse.data;
+
+      // Step 2: Create rooms for the home
+      if (homeData.rooms && homeData.rooms.length > 0) {
+        for (const room of homeData.rooms) {
+          const roomRes = await fetch("/server/rooms", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              name: room.name,
+              type: room.type,
+              home: newHome._id, // Pass the home._id in the request body
+            }),
+          });
+          const roomData = await roomRes.json();
+
+          if (!roomData.success) {
+            console.error("Failed to create room:", roomData.message);
+            // Handle room creation failure (optional)
+          }
+        }
+      }
+
+      // Step 3: Update the store with the new home
       set({
-        currentHome: data.data,
+        currentHome: newHome,
         isLoading: true,
       });
-      console.log(data.data);
+
       return {
         success: true,
-        message: "Home created successfully",
-        data: data.data,
+        message: "Home and rooms created successfully",
+        data: newHome,
       };
     } catch (error) {
       console.error("Failed to create home:", error);
@@ -52,6 +79,7 @@ export const useHomeStore = create((set, get) => ({
     try {
       const res = await fetch(`/server/homes/${currentHome._id}`);
       const data = await res.json();
+      console.log(data)
       if (data.success) {
         set({ currentHome: data.data });
       }
@@ -66,6 +94,8 @@ export const useHomeStore = create((set, get) => ({
       return { success: false, message: data.message };
     }
     set({ homes: data.data });
+    console.log(data.data);
+    return { success: true, data: data.data };
   },
   addDweller: async (userId) => {
     const res = await fetch(`server/homes/${currentHome._id}`, {

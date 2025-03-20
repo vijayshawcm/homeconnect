@@ -67,20 +67,64 @@ const modifyAppliance = async (req, res) => {
         .json({ success: false, message: "Appliance not found" });
     }
 
+    if (appliance.status === "disabled") {
+      return res
+        .status(400)
+        .json({ success: false, message: "Appliance is disabled." });
+    }
+
+    // Update common fields
+    if (req.body.name) appliance.name = req.body.name;
+    if (req.body.status) appliance.status = req.body.status;
+
+    // Update appliance-specific fields
     switch (appliance.applianceType) {
       case "Fan":
-        appliance.currentSpeed = req.body.currentSpeed;
+        if (req.body.currentSpeed !== undefined) {
+          appliance.currentSpeed = req.body.currentSpeed;
+        }
+        if (req.body.speedLevels !== undefined) {
+          appliance.speedLevels = req.body.speedLevels;
+        }
+        break;
+
       case "Light":
-        appliance.status = "on";
-      case "disabled":
+        if (req.body.colorTemperature !== undefined) {
+          appliance.colorTemperature = req.body.colorTemperature;
+        }
+        if (req.body.brightness !== undefined) {
+          appliance.brightness = req.body.brightness;
+        }
+        break;
+
+      case "AirConditioner":
+        if (req.body.temperature !== undefined) {
+          appliance.temperature = req.body.temperature;
+        }
+        if (req.body.swing !== undefined) {
+          appliance.swing = req.body.swing;
+        }
+        if (req.body.mode !== undefined) {
+          appliance.mode = req.body.mode;
+        }
+        break;
+
+      case "Sprinkler":
+        if (req.body.waterFlowRate !== undefined) {
+          appliance.waterFlowRate = req.body.waterFlowRate;
+        }
+        break;
+
+      default:
         return res
-          .status(500)
-          .json({ success: false, message: "Appliance is disabled." });
+          .status(400)
+          .json({ success: false, message: "Invalid appliance type." });
     }
+
     await appliance.save();
-    res.status(201).json({ success: true, data: appliance });
+    res.status(200).json({ success: true, data: appliance });
   } catch (error) {
-    console.error("Error in toggling appliance: ", error.message);
+    console.error("Error in modifying appliance: ", error.message);
     res.status(500).json({ success: false, message: "Server Error" });
   }
 };
@@ -96,12 +140,10 @@ const turnOnAppliance = async (req, res) => {
     }
 
     if (appliance.status === "disabled") {
-      return res
-        .status(400)
-        .json({
-          success: false,
-          message: "Appliance is disabled and cannot be turned on.",
-        });
+      return res.status(400).json({
+        success: false,
+        message: "Appliance is disabled and cannot be turned on.",
+      });
     }
 
     if (appliance.status === "off") {
@@ -223,6 +265,7 @@ module.exports = {
   getAppliancesByRoom,
   turnOnAppliance,
   turnOffAppliance,
+  modifyAppliance,
   disableAppliance,
   deleteAppliance,
 };

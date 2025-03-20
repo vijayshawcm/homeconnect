@@ -49,8 +49,9 @@ const getHomeById = async (req, res) => {
 const getHomesByUserId = async (req, res) => {
   const { id } = req.params;
   try {
-    const ownedHomes = await Home.find({ owner: id });
-    const dwelledHomes = await Home.find({ "dwellers.user": id });
+    const user = await User.findOne({ "userInfo.username": id });
+    const ownedHomes = await Home.find({ owner: user._id });
+    const dwelledHomes = await Home.find({ "dwellers.user": user._id });
     res.status(200).json({
       success: true,
       data: {

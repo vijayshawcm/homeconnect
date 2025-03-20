@@ -3,17 +3,8 @@ import { Switch } from "@/components/ui/switch";
 import { useRoomStore } from "@/store/room";
 import { motion } from "framer-motion";
 
-const FanCard = ({ hovered }) => {
+const FanCard = ({ hovered, totalFans, activeFans }) => {
   const { currentRoom, updateRoom, turnOnAll, turnOffAll } = useRoomStore();
-  // Extract fans from the room's appliances list
-  const fans =
-    currentRoom?.appliances?.filter(
-      (appliance) => appliance.applianceType === "Fan"
-    ) || [];
-
-  // Count total and active fans
-  const totalFans = fans.length;
-  const activeFans = fans.filter((ac) => ac.status === "on").length;
 
   // Determine if all fan are ON
   const isAllFansOn = totalFans > 0 && activeFans === totalFans;
@@ -37,8 +28,8 @@ const FanCard = ({ hovered }) => {
     <Card className="flex-1 rounded-3xl flex flex-col relative overflow-hidden">
       <div className="sm:px-6 sm:pt-6 px-4 pt-2 flex flex-1">
         <div className="flex flex-1 justify-between relative">
-          <h1 className="text-2xl xl:text-3xl font-semibold">Fan</h1>
-          <div>
+          <h1 className="text-2xl xl:text-3xl font-semibold">Fans</h1>
+          <div className="switch-container">
             <Switch checked={isAllFansOn} onCheckedChange={toggleFans} />
           </div>
           <img
