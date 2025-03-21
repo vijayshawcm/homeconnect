@@ -245,6 +245,36 @@ const modifyAppliance = async (req, res) => {
 
 const turnOnAppliance = async (req, res) => {
   const { id } = req.params;
+
+  if (!req.body.requester) {
+    return res
+      .status(400)
+      .json({ success: false, message: "Please provide all fields" });
+  }
+
+  const requesterName = req.body.requester;
+  // Attempt to query database for user that is sending the request
+  const requester = await User.findOne({ 'userInfo.usernameLower': requesterName.toLowerCase() });
+  if(!requester) {
+      return res.status(404).json("Requester not found.");
+  } 
+
+  // Query database for home and room to check user permissions
+  const room = await Room.findOne({ appliances: id });
+  if (!room) {
+    return res.status(404).json({ success: false, message: "Room not found" });
+  }
+  const home = await Home.findOne({ rooms: room._id });
+  if(!home) {
+      return res.status(404).json("Could not find home.");
+  }
+
+  // Permission check
+  const validPerms = checkPermission(requester, home, "onOffAppliance");
+  if(!validPerms) {
+      return res.status(403).json("User does not have sufficient permissions");
+  }
+
   try {
     const appliance = await Appliance.findById(id);
     if (!appliance) {
@@ -261,17 +291,22 @@ const turnOnAppliance = async (req, res) => {
     }
 
     if (appliance.status === "off") {
-      // Home I/O Appliance logic
-      const response = await fetch(appliance.interface[0], {
-				method: 'GET',
-				headers: { 'Content-Type': 'application/json' }
-			});
+      if(appliance.interface[0]) {
+        // Home I/O Appliance logic
+        const response = await fetch(appliance.interface[0], {
+          method: 'GET',
+          headers: { 'Content-Type': 'application/json' }
+        });
 
-      if(response.ok) {
+        if(response.ok) {
+          appliance.status = "on";
+          await appliance.save();
+        } else {
+          return res.status(500).json({ success: false, message: "Home I/O has encountered an error." });
+        }
+      } else {
         appliance.status = "on";
         await appliance.save();
-      } else {
-        return res.status(500).json({ success: false, message: "Home I/O has encountered an error." });
       }
     }
 
@@ -284,6 +319,36 @@ const turnOnAppliance = async (req, res) => {
 
 const turnOffAppliance = async (req, res) => {
   const { id } = req.params;
+
+  if (!req.body.requester) {
+    return res
+      .status(400)
+      .json({ success: false, message: "Please provide all fields" });
+  }
+
+  const requesterName = req.body.requester;
+  // Attempt to query database for user that is sending the request
+  const requester = await User.findOne({ 'userInfo.usernameLower': requesterName.toLowerCase() });
+  if(!requester) {
+      return res.status(404).json("Requester not found.");
+  } 
+
+  // Query database for home and room to check user permissions
+  const room = await Room.findOne({ appliances: id });
+  if (!room) {
+    return res.status(404).json({ success: false, message: "Room not found" });
+  }
+  const home = await Home.findOne({ rooms: room._id });
+  if(!home) {
+      return res.status(404).json("Could not find home.");
+  }
+
+  // Permission check
+  const validPerms = checkPermission(requester, home, "onOffAppliance");
+  if(!validPerms) {
+      return res.status(403).json("User does not have sufficient permissions");
+  }
+
   try {
     const appliance = await Appliance.findById(id);
     if (!appliance) {
@@ -301,16 +366,21 @@ const turnOffAppliance = async (req, res) => {
 
     if (appliance.status === "on") {
       // Home I/O Appliance logic
-      const response = await fetch(appliance.interface[1], {
-				method: 'GET',
-				headers: { 'Content-Type': 'application/json' }
-			});
-
-      if(response.ok) {
+      if(appliance.interface[1]) {
+        const response = await fetch(appliance.interface[1], {
+          method: 'GET',
+          headers: { 'Content-Type': 'application/json' }
+        });
+  
+        if(response.ok) {
+          appliance.status = "off";
+          await appliance.save();
+        } else {
+          return res.status(500).json({ success: false, message: "Home I/O has encountered an error." });
+        }
+      } else {
         appliance.status = "off";
         await appliance.save();
-      } else {
-        return res.status(500).json({ success: false, message: "Home I/O has encountered an error." });
       }
     }
 
