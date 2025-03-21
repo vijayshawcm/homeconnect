@@ -10,6 +10,7 @@ import {
   Sofa,
   BedDouble,
   CookingPot,
+  Toilet,
 } from "lucide-react";
 import {
   Collapsible,
@@ -49,6 +50,7 @@ const roomTypeIcons = {
   living_room: Sofa,
   bedroom: BedDouble,
   kitchen: CookingPot,
+  bathroom: Toilet,
 };
 
 export function NavMain({ items }) {
