@@ -125,6 +125,52 @@ const removeAppliance = async (req, res) => {
   res.status(200).json({ success: true, data: room});
 };
 
+const renameAppliance = async (req, res) => {
+  const { id } = req.params;
+
+  if (!req.body.requester || !req.body.appliance.name) {
+    return res
+      .status(400)
+      .json({ success: false, message: "Please provide all fields" });
+  }
+
+  const requesterName = req.body.requester;
+  const applianceName = req.body.appliance.name;
+
+
+  // Attempt to query database for user that is sending the request
+  const requester = await User.findOne({ 'userInfo.usernameLower': requesterName.toLowerCase() });
+  if(!requester) {
+      return res.status(404).json("Requester not found.");
+  }
+
+  // Prevent duplicate names
+  if ((await Appliance.findOne({ name: applianceName }))) {
+    return res.status(409).json({ success: false, message: "Duplicate appliance name" });
+  }
+
+  // Query database for home and room to check user permissions
+  const room = await Room.findOne({ appliances: id });
+  if (!room) {
+    return res.status(404).json({ success: false, message: "Room not found" });
+  }
+  const home = await Home.findOne({ rooms: room._id });
+  if(!home) {
+      return res.status(404).json("Could not find home.");
+  }
+
+  // Permission check
+  const validPerms = checkPermission(requester, home, "addRemoveAppliance");
+  if(!validPerms) {
+      return res.status(403).json("User does not have sufficient permissions");
+  }
+
+  // Delete appliance
+  const appliance = await Appliance.findByIdAndUpdate(id, { name: applianceName });
+  
+  res.status(200).json({ success: true, data: appliance });
+};
+
 const modifyAppliance = async (req, res) => {
   const { id } = req.params;
   try {
@@ -315,6 +361,7 @@ const getAppliancesByRoom = async (req, res) => {
 module.exports = {
   createAppliance,
   removeAppliance,
+  renameAppliance,
   getAppliancesByRoom,
   turnOnAppliance,
   turnOffAppliance,
