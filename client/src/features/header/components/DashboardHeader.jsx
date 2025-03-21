@@ -1,5 +1,4 @@
 import HeaderAvatar from "./HeaderAvatar";
-import { HeaderInput } from "./HeaderInput";
 
 const DashboardHeader = () => {
   return (
