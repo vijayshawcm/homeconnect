@@ -42,6 +42,7 @@ import { useHomeStore } from "@/store/home";
 import { Link } from "react-router-dom";
 import { useRoomStore } from "@/store/room";
 import { useNavigate } from "react-router-dom";
+import { Button } from "@/components/ui/button";
 
 const buttonClass = "text-xl font-light h-12 transition-all duration-500";
 
@@ -64,6 +65,10 @@ export function NavMain({ items }) {
     setCurrentHome(homeId);
     navigate("/dashboard");
   };
+
+  const homeless =
+    ownedHomes.filter((home) => home._id !== currentHome?._id).length === 0 &&
+    dwelledHomes.filter((home) => home._id !== currentHome?._id).length === 0;
 
   return (
     <SidebarGroup className="gap-6">
@@ -105,7 +110,29 @@ export function NavMain({ items }) {
                 <DropdownMenuLabel className="text-xs text-muted-foreground">
                   Switch Homes
                 </DropdownMenuLabel>
-                {ownedHomes
+                {homeless && (
+                  <div className="flex flex-col items-center justify-center gap-4 p-4 text-center text-balance">
+                    <p className="text-md text-muted-foreground">
+                      You are not part of any home. Join an existing home or
+                      create a new one to get started.
+                    </p>
+                    <div className="flex gap-4">
+                      <Button
+                        onClick={() => navigate("/join-home")} // Navigate to join home page
+                        className="bg-[#C2E03A] text-black hover:bg-[#A8C82A]"
+                      >
+                        Join a Home
+                      </Button>
+                      <Button
+                        onClick={() => navigate("/create-home")} // Navigate to create home page
+                        className="bg-[#184C85] text-white hover:bg-[#0D1B2A]"
+                      >
+                        Create a Home
+                      </Button>
+                    </div>
+                  </div>
+                )}
+                {!homeless && ownedHomes
                   .filter((home) => home._id !== currentHome?._id)
                   .map((home) => (
                     <DropdownMenuItem
