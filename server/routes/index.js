@@ -5,4 +5,5 @@ module.exports = {
   roomRoutes: require("./room.routes"),
   applianceRoutes: require("./appliance.routes"),
   homeRoutes: require("./home.routes"),
+  googleRoutes: require("./google.routes")
 };
