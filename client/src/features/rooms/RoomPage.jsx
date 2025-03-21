@@ -10,19 +10,23 @@ import { ArrowRight } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useSidebar } from "@/components/ui/sidebar";
 import ExpandedView from "./components/ExpandedView";
-import { Popover, PopoverTrigger } from "@/components/ui/popover";
-import { PopoverContent } from "@radix-ui/react-popover";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 
 const RoomPage = () => {
   const [currentExpanded, setExpanded] = useState(null);
   const [hovered, setHovered] = useState(null);
-  const { currentRoom, addAppliance} = useRoomStore();
+  const { currentRoom, addAppliance } = useRoomStore();
   const { isMobile } = useSidebar();
-  const [isPopoverOpen, setIsPopoverOpen] = useState(false); // State for Popover
   const [applianceType, setApplianceType] = useState(""); // State for appliance type
   const [applianceName, setApplianceName] = useState(""); // State for appliance name
 
@@ -38,6 +42,7 @@ const RoomPage = () => {
         .length,
     };
   };
+
   // Track the current room ID
   const [currentRoomId, setCurrentRoomId] = useState(currentRoom?._id);
 
@@ -69,7 +74,6 @@ const RoomPage = () => {
     // Reset form fields and close the Popover
     setApplianceType("");
     setApplianceName("");
-    setIsPopoverOpen(false);
   };
 
   const applianceGrid = [
@@ -113,13 +117,13 @@ const RoomPage = () => {
       className: "roomAddAppliance",
       key: "add",
       component: (
-        <Popover open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
-          <PopoverTrigger asChild>
+        <Dialog>
+          <DialogTrigger asChild>
             <div className="flex-1 flex justify-center items-center h-full">
               <AddApplianceCard key={"add"} />
             </div>
-          </PopoverTrigger>
-          <PopoverContent className="w-80 p-4 bg-white rounded-lg shadow-lg">
+          </DialogTrigger>
+          <DialogContent className="w-80 p-4 bg-white rounded-lg shadow-lg">
             <h3 className="font-semibold text-lg mb-4">Add New Appliance</h3>
             <div className="space-y-4">
               {/* Appliance Type Dropdown */}
@@ -158,11 +162,12 @@ const RoomPage = () => {
                 Add Appliance
               </Button>
             </div>
-          </PopoverContent>
-        </Popover>
+          </DialogContent>
+        </Dialog>
       ),
     },
   ];
+
   return (
     <motion.div
       className="xl:p-8 flex-1 flex xl:gap-4 gap-2 p-4 flex-col xl:flex-row"
@@ -172,8 +177,9 @@ const RoomPage = () => {
       transition={{ duration: 1 }}
       key={currentRoom.name}
     >
+
       <motion.div
-        className="flex-1 flex justify-center items-center"
+        className="flex-1 flex justify-center items-center relative z-50"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
@@ -194,18 +200,20 @@ const RoomPage = () => {
                 layoutId="hoveredCard"
                 initial={{ scale: 1, opacity: 1, filter: "blur(0px)" }}
                 animate={{
-                  scale: hovered === key ? 1.03 : 1,
-                  opacity: hovered && hovered !== key ? 0.6 : 1,
+                  scale: hovered === key? 1.03 : 1, // Disable hover effect when Popover is open
+                  opacity:
+                    hovered && hovered !== key? 0.6 : 1, // Disable hover effect when Popover is open
                   filter:
-                    hovered && hovered !== key ? "blur(2px)" : "blur(0px)",
+                    hovered && hovered !== key
+                      ? "blur(2px)"
+                      : "blur(0px)",
                   boxShadow: "0px 0px 8px rgb(255,255,255)",
                 }}
                 transition={{ type: "spring", stiffness: 250, damping: 20 }}
-                onHoverStart={() => setHovered(key)}
-                onHoverEnd={() => setHovered(null)}
+                onHoverStart={() => setHovered(key)} // Disable hover effect when Popover is open
+                onHoverEnd={() => setHovered(null)} // Disable hover effect when Popover is open
                 onClick={(e) => {
                   if (key === "add") {
-                    setIsPopoverOpen(true); // Open Popover for "Add Appliance"
                     return; // Prevent setting expanded view
                   }
                   if (e.target.closest(".switch-container")) return; // Prevent expansion if clicking switch

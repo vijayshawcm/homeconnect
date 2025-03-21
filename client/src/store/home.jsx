@@ -98,6 +98,59 @@ export const useHomeStore = create(
       console.log(data.data);
       return { success: true, data: data.data };
     },
+    addRoom: async (roomData) => {
+      const { currentHome } = get();
+      if (!currentHome) {
+        return { success: false, message: "No home selected" };
+      }
+
+      set({ isLoading: true });
+      try {
+        const payload = {
+          name: roomData.name,
+          type: roomData.roomType,
+          home: currentHome._id,
+        };
+
+        console.log(payload); // Log the payload
+        // Step 1: Create the room
+        const res = await fetch("/server/rooms", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+
+        console.log(res);
+        const data = await res.json();
+
+        if (!data.success) {
+          set({ isLoading: false });
+          return { success: false, message: data.message };
+        }
+
+        const newRoom = data.data;
+
+        // Step 2: Update the current home in the store
+        set((state) => ({
+          currentHome: {
+            ...state.currentHome,
+            rooms: [...state.currentHome.rooms, newRoom],
+          },
+        }));
+
+        set({ isLoading: false });
+        console.log(data);
+        return {
+          success: true,
+          message: "Room added successfully",
+          data: newRoom,
+        };
+      } catch (error) {
+        console.error("Failed to add room:", error);
+        set({ isLoading: false });
+        return { success: false, message: "Failed to add room" };
+      }
+    },
     addDweller: async (userId) => {
       const res = await fetch(`server/homes/${currentHome._id}`, {
         method: "PATCH",

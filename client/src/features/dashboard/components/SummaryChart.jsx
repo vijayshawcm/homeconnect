@@ -1,4 +1,11 @@
-import { ChartContainer, ChartLegend, ChartLegendContent, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
+import {
+  ChartContainer,
+  ChartLegend,
+  ChartLegendContent,
+  ChartTooltip,
+  ChartTooltipContent,
+} from "@/components/ui/chart";
+import { useHomeStore } from "@/store/home";
 import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from "recharts";
 
 const chartData = [
@@ -6,7 +13,6 @@ const chartData = [
   { month: "Admin's Bedroom", light: 50, fan: 129, airConditioner: 190 },
   { month: "March", light: 120, fan: 80, airConditioner: 90 },
   { month: "April", light: 290, fan: 80, airConditioner: 320 },
-
 ];
 
 const chartConfig = {
@@ -25,6 +31,7 @@ const chartConfig = {
 };
 
 const SummaryChart = () => {
+  const { currentHome } = useHomeStore();
   return (
     <ChartContainer config={chartConfig} className="flex-1">
       <BarChart accessibilityLayer data={chartData}>
