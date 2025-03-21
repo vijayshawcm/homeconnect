@@ -170,7 +170,7 @@ const RoomPage = () => {
 
   return (
     <motion.div
-      className="xl:p-8 flex-1 flex xl:gap-4 gap-2 p-4 flex-col xl:flex-row"
+      className="xl:p-4 flex-1 flex xl:gap-4 gap-2 p-4 flex-col xl:flex-row"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}

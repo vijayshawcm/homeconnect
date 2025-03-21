@@ -26,7 +26,7 @@ const RoomScrollArea = ({ rooms }) => {
   const gapClass = clsx({
     "gap-4": isMobile, // Smaller gap for mobile
     "gap-10": !isMobile && open, // Medium gap when sidebar is open
-    "gap-14": !isMobile && !open, // Default gap when sidebar is closed
+    "gap-12": !isMobile && !open, // Default gap when sidebar is closed
   });
 
   const [roomType, setRoomType] = useState(""); // State for appliance type

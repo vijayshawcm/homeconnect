@@ -91,70 +91,74 @@ export function NavMain({ items }) {
               </SidebarMenuButton>
             </DropdownMenuTrigger>
             <DropdownMenuContent
-              className="w-[--radix-dropdown-menu-trigger-width] min-w-56 rounded-lg"
+              className="w-[--radix-dropdown-menu-trigger-width] min-w-72 rounded-lg"
               side={"right"}
               align="start"
               sideOffset={4}
             >
-              <DropdownMenuLabel className="p-0 font-normal">
-                <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
-                  <div className="grid flex-1 text-left text-sm leading-tight">
-                    <span className="truncate font-semibold">
-                      {currentHome ? currentHome.name : "Select a Home"}
-                    </span>
+              {homeless && (
+                <div className="flex flex-col items-center justify-center gap-4 p-4 text-center text-balance">
+                  <p className="text-md text-muted-foreground">
+                    You are not part of any home. Join an existing home or
+                    create a new one to get started.
+                  </p>
+                  <div className="flex gap-4">
+                    <Button
+                      onClick={() => navigate("/join-home")} // Navigate to join home page
+                      className="bg-[#C2E03A] text-black hover:bg-[#A8C82A]"
+                    >
+                      Join a Home
+                    </Button>
+                    <Button
+                      onClick={() => navigate("/create-home")} // Navigate to create home page
+                      className="bg-[#184C85] text-white hover:bg-[#0D1B2A]"
+                    >
+                      Create a Home
+                    </Button>
                   </div>
                 </div>
-              </DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <DropdownMenuGroup>
-                <DropdownMenuLabel className="text-xs text-muted-foreground">
-                  Switch Homes
-                </DropdownMenuLabel>
-                {homeless && (
-                  <div className="flex flex-col items-center justify-center gap-4 p-4 text-center text-balance">
-                    <p className="text-md text-muted-foreground">
-                      You are not part of any home. Join an existing home or
-                      create a new one to get started.
-                    </p>
-                    <div className="flex gap-4">
-                      <Button
-                        onClick={() => navigate("/join-home")} // Navigate to join home page
-                        className="bg-[#C2E03A] text-black hover:bg-[#A8C82A]"
-                      >
-                        Join a Home
-                      </Button>
-                      <Button
-                        onClick={() => navigate("/create-home")} // Navigate to create home page
-                        className="bg-[#184C85] text-white hover:bg-[#0D1B2A]"
-                      >
-                        Create a Home
-                      </Button>
+              )}
+              {!homeless && (
+                <div>
+                  <DropdownMenuLabel className="p-0 font-normal">
+                    <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
+                      <div className="grid flex-1 text-left text-sm leading-tight">
+                        <span className="truncate font-semibold">
+                          {currentHome ? currentHome.name : "Select a Home"}
+                        </span>
+                      </div>
                     </div>
-                  </div>
-                )}
-                {!homeless && ownedHomes
-                  .filter((home) => home._id !== currentHome?._id)
-                  .map((home) => (
-                    <DropdownMenuItem
-                      key={home._id}
-                      className="gap-2 p-2"
-                      onClick={() => handleSwitchHome(home._id)}
-                    >
-                      {home.name}
-                    </DropdownMenuItem>
-                  ))}
-                {dwelledHomes
-                  .filter((home) => home._id !== currentHome?._id)
-                  .map((home) => (
-                    <DropdownMenuItem
-                      key={home._id}
-                      className="gap-2 p-2"
-                      onClick={() => handleSwitchHome(home._id)}
-                    >
-                      {home.name}
-                    </DropdownMenuItem>
-                  ))}
-              </DropdownMenuGroup>
+                  </DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuGroup>
+                    <DropdownMenuLabel className="text-xs text-muted-foreground">
+                      Switch Homes
+                    </DropdownMenuLabel>
+                    {ownedHomes
+                      .filter((home) => home._id !== currentHome?._id)
+                      .map((home) => (
+                        <DropdownMenuItem
+                          key={home._id}
+                          className="gap-2 p-2"
+                          onClick={() => handleSwitchHome(home._id)}
+                        >
+                          {home.name}
+                        </DropdownMenuItem>
+                      ))}
+                    {dwelledHomes
+                      .filter((home) => home._id !== currentHome?._id)
+                      .map((home) => (
+                        <DropdownMenuItem
+                          key={home._id}
+                          className="gap-2 p-2"
+                          onClick={() => handleSwitchHome(home._id)}
+                        >
+                          {home.name}
+                        </DropdownMenuItem>
+                      ))}
+                  </DropdownMenuGroup>
+                </div>
+              )}
             </DropdownMenuContent>
           </DropdownMenu>
         </SidebarMenuItem>
