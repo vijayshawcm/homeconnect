@@ -1,3 +1,5 @@
+const { checkPermission } = require('./permissions.controller.js');
+
 const {
   Room,
   Fan,
@@ -5,23 +7,47 @@ const {
   Light,
   Sprinkler,
   Appliance,
+  Home,
+  User,
 } = require("../models");
 
 const createAppliance = async (req, res) => {
   const { id } = req.params;
-  const appliance = req.body;
+  const requesterName = req.body.requester;
+  const appliance = req.body.appliance;
 
-  console.log(id);
-
-  if (!appliance.name || !appliance.applianceType) {
+  if (!requesterName || !appliance.name || !appliance.applianceType) {
     return res
       .status(400)
       .json({ success: false, message: "Please provide all fields" });
   }
 
+  // Attempt to query database for user that is sending the request
+  const requester = await User.findOne({ 'userInfo.usernameLower': requesterName.toLowerCase() });
+  if(!requester) {
+      return res.status(404).json("Requester not found.");
+  }
+
+  // Prevent duplicate names
+  if ((await Appliance.findOne({ name: appliance.name }))) {
+    return res.status(409).json({ success: false, message: "Duplicate appliance name" });
+  }
+
   // Verify that the room exists
   if (!(await Room.findById(id))) {
     return res.status(404).json({ success: false, message: "Room not found" });
+  }
+
+  // Query database for home to check user permissions
+  const home = await Home.findOne({ rooms: id });
+  if(!home) {
+      return res.status(404).json("Could not find home.");
+  }
+
+  // Permission check
+  const validPerms = checkPermission(requester, home, "addRemoveAppliance");
+  if(!validPerms) {
+      return res.status(403).json("User does not have sufficient permissions");
   }
 
   // Add room ID to appliance object
@@ -55,6 +81,48 @@ const createAppliance = async (req, res) => {
     console.error("Error in creating appliance: ", error.message);
     res.status(500).json({ success: false, message: "Server Error" });
   }
+};
+
+const removeAppliance = async (req, res) => {
+  const { id } = req.params;
+  const requesterName = req.body.requester;
+
+  if (!requesterName) {
+    return res
+      .status(400)
+      .json({ success: false, message: "Please provide all fields" });
+  }
+
+  // Attempt to query database for user that is sending the request
+  const requester = await User.findOne({ 'userInfo.usernameLower': requesterName.toLowerCase() });
+  if(!requester) {
+      return res.status(404).json("Requester not found.");
+  }
+
+  // Query database for home and room to check user permissions
+  const room = await Room.findOne({ appliances: id });
+  if (!room) {
+    return res.status(404).json({ success: false, message: "Room not found" });
+  }
+  const home = await Home.findOne({ rooms: room._id });
+  if(!home) {
+      return res.status(404).json("Could not find home.");
+  }
+
+  // Permission check
+  const validPerms = checkPermission(requester, home, "addRemoveAppliance");
+  if(!validPerms) {
+      return res.status(403).json("User does not have sufficient permissions");
+  }
+
+  // Delete appliance
+  await room.updateOne({
+    $pull: {
+      appliances: id
+    }
+  })
+  
+  res.status(200).json({ success: true, data: room});
 };
 
 const modifyAppliance = async (req, res) => {
@@ -214,7 +282,7 @@ const disableAppliance = async (req, res) => {
     if (!appliance) {
       return res
         .status(404)
-        .json({ success: false, message: "Applaince not found" });
+        .json({ success: false, message: "Appliance not found" });
     }
 
     appliance.status = "disabled";
@@ -244,28 +312,12 @@ const getAppliancesByRoom = async (req, res) => {
   }
 };
 
-const deleteAppliance = async (req, res) => {
-  const { id } = req.params;
-  try {
-    const appliance = await Appliance.findByIdAndDelete(id);
-    if (!appliance) {
-      return res
-        .status(404)
-        .json({ success: false, message: "Applaince not found" });
-    }
-    res.status(200).json({ success: true, message: "Appliance Deleted" });
-  } catch (error) {
-    res.status(500).json({ success: false, message: "Server Error" });
-    console.log(error.message);
-  }
-};
-
 module.exports = {
   createAppliance,
+  removeAppliance,
   getAppliancesByRoom,
   turnOnAppliance,
   turnOffAppliance,
   modifyAppliance,
   disableAppliance,
-  deleteAppliance,
 };
