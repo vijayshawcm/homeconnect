@@ -13,6 +13,7 @@ function randomString(length) {
     return result;
 }
 
+// Checks if user has permission to perform action
 function checkPermission(user, home, permission) {
     const dweller = home.dwellers.find(e => e.user.equals(user._id)); // Get specific dweller in home
     if(!dweller) {
@@ -26,7 +27,7 @@ function checkPermission(user, home, permission) {
 const createInvite = async(req, res) => {
     // Check for home in request body
     if(!req.body.home || !req.body.username) {
-        return res.status(500).json("Missing argument(s) in request body.");
+        return res.status(400).json("Missing argument(s) in request body.");
     }
 
     // Query database for user
@@ -44,7 +45,7 @@ const createInvite = async(req, res) => {
     // Permission check
     const validPerms = checkPermission(user, home, "addRemoveDweller");
     if(!validPerms) {
-        return res.status(401).json("User does not have sufficient permissions");
+        return res.status(403).json("User does not have sufficient permissions");
     }
 
     // Generate code and push to database
@@ -68,7 +69,7 @@ const createInvite = async(req, res) => {
 const acceptInvite = async (req, res) => {
     // Check for arguments in request body
     if(!req.body.username || !req.body.invite) {
-        return res.status(500).json("Missing argument(s) in request body.");
+        return res.status(400).json("Missing argument(s) in request body.");
     }
 
     // Extract arguments
@@ -120,26 +121,98 @@ const acceptInvite = async (req, res) => {
     return res.status(200).json("Home joined successfully.");
 }
 
+// Remove a dweller from a home
+const removeDweller = async (req, res) => {
+    // Check for arguments in request body
+    if(!req.body.requester || !req.body.username || !req.body.home) {
+        return res.status(400).json("Missing argument(s) in request body.");
+    }
+
+    // Extract usernames
+    const requesterName = req.body.requester;
+    const username = req.body.username;
+
+    // Attempt to query database for user that is sending the request
+    const requester = await User.findOne({ 'userInfo.usernameLower': requesterName.toLowerCase() });
+    if(!requester) {
+        return res.status(404).json("Requester not found.");
+    }
+
+    // Attempt to query database for user to be removed from home
+    const user = await User.findOne({ 'userInfo.usernameLower': username.toLowerCase() });
+    if(!user) {
+        return res.status(404).json("The dweller that you are trying to remove does not exist.");
+    }
+
+    // Query database for home
+    const home = await Home.findById(req.body.home);
+    if(!home) {
+        return res.status(404).json("Could not find home.");
+    }
+
+    // Query database to check that user scheduled for removal is part of the home
+    const dweller = home.dwellers.find(e => e.user.equals(user._id)); // Get dweller to be deleted in home
+    if(!dweller) {
+        return res.status(404).json("The dweller you are trying to remove is not part of the home.");
+    }
+
+    // Permission check, also allows user to remove themselves from a home
+    const validPerms = checkPermission(requester, home, "modifyDweller");
+    if(!validPerms && !requester._id.equals(user._id)) {
+        return res.status(403).json("User does not have sufficient permissions");
+    }
+
+    // Remove user from home
+    await home.updateOne({
+        $pull:
+        {
+            dwellers: {
+                user: user._id
+            }
+        }
+    })
+
+    return res.status(200).json("Dweller removed successfully.")
+}
+
 // Modify user permissions
 const modifyPermissions = async (req, res) => {
     // Check for arguments in request body
-    if(!req.body.username || !req.body.permissions || !req.body.home) {
-        return res.status(500).json("Missing argument(s) in request body.");
+    if(!req.body.requester || !req.body.username || !req.body.permissions || !req.body.home) {
+        return res.status(400).json("Missing argument(s) in request body.");
     }
 
     // Extract username
+    const requesterName = req.body.requester;
     const username = req.body.username;
 
-    // Attempt to locate user to be added to home
+    // Don't allow users to change their own permissions
+    if(requesterName == username) {
+        return res.status(409).json("You are trying to modify your own permissions.")
+    }
+
+    // Attempt to query database for user that is sending the request
+    const requester = await User.findOne({ 'userInfo.usernameLower': requesterName.toLowerCase() });
+    if(!requester) {
+        return res.status(404).json("Requester not found.");
+    }
+
+    // Attempt to locate user to be modified
     const user = await User.findOne({ 'userInfo.usernameLower': username.toLowerCase() });
     if(!user) {
-        return res.status(404).json("User not found, did user sign up fail?");
+        return res.status(404).json("The user you are trying to modify does not exist.");
     }
 
     // Query database for home to get current user permissions
     const home = await Home.findById(req.body.home);
     if(!home) {
         return res.status(404).json("Could not find home.");
+    }
+
+    // Permission check
+    const validPerms = checkPermission(requester, home, "modifyDweller");
+    if(!validPerms) {
+        return res.status(403).json("User does not have sufficient permissions");
     }
 
     // Get dweller index
@@ -172,9 +245,9 @@ const modifyPermissions = async (req, res) => {
     return res.status(200).json("User permissions updated successfully.");
 } 
 
-// TODO: kick user from home
 module.exports = {
     createInvite,
     acceptInvite,
+    removeDweller,
     modifyPermissions
 }
