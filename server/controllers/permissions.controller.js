@@ -242,6 +242,23 @@ const modifyPermissions = async (req, res) => {
         $unset: unsetPermissions
     })
 
+    // Handle case for permissions where default is true because it breaks stuff
+    if (unsetPermissions[`dwellers.${currentDweller}.accessLevel.onOffAppliance`]) {
+        await home.updateOne({
+            $set: {
+                [`dwellers.${currentDweller}.accessLevel.onOffAppliance`]: false
+            }
+        })
+    }
+
+    if (unsetPermissions[`dwellers.${currentDweller}.accessLevel.adjustAppliance`]) {
+        await home.updateOne({
+            $set: {
+                [`dwellers.${currentDweller}.accessLevel.adjustAppliance`]: false
+            }
+        })
+    }
+
     return res.status(200).json("User permissions updated successfully.");
 } 
 
