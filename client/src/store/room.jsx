@@ -30,7 +30,7 @@ export const useRoomStore = create((set, get) => ({
     if (!currentRoom) return;
     try {
       const res = await fetch(`/server/appliances/${currentRoom._id}`, {
-        method: "POST",
+        method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),
       });

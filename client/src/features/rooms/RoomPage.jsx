@@ -16,11 +16,13 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { userAuthStore } from "@/store/userAuth";
 
 const RoomPage = () => {
   const [currentExpanded, setExpanded] = useState(null);
   const [hovered, setHovered] = useState(null);
   const { currentRoom, addAppliance} = useRoomStore();
+  const { user } = userAuthStore();
   const { isMobile } = useSidebar();
   const [isPopoverOpen, setIsPopoverOpen] = useState(false); // State for Popover
   const [applianceType, setApplianceType] = useState(""); // State for appliance type
@@ -62,8 +64,11 @@ const RoomPage = () => {
 
     // Add the new appliance to the room
     addAppliance({
-      applianceType: applianceType,
-      name: applianceName,
+      requester: user.username,
+      appliance: {
+        applianceType: applianceType,
+        name: applianceName,
+      }
     });
 
     // Reset form fields and close the Popover
