@@ -249,5 +249,6 @@ module.exports = {
     createInvite,
     acceptInvite,
     removeDweller,
-    modifyPermissions
+    modifyPermissions,
+    checkPermission,
 }
