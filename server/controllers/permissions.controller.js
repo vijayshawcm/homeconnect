@@ -13,19 +13,38 @@ function randomString(length) {
     return result;
 }
 
+function checkPermission(user, home, permission) {
+    const dweller = home.dwellers.find(e => e.user.equals(user._id)); // Get specific dweller in home
+    if(!dweller) {
+        return user._id.equals(home.owner);
+    }
+
+    return user._id.equals(home.owner) || dweller.accessLevel[permission]; // Return true if user is home owner or has relevant permission.
+}
+
 // Creates invite to home
 const createInvite = async(req, res) => {
-    // TODO: permissions check here
-
     // Check for home in request body
-    if(!req.body.home) {
-        return res.status(500).json("Home not provided in request body.");
+    if(!req.body.home || !req.body.username) {
+        return res.status(500).json("Missing argument(s) in request body.");
+    }
+
+    // Query database for user
+    const user = await User.findOne({ 'userInfo.usernameLower': req.body.username });
+    if(!user) {
+        return res.status(404).json("User not found");
     }
 
     // Query database for home
     const home = await Home.findById(req.body.home);
-    if(!home){
+    if(!home) {
         return res.status(404).json("Home not found");
+    }
+
+    // Permission check
+    const validPerms = checkPermission(user, home, "addRemoveDweller");
+    if(!validPerms) {
+        return res.status(401).json("User does not have sufficient permissions");
     }
 
     // Generate code and push to database
