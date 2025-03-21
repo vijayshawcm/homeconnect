@@ -17,7 +17,6 @@ function AppRoutes() {
   const { currentHome, fetchHomeByUserId, setCurrentHome } = useHomeStore();
   // Update currentHome when isAuthenticated changes
   useEffect(() => {
-		console.log(user)
     if (isAuthenticated && user) {
       // Fetch the home data for the authenticated user
       fetchHomeByUserId(user.username)
@@ -25,8 +24,14 @@ function AppRoutes() {
           if (data?.success) {
             // Check if data exists and has a success property
             // Set the current home if the user has a home
-						const{ownedHomes, dwelledHomes} = data.data
-            setCurrentHome(ownedHomes[0]._id); // Assuming the user has only one home
+            const { ownedHomes, dwelledHomes } = data.data;
+            if (ownedHomes.length > 0)
+              setCurrentHome(
+                ownedHomes[0]._id
+              ); // Assuming the user has only one home
+            else if (dwelledHomes.length > 0)
+              setCurrentHome(dwelledHomes[0]._id);
+            else setCurrentHome(null);
           } else {
             console.error(
               "Failed to fetch home data:",
