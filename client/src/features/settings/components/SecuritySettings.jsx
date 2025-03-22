@@ -153,7 +153,7 @@ function SecuritySettings() {
 
 		try {
 			// API call to update password
-			const response = await fetch('server/users/updatePassword', {
+			const response = await fetch('/server/users/updatePassword', {
 				method: 'PATCH',
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({ email: user.email, currentPassword: currentPassword.value, password: newPassword.value }),
@@ -179,15 +179,22 @@ function SecuritySettings() {
 
 	const handleToggleTwoFactor = async () => {
 		try {
-			// TODO: api call to 2fa (may not be implemented)
-			await new Promise((resolve) => setTimeout(resolve, 800));
+			// api call to update 2fa status
+			const response = await fetch("/server/users/twoFactorAuthentication", {
+			method: "PATCH",
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({ username: user.username, status: !isTwoFactorEnabled }),
+		})
 
+		if(response.ok) {
 			setIsTwoFactorEnabled(!isTwoFactorEnabled);
 			toast.success(
 				isTwoFactorEnabled
 					? 'Two-factor authentication disabled'
 					: 'Two-factor authentication enabled'
 			);
+		}
+			
 		} catch (error) {
 			toast.error('Failed to update two-factor authentication');
 		}
