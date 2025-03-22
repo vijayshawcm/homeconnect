@@ -20,12 +20,24 @@ const homeSchema = new Schema(
           type: Schema.Types.ObjectId,
           ref: "User",
         },
+        // This thing uses presence based checking (permission is granted if key exists).
         accessLevel: {
-          type: String,
-          enum: ["full", "limited", "guest"],
-          default: "full",
+          addRemoveDweller: { type: Boolean },
+          modifyDweller: { type: Boolean },
+          onOffAppliance: { type: Boolean, default: true },
+          adjustAppliance: { type: Boolean, default: true },
+          automateAppliance: { type: Boolean },
+          enableDisableAppliance: { type: Boolean },
+          addRemoveAppliance: { type: Boolean },
+          modifyHome: { type: Boolean }
         },
       },
+    ],
+    activeInvites: [
+      {
+        invite: String,
+        expiryDate: Date,
+      }
     ],
     rooms: [
       {

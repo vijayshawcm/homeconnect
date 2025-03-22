@@ -1,3 +1,5 @@
+const { checkPermission } = require('./permissions.controller.js');
+
 const {
   Room,
   Fan,
@@ -5,21 +7,52 @@ const {
   Light,
   Sprinkler,
   Appliance,
+  Home,
+  User,
+  EnergyProfile,
 } = require("../models");
 
 const createAppliance = async (req, res) => {
   const { id } = req.params;
-  const appliance = req.body;
+  const requesterName = req.body.requester;
+  const appliance = req.body.appliance;
 
-  if (!appliance.name || !appliance.applianceType) {
+  if (!requesterName || !appliance.name || !appliance.applianceType) {
     return res
       .status(400)
       .json({ success: false, message: "Please provide all fields" });
   }
 
+  // Attempt to query database for user that is sending the request
+  const requester = await User.findOne({ 'userInfo.usernameLower': requesterName.toLowerCase() });
+  if(!requester) {
+      return res.status(404).json("Requester not found.");
+  }
+
   // Verify that the room exists
-  if (!(await Room.findById(id))) {
+  const room = await Room.findById(id);
+  if (!room) {
     return res.status(404).json({ success: false, message: "Room not found" });
+  }
+
+  // Prevent duplicate names
+  for (const e in room.appliances){
+    const curr = await Appliance.findById(e);
+    if (curr.name == appliance.name) {
+      return res.status(409).json({ success: false, message: "Duplicate appliance name" });
+    }
+  }
+
+  // Query database for home to check user permissions
+  const home = await Home.findOne({ rooms: id });
+  if(!home) {
+      return res.status(404).json("Could not find home.");
+  }
+
+  // Permission check
+  const validPerms = checkPermission(requester, home, "addRemoveAppliance");
+  if(!validPerms) {
+      return res.status(403).json("User does not have sufficient permissions");
   }
 
   // Add room ID to appliance object
@@ -55,8 +88,130 @@ const createAppliance = async (req, res) => {
   }
 };
 
-const modifyAppliance = async (req, res) => {
+const removeAppliance = async (req, res) => {
   const { id } = req.params;
+  const requesterName = req.body.requester;
+
+  if (!requesterName) {
+    return res
+      .status(400)
+      .json({ success: false, message: "Please provide all fields" });
+  }
+
+  // Attempt to query database for user that is sending the request
+  const requester = await User.findOne({ 'userInfo.usernameLower': requesterName.toLowerCase() });
+  if(!requester) {
+      return res.status(404).json("Requester not found.");
+  }
+
+  // Query database for home and room to check user permissions
+  const room = await Room.findOne({ appliances: id });
+  if (!room) {
+    return res.status(404).json({ success: false, message: "Room not found" });
+  }
+  const home = await Home.findOne({ rooms: room._id });
+  if(!home) {
+      return res.status(404).json("Could not find home.");
+  }
+
+  // Permission check
+  const validPerms = checkPermission(requester, home, "addRemoveAppliance");
+  if(!validPerms) {
+      return res.status(403).json("User does not have sufficient permissions");
+  }
+
+  // Delete appliance and all documents associated with it
+  await room.updateOne({
+    $pull: {
+      appliances: id
+    }
+  })
+
+  const appliance = await appliance.findByIdAndDelete(id);
+  res.status(200).json({ success: true, data: room});
+};
+
+const renameAppliance = async (req, res) => {
+  const { id } = req.params;
+
+  if (!req.body.requester || !req.body.appliance.name) {
+    return res
+      .status(400)
+      .json({ success: false, message: "Please provide all fields" });
+  }
+
+  const requesterName = req.body.requester;
+  const applianceName = req.body.appliance.name;
+
+
+  // Attempt to query database for user that is sending the request
+  const requester = await User.findOne({ 'userInfo.usernameLower': requesterName.toLowerCase() });
+  if(!requester) {
+      return res.status(404).json("Requester not found.");
+  }
+
+  // Query database for home and room to check user permissions
+  const room = await Room.findOne({ appliances: id });
+  if (!room) {
+    return res.status(404).json({ success: false, message: "Room not found" });
+  }
+  const home = await Home.findOne({ rooms: room._id });
+  if(!home) {
+      return res.status(404).json("Could not find home.");
+  }
+
+  // Permission check
+  const validPerms = checkPermission(requester, home, "addRemoveAppliance");
+  if(!validPerms) {
+      return res.status(403).json("User does not have sufficient permissions");
+  }
+
+  // Prevent duplicate names
+  for (const e of room.appliances) {
+    const curr = await Appliance.findById(e);
+    if (curr.name == applianceName) {
+      return res.status(409).json({ success: false, message: "Duplicate appliance name" });
+    }
+  }
+
+  // Rename appliance
+  const appliance = await Appliance.findByIdAndUpdate(id, { name: applianceName });
+  
+  res.status(200).json({ success: true, data: appliance });
+};
+
+const adjustAppliance = async (req, res) => {
+  const { id } = req.params;
+  if (!req.body.requester) {
+    return res
+      .status(400)
+      .json({ success: false, message: "Please provide all fields" });
+  }
+
+  const requesterName = req.body.requester;
+
+  // Attempt to query database for user that is sending the request
+  const requester = await User.findOne({ 'userInfo.usernameLower': requesterName.toLowerCase() });
+  if(!requester) {
+      return res.status(404).json("Requester not found.");
+  }
+
+  // Query database for home and room to check user permissions
+  const room = await Room.findOne({ appliances: id });
+  if (!room) {
+    return res.status(404).json({ success: false, message: "Room not found" });
+  }
+  const home = await Home.findOne({ rooms: room._id });
+  if(!home) {
+      return res.status(404).json("Could not find home.");
+  }
+
+  // Permission check
+  const validPerms = checkPermission(requester, home, "adjustAppliance");
+  if(!validPerms) {
+      return res.status(403).json("User does not have sufficient permissions");
+  }
+
   try {
     const appliance = await Appliance.findById(id);
     if (!appliance) {
@@ -70,10 +225,6 @@ const modifyAppliance = async (req, res) => {
         .status(400)
         .json({ success: false, message: "Appliance is disabled." });
     }
-
-    // Update common fields
-    if (req.body.name) appliance.name = req.body.name;
-    if (req.body.status) appliance.status = req.body.status;
 
     // Update appliance-specific fields
     switch (appliance.applianceType) {
@@ -127,8 +278,411 @@ const modifyAppliance = async (req, res) => {
   }
 };
 
+const scheduleAppliance = async (req, res) => {
+  const { id } = req.params;
+  if(!req.body.schedule) {
+    return res
+      .status(400)
+      .json({ success: false, message: "Please provide all fields" });
+  }
+
+  const schedule = req.body.schedule;
+  if (!req.body.requester || !schedule.name || !schedule.startTime.hour || !schedule.startTime.minute || !schedule.endTime.hour || !schedule.endTime.minute || !schedule.days) {
+    return res
+      .status(400)
+      .json({ success: false, message: "Please provide all fields" });
+  }
+
+  const validHour = (schedule.startTime.hour >= 0 && schedule.startTime.hour < 24) && (schedule.endTime.hour >= 0 && schedule.endTime.hour < 24)
+  const validMinute = (schedule.startTime.minute >= 0 && schedule.startTime.minute < 60) && (schedule.endTime.minute >= 0 && schedule.endTime.minute < 60)
+  const validTime = validHour && validMinute;
+  if(!validTime) {
+    return res
+    .status(400)
+    .json({ success: false, message: "Malformed time" });
+  }
+
+  // Query database for appliance
+  const appliance = await Appliance.findById(id);
+  if (!appliance) {
+    return res
+      .status(404)
+      .json({ success: false, message: "Appliance not found" });
+  }
+
+  const requesterName = req.body.requester;
+  // Attempt to query database for user that is sending the request
+  const requester = await User.findOne({ 'userInfo.usernameLower': requesterName.toLowerCase() });
+  if(!requester) {
+    return res.status(404).json("Requester not found.");
+  } 
+
+  // Query database for home and room to check user permissions
+  const room = await Room.findOne({ appliances: id });
+  if (!room) {
+    return res.status(404).json({ success: false, message: "Room not found" });
+  }
+  const home = await Home.findOne({ rooms: room._id });
+  if(!home) {
+    return res.status(404).json("Could not find home.");
+  }
+
+  // Permission check
+  const validPerms = checkPermission(requester, home, "automateAppliance");
+  if(!validPerms) {
+    return res.status(403).json("User does not have sufficient permissions");
+  }
+
+  // Prevent duplicate names
+  for (const e of appliance.schedules) {
+    if (e.name == schedule.name) {
+      return res.status(409).json({ success: false, message: "Duplicate schedule name" });
+    }
+  }
+
+  await appliance.updateOne({ $push: {schedules: schedule }});
+  return res.status(200).json("Schedule created successfully.");
+}
+
+const modifySchedule = async (req, res) => {
+  const { id } = req.params;
+  if (!req.body.requester || !req.body.schedule) {
+    return res
+      .status(400)
+      .json({ success: false, message: "Please provide all fields" });
+  }
+
+  const schedule = req.body.schedule;
+
+  // Ensure that time is valid if a time is provided
+  if(schedule.startTime) {
+    const validHour = (schedule.startTime.hour >= 0 && schedule.startTime.hour < 24);
+    const validMinute = (schedule.startTime.minute >= 0 && schedule.startTime.minute < 60);
+    const validTime = validHour && validMinute;
+    if(!validTime) {
+      return res
+      .status(400)
+      .json({ success: false, message: "Malformed time" });
+    }
+  }
+  if(schedule.endTime) {
+    const validHour = (schedule.endTime.hour >= 0 && schedule.endTime.hour < 24);
+    const validMinute = (schedule.endTime.minute >= 0 && schedule.endTime.minute < 60)
+    const validTime = validHour && validMinute;
+    if(!validTime) {
+      return res
+      .status(400)
+      .json({ success: false, message: "Malformed time" });
+    }
+  }
+
+  // Query database for appliance
+  const appliance = await Appliance.findOne({ 'schedules._id': id });
+  if (!appliance) {
+    return res
+      .status(404)
+      .json({ success: false, message: "Appliance not found" });
+  }
+
+  const requesterName = req.body.requester;
+  // Attempt to query database for user that is sending the request
+  const requester = await User.findOne({ 'userInfo.usernameLower': requesterName.toLowerCase() });
+  if(!requester) {
+    return res.status(404).json("Requester not found.");
+  } 
+
+  // Query database for home and room to check user permissions
+  const room = await Room.findOne({ appliances: appliance._id });
+  if (!room) {
+    return res.status(404).json({ success: false, message: "Room not found" });
+  }
+  const home = await Home.findOne({ rooms: room._id });
+  if(!home) {
+    return res.status(404).json("Could not find home.");
+  }
+
+  // Permission check
+  const validPerms = checkPermission(requester, home, "automateAppliance");
+  if(!validPerms) {
+    return res.status(403).json("User does not have sufficient permissions");
+  }
+
+  // Prevent duplicate names if name is provided as a parameter
+  if(schedule.name) {
+    for (const e of appliance.schedules) {
+      if (e.name == schedule.name && !e._id.equals(id)) {
+        return res.status(409).json({ success: false, message: "Duplicate schedule name" });
+      }
+    }
+  }
+
+  // Update field provided to appliance
+  const dbSchedule = appliance.schedules.find(e => e._id.equals(id));
+  if(schedule.name) {
+    dbSchedule.name = schedule.name;
+  }
+  if(schedule.startTime) {
+    dbSchedule.startTime = schedule.startTime;
+  }
+  if(schedule.endTime) {
+    dbSchedule.endTime = schedule.endTime;
+  }
+  if(schedule.days) {
+    dbSchedule.days = schedule.days;
+  }
+  if(schedule.active != null) {
+    dbSchedule.active = schedule.active;
+  }
+
+  await appliance.save();
+  return res.status(200).json("Schedule modified successfully.");
+}
+
+const deleteSchedule = async (req, res) => {
+  const { id } = req.params;
+
+  if (!req.body.requester) {
+    return res
+      .status(400)
+      .json({ success: false, message: "Please provide all fields" });
+  }
+
+  // Query database for appliance
+  const appliance = await Appliance.findOne({ 'schedules._id': id });
+  if (!appliance) {
+    return res
+      .status(404)
+      .json({ success: false, message: "Appliance not found" });
+  }
+
+  const requesterName = req.body.requester;
+  // Attempt to query database for user that is sending the request
+  const requester = await User.findOne({ 'userInfo.usernameLower': requesterName.toLowerCase() });
+  if(!requester) {
+    return res.status(404).json("Requester not found.");
+  } 
+
+  // Query database for home and room to check user permissions
+  const room = await Room.findOne({ appliances: appliance.id });
+  if (!room) {
+    return res.status(404).json({ success: false, message: "Room not found" });
+  }
+  const home = await Home.findOne({ rooms: room._id });
+  if(!home) {
+    return res.status(404).json("Could not find home.");
+  }
+
+  // Permission check
+  const validPerms = checkPermission(requester, home, "automateAppliance");
+  if(!validPerms) {
+    return res.status(403).json("User does not have sufficient permissions");
+  }
+
+  await appliance.updateOne({ $pull: {schedules: {_id: id} }});
+  return res.status(200).json("Schedule deleted successfully.");
+}
+
+const automateAppliance = async (req, res) => {
+  const { id } = req.params;
+  if(!req.body.automation) {
+    return res
+      .status(400)
+      .json({ success: false, message: "Please provide all fields" });
+  }
+
+  const automation = req.body.automation;
+  if (!req.body.requester || !automation.name || !automation.sensorType || !automation.threshold) {
+    return res
+      .status(400)
+      .json({ success: false, message: "Please provide all fields" });
+  }
+
+  // Query database for appliance
+  const appliance = await Appliance.findById(id);
+  if (!appliance) {
+    return res
+      .status(404)
+      .json({ success: false, message: "Appliance not found" });
+  }
+
+  const requesterName = req.body.requester;
+  // Attempt to query database for user that is sending the request
+  const requester = await User.findOne({ 'userInfo.usernameLower': requesterName.toLowerCase() });
+  if(!requester) {
+    return res.status(404).json("Requester not found.");
+  } 
+
+  // Query database for home and room to check user permissions
+  const room = await Room.findOne({ appliances: id });
+  if (!room) {
+    return res.status(404).json({ success: false, message: "Room not found" });
+  }
+  const home = await Home.findOne({ rooms: room._id });
+  if(!home) {
+    return res.status(404).json("Could not find home.");
+  }
+
+  // Permission check
+  const validPerms = checkPermission(requester, home, "automateAppliance");
+  if(!validPerms) {
+    return res.status(403).json("User does not have sufficient permissions");
+  }
+
+  // Prevent duplicate names
+  for (const e of appliance.automations) {
+    if (e.name == automation.name) {
+      return res.status(409).json({ success: false, message: "Duplicate automation name" });
+    }
+  }
+
+  await appliance.updateOne({ $push: {automations: automation}});
+  return res.status(200).json("Automation created successfully.");
+}
+
+const modifyAutomation = async (req, res) => {
+  const { id } = req.params;
+  if (!req.body.requester || !req.body.automation) {
+    return res
+      .status(400)
+      .json({ success: false, message: "Please provide all fields" });
+  }
+
+  const automation = req.body.automation;
+  // Query database for appliance
+  const appliance = await Appliance.findOne({ 'automations._id': id });
+  if (!appliance) {
+    return res
+      .status(404)
+      .json({ success: false, message: "Appliance not found" });
+  }
+
+  const requesterName = req.body.requester;
+  // Attempt to query database for user that is sending the request
+  const requester = await User.findOne({ 'userInfo.usernameLower': requesterName.toLowerCase() });
+  if(!requester) {
+    return res.status(404).json("Requester not found.");
+  } 
+
+  // Query database for home and room to check user permissions
+  const room = await Room.findOne({ appliances: appliance._id });
+  if (!room) {
+    return res.status(404).json({ success: false, message: "Room not found" });
+  }
+  const home = await Home.findOne({ rooms: room._id });
+  if(!home) {
+    return res.status(404).json("Could not find home.");
+  }
+
+  // Permission check
+  const validPerms = checkPermission(requester, home, "automateAppliance");
+  if(!validPerms) {
+    return res.status(403).json("User does not have sufficient permissions");
+  }
+
+  // Prevent duplicate names if name is provided as a parameter
+  if(automation.name) {
+    for (const e of appliance.automations) {
+      if (e.name == automation.name && !e._id.equals(id)) {
+        return res.status(409).json({ success: false, message: "Duplicate automation name" });
+      }
+    }
+  }
+
+  // Update field provided to appliance
+  const dbAutomation = appliance.automations.find(e => e._id.equals(id));
+  if(automation.name) {
+    dbAutomation.name = automation.name;
+  }
+  if(automation.sensorType) {
+    dbAutomation.sensorType = automation.sensorType;
+  }
+  if(automation.threshold) {
+    dbAutomation.threshold = automation.threshold;
+  }
+  if(automation.active !=  null) {
+    dbAutomation.active = automation.active;
+  }
+
+  await appliance.save();
+  return res.status(200).json("Automation modified successfully.");
+}
+
+const deleteAutomation = async (req, res) => {
+  const { id } = req.params;
+
+  if (!req.body.requester) {
+    return res
+      .status(400)
+      .json({ success: false, message: "Please provide all fields" });
+  }
+
+  // Query database for appliance
+  const appliance = await Appliance.findOne({ 'automations._id': id });
+  if (!appliance) {
+    return res
+      .status(404)
+      .json({ success: false, message: "Appliance not found" });
+  }
+
+  const requesterName = req.body.requester;
+  // Attempt to query database for user that is sending the request
+  const requester = await User.findOne({ 'userInfo.usernameLower': requesterName.toLowerCase() });
+  if(!requester) {
+    return res.status(404).json("Requester not found.");
+  } 
+
+  // Query database for home and room to check user permissions
+  const room = await Room.findOne({ appliances: appliance.id });
+  if (!room) {
+    return res.status(404).json({ success: false, message: "Room not found" });
+  }
+  const home = await Home.findOne({ rooms: room._id });
+  if(!home) {
+    return res.status(404).json("Could not find home.");
+  }
+
+  // Permission check
+  const validPerms = checkPermission(requester, home, "automateAppliance");
+  if(!validPerms) {
+    return res.status(403).json("User does not have sufficient permissions");
+  }
+
+  await appliance.updateOne({ $pull: {automations: {_id: id} }});
+  return res.status(200).json("Automation deleted successfully.");
+}
+
 const turnOnAppliance = async (req, res) => {
   const { id } = req.params;
+
+  if (!req.body.requester) {
+    return res
+      .status(400)
+      .json({ success: false, message: "Please provide all fields" });
+  }
+
+  const requesterName = req.body.requester;
+  // Attempt to query database for user that is sending the request
+  const requester = await User.findOne({ 'userInfo.usernameLower': requesterName.toLowerCase() });
+  if(!requester) {
+      return res.status(404).json("Requester not found.");
+  } 
+
+  // Query database for home and room to check user permissions
+  const room = await Room.findOne({ appliances: id });
+  if (!room) {
+    return res.status(404).json({ success: false, message: "Room not found" });
+  }
+  const home = await Home.findOne({ rooms: room._id });
+  if(!home) {
+      return res.status(404).json("Could not find home.");
+  }
+
+  // Permission check
+  const validPerms = checkPermission(requester, home, "onOffAppliance");
+  if(!validPerms) {
+      return res.status(403).json("User does not have sufficient permissions");
+  }
+
   try {
     const appliance = await Appliance.findById(id).populate("energyProfile");
     if (!appliance) {
@@ -145,15 +699,30 @@ const turnOnAppliance = async (req, res) => {
     }
 
     if (appliance.status === "off") {
-      appliance.status = "on";
+      if(appliance.interface[0]) {
+        // Home I/O Appliance logic
+        const response = await fetch(appliance.interface[0], {
+          method: 'GET',
+          headers: { 'Content-Type': 'application/json' }
+        });
+
+        if(response.ok) {
+          appliance.status = "on";
+          await appliance.save();
+        } else {
+          return res.status(500).json({ success: false, message: "Home I/O has encountered an error." });
+        }
+      } else {
+        appliance.status = "on";
+        await appliance.save();
+      }
+
       // Set currentUsage to energyConsumption in the energyProfile
       if (appliance.energyProfile) {
         appliance.energyProfile.currentUsage =
           appliance.energyProfile.energyConsumption;
         await appliance.energyProfile.save(); // Save the updated energyProfile
       }
-
-      await appliance.save();
     }
 
     res.status(200).json({ success: true, data: appliance });
@@ -165,6 +734,36 @@ const turnOnAppliance = async (req, res) => {
 
 const turnOffAppliance = async (req, res) => {
   const { id } = req.params;
+
+  if (!req.body.requester) {
+    return res
+      .status(400)
+      .json({ success: false, message: "Please provide all fields" });
+  }
+
+  const requesterName = req.body.requester;
+  // Attempt to query database for user that is sending the request
+  const requester = await User.findOne({ 'userInfo.usernameLower': requesterName.toLowerCase() });
+  if(!requester) {
+      return res.status(404).json("Requester not found.");
+  } 
+
+  // Query database for home and room to check user permissions
+  const room = await Room.findOne({ appliances: id });
+  if (!room) {
+    return res.status(404).json({ success: false, message: "Room not found" });
+  }
+  const home = await Home.findOne({ rooms: room._id });
+  if(!home) {
+      return res.status(404).json("Could not find home.");
+  }
+
+  // Permission check
+  const validPerms = checkPermission(requester, home, "onOffAppliance");
+  if(!validPerms) {
+      return res.status(403).json("User does not have sufficient permissions");
+  }
+
   try {
     const appliance = await Appliance.findById(id).populate("energyProfile");
     if (!appliance) {
@@ -181,12 +780,27 @@ const turnOffAppliance = async (req, res) => {
     }
 
     if (appliance.status === "on") {
-      appliance.status = "off";
+      // Home I/O Appliance logic
+      if(appliance.interface[1]) {
+        const response = await fetch(appliance.interface[1], {
+          method: 'GET',
+          headers: { 'Content-Type': 'application/json' }
+        });
+  
+        if(response.ok) {
+          appliance.status = "off";
+          await appliance.save();
+        } else {
+          return res.status(500).json({ success: false, message: "Home I/O has encountered an error." });
+        }
+      } else {
+        appliance.status = "off";
+        await appliance.save();
+      }
+
       if (appliance.energyProfile) {
         appliance.energyProfile.currentUsage = 0;
         await appliance.energyProfile.save(); // Save the updated energyProfile
-      }
-      await appliance.save();
     }
 
     res.status(200).json({ success: true, data: appliance });
@@ -198,15 +812,94 @@ const turnOffAppliance = async (req, res) => {
 
 const disableAppliance = async (req, res) => {
   const { id } = req.params;
+  if (!req.body.requester) {
+    return res
+      .status(400)
+      .json({ success: false, message: "Please provide all fields" });
+  }
+
   try {
     const appliance = await Appliance.findById(id);
     if (!appliance) {
       return res
         .status(404)
-        .json({ success: false, message: "Applaince not found" });
+        .json({ success: false, message: "Appliance not found" });
+    }
+
+    const requesterName = req.body.requester;
+
+    // Attempt to query database for user that is sending the request
+    const requester = await User.findOne({ 'userInfo.usernameLower': requesterName.toLowerCase() });
+    if(!requester) {
+        return res.status(404).json("Requester not found.");
+    }
+  
+    // Query database for home and room to check user permissions
+    const room = await Room.findOne({ appliances: id });
+    if (!room) {
+      return res.status(404).json({ success: false, message: "Room not found" });
+    }
+    const home = await Home.findOne({ rooms: room._id });
+    if(!home) {
+        return res.status(404).json("Could not find home.");
+    }
+  
+    // Permission check
+    const validPerms = checkPermission(requester, home, "enableDisableAppliance");
+    if(!validPerms) {
+        return res.status(403).json("User does not have sufficient permissions");
     }
 
     appliance.status = "disabled";
+    await appliance.save();
+    res.status(201).json({ success: true, data: appliance });
+  } catch (error) {
+    console.error("Error in disabling appliance: ", error.message);
+    res.status(500).json({ success: false, message: "Server Error" });
+  }
+};
+
+const enableAppliance = async (req, res) => {
+  const { id } = req.params;
+  if (!req.body.requester) {
+    return res
+      .status(400)
+      .json({ success: false, message: "Please provide all fields" });
+  }
+  
+  try {
+    const appliance = await Appliance.findById(id);
+    if (!appliance) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Appliance not found" });
+    }
+
+    const requesterName = req.body.requester;
+
+    // Attempt to query database for user that is sending the request
+    const requester = await User.findOne({ 'userInfo.usernameLower': requesterName.toLowerCase() });
+    if(!requester) {
+        return res.status(404).json("Requester not found.");
+    }
+  
+    // Query database for home and room to check user permissions
+    const room = await Room.findOne({ appliances: id });
+    if (!room) {
+      return res.status(404).json({ success: false, message: "Room not found" });
+    }
+    const home = await Home.findOne({ rooms: room._id });
+    if(!home) {
+        return res.status(404).json("Could not find home.");
+    }
+  
+    // Permission check
+    const validPerms = checkPermission(requester, home, "enableDisableAppliance");
+    if(!validPerms) {
+        return res.status(403).json("User does not have sufficient permissions");
+    }
+
+    appliance.status = "off";
     await appliance.save();
     res.status(201).json({ success: true, data: appliance });
   } catch (error) {
@@ -233,28 +926,20 @@ const getAppliancesByRoom = async (req, res) => {
   }
 };
 
-const deleteAppliance = async (req, res) => {
-  const { id } = req.params;
-  try {
-    const appliance = await Appliance.findByIdAndDelete(id);
-    if (!appliance) {
-      return res
-        .status(404)
-        .json({ success: false, message: "Applaince not found" });
-    }
-    res.status(200).json({ success: true, message: "Appliance Deleted" });
-  } catch (error) {
-    res.status(500).json({ success: false, message: "Server Error" });
-    console.log(error.message);
-  }
-};
-
 module.exports = {
   createAppliance,
+  removeAppliance,
+  renameAppliance,
   getAppliancesByRoom,
   turnOnAppliance,
   turnOffAppliance,
-  modifyAppliance,
+  adjustAppliance,
+  scheduleAppliance,
+  modifySchedule,
+  deleteSchedule,
+  automateAppliance,
+  modifyAutomation,
+  deleteAutomation,
   disableAppliance,
-  deleteAppliance,
+  enableAppliance,
 };
