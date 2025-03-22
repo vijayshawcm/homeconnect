@@ -18,7 +18,7 @@ var userSchema = new mongoose.Schema(
       twoFactorAuthentication: { type: Boolean, default: false },
       notification: {
         channels: { type: [String], enum: ['email', 'push', 'sms'], default: ['email'] },
-        types: { type: [String], enum: ['marketing', 'security', 'update', 'reminder', 'billing'], default: ['security', 'reminder']}
+        types: { type: [String], enum: ['marketing', 'security', 'update', 'reminder', 'billing'], default: ['security', 'reminder', 'billing']}
       },
     },
     sessions: [{
