@@ -8,7 +8,7 @@ const updateEmail = async (req, res) => {
     }
 
     const user = await User.findOneAndUpdate(
-        { 'userInfo.usernameLower': req.body.username }, 
+        { 'userInfo.usernameLower': req.body.username.toLowerCase() }, 
         { 'userInfo.email': req.body.email }
     );
 
@@ -49,7 +49,7 @@ const updateUsername = async (req, res) => {
     }
 
     const user = await User.findOneAndUpdate(
-        { 'userInfo.usernameLower': req.body.username }, 
+        { 'userInfo.usernameLower': req.body.username.toLowerCase() }, 
         { 'userInfo.username': req.body.updatedUsername }
     );
 
@@ -63,7 +63,7 @@ const updateUsername = async (req, res) => {
 // Change user display name
 const updateDisplayName = async (req, res) => {
     const user = await User.findOneAndUpdate(
-        { 'userInfo.usernameLower': req.body.username }, 
+        { 'userInfo.usernameLower': req.body.username.toLowerCase() }, 
         { 'userInfo.displayName': req.body.displayName }
     );
 
@@ -78,7 +78,7 @@ const updateDisplayName = async (req, res) => {
 const updateTheme = async (req, res) => {
     var user = new User();
     try {
-        user = await User.findOneAndUpdate({ 'userInfo.usernameLower': req.body.username }, { 'settings.theme': req.body.theme });
+        user = await User.findOneAndUpdate({ 'userInfo.usernameLower': req.body.username.toLowerCase() }, { 'settings.theme': req.body.theme });
     } catch (err) {
         return res.status(500).json("Invalid input received.");
     }
@@ -94,7 +94,7 @@ const updateTheme = async (req, res) => {
 const updateNotificationChannel = async (req, res) => {
     var user = new User();
     try {
-        user = await User.findOneAndUpdate({ 'userInfo.usernameLower': req.body.username }, { 'settings.notification.channels': req.body.channels });
+        user = await User.findOneAndUpdate({ 'userInfo.usernameLower': req.body.username.toLowerCase() }, { 'settings.notification.channels': req.body.channels });
     } catch (err) {
         return res.status(500).json("Invalid input received.");
     }
@@ -110,7 +110,7 @@ const updateNotificationChannel = async (req, res) => {
 const updateNotificationType = async (req, res) => {
     var user = new User();
     try {
-        user = await User.findOneAndUpdate({ 'userInfo.usernameLower': req.body.username }, { 'settings.notification.types': req.body.types });
+        user = await User.findOneAndUpdate({ 'userInfo.usernameLower': req.body.username.toLowerCase() }, { 'settings.notification.types': req.body.types });
     } catch (err) {
         return res.status(500).json("Invalid input received.");
     }
@@ -126,10 +126,21 @@ const updateNotificationType = async (req, res) => {
 const updateAccountStatus = async (req, res) => {
     var user = new User();
     try {
-        user = await User.findOneAndUpdate({ 'userInfo.usernameLower': req.body.username }, { 'settings.accountStatus': req.body.status });
+        user = await User.findOneAndUpdate({ 'userInfo.usernameLower': req.body.username.toLowerCase() }, { 'settings.accountStatus': req.body.status });
     } catch (err) {
         return res.status(500).json("Invalid input received.");
     }
+
+    if(!user) {
+        return res.status(404).json("User does not exist.");
+    }
+
+    return res.status(200).json("Account status updated successfully.");
+}
+
+// Update 2fa
+const updateTwoFactor = async (req, res) => {
+    const user = await User.findOneAndUpdate({ 'userInfo.usernameLower': req.body.username.toLowerCase() }, { 'settings.twoFactorAuthentication': req.body.status });
 
     if(!user) {
         return res.status(404).json("User does not exist.");
@@ -146,5 +157,6 @@ module.exports = {
     updateTheme,
     updateNotificationChannel,
     updateNotificationType,
-    updateAccountStatus
+    updateAccountStatus,
+    updateTwoFactor
 }
