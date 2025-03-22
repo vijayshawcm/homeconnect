@@ -293,8 +293,8 @@ const scheduleAppliance = async (req, res) => {
       .json({ success: false, message: "Please provide all fields" });
   }
 
-  const validHour = (schedule.startTime.hour >= 0 && schedule.startTime.hour < 24) || (schedule.endTime.hour >= 0 && schedule.endTime.hour < 24)
-  const validMinute = (schedule.startTime.minute >= 0 && schedule.startTime.minute < 60) || (schedule.endTime.minute >= 0 && schedule.endTime.minute < 60)
+  const validHour = (schedule.startTime.hour >= 0 && schedule.startTime.hour < 24) && (schedule.endTime.hour >= 0 && schedule.endTime.hour < 24)
+  const validMinute = (schedule.startTime.minute >= 0 && schedule.startTime.minute < 60) && (schedule.endTime.minute >= 0 && schedule.endTime.minute < 60)
   const validTime = validHour && validMinute;
   if(!validTime) {
     return res
@@ -342,6 +342,105 @@ const scheduleAppliance = async (req, res) => {
 
   await appliance.updateOne({ $push: {schedules: schedule }});
   return res.status(200).json("Schedule created successfully.");
+}
+
+const modifySchedule = async (req, res) => {
+  const { id } = req.params;
+  if(!req.body.schedule) {
+    return res
+      .status(400)
+      .json({ success: false, message: "Please provide all fields" });
+  }
+
+  const schedule = req.body.schedule;
+  if (!req.body.requester || !schedule) {
+    return res
+      .status(400)
+      .json({ success: false, message: "Please provide all fields" });
+  }
+
+  // Ensure that time is valid if a time is provided
+  if(schedule.startTime) {
+    const validHour = (schedule.startTime.hour >= 0 && schedule.startTime.hour < 24);
+    const validMinute = (schedule.startTime.minute >= 0 && schedule.startTime.minute < 60);
+    const validTime = validHour && validMinute;
+    if(!validTime) {
+      return res
+      .status(400)
+      .json({ success: false, message: "Malformed time" });
+    }
+  }
+  if(schedule.endTime) {
+    const validHour = (schedule.endTime.hour >= 0 && schedule.endTime.hour < 24);
+    const validMinute = (schedule.endTime.minute >= 0 && schedule.endTime.minute < 60)
+    const validTime = validHour && validMinute;
+    if(!validTime) {
+      return res
+      .status(400)
+      .json({ success: false, message: "Malformed time" });
+    }
+  }
+
+  // Query database for appliance
+  const appliance = await Appliance.findOne({ 'schedules._id': id });
+  if (!appliance) {
+    return res
+      .status(404)
+      .json({ success: false, message: "Appliance not found" });
+  }
+
+  const requesterName = req.body.requester;
+  // Attempt to query database for user that is sending the request
+  const requester = await User.findOne({ 'userInfo.usernameLower': requesterName.toLowerCase() });
+  if(!requester) {
+    return res.status(404).json("Requester not found.");
+  } 
+
+  // Query database for home and room to check user permissions
+  const room = await Room.findOne({ appliances: appliance._id });
+  if (!room) {
+    return res.status(404).json({ success: false, message: "Room not found" });
+  }
+  const home = await Home.findOne({ rooms: room._id });
+  if(!home) {
+    return res.status(404).json("Could not find home.");
+  }
+
+  // Permission check
+  const validPerms = checkPermission(requester, home, "automateAppliance");
+  if(!validPerms) {
+    return res.status(403).json("User does not have sufficient permissions");
+  }
+
+  // Prevent duplicate names if name is provided as a parameter
+  if(schedule.name) {
+    for (const e of appliance.schedules) {
+      if (e.name == schedule.name && !e._id.equals(id)) {
+        return res.status(409).json({ success: false, message: "Duplicate schedule name" });
+      }
+    }
+  }
+
+  // Update field provided to appliance
+  const dbSchedule = appliance.schedules.find(e => e._id.equals(id));
+  if(schedule.name) {
+    dbSchedule.name = schedule.name;
+  }
+  if(schedule.startTime) {
+    dbSchedule.startTime = schedule.startTime;
+  }
+  if(schedule.endTime) {
+    dbSchedule.endTime = schedule.endTime;
+  }
+  if(schedule.days) {
+    dbSchedule.days = schedule.days;
+  }
+  if(schedule.active != null) {
+    dbSchedule.active = schedule.active;
+  }
+
+  await appliance.save();
+  return res.status(200).json("Schedule modified successfully.");
 }
 
 
@@ -618,6 +717,7 @@ module.exports = {
   turnOffAppliance,
   adjustAppliance,
   scheduleAppliance,
+  modifySchedule,
   disableAppliance,
   enableAppliance,
 };
