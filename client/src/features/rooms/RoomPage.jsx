@@ -20,6 +20,7 @@ import {
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { userAuthStore } from "@/store/userAuth";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import {
   ChartContainer,
@@ -34,7 +35,10 @@ import { LampCeiling, AirVent, Fan } from "lucide-react";
 const RoomPage = () => {
   const [currentExpanded, setExpanded] = useState(null);
   const [hovered, setHovered] = useState(null);
-  const { currentRoom, addAppliance, getCurrentUsage } = useRoomStore();
+  const { currentRoom, addAppliance, getCurrentUsag} = useRoomStore();
+  const { user } = userAuthStore();
+  const { isMobile } = useSidebar();
+  const [isPopoverOpen, setIsPopoverOpen] = useState(false); // State for Popover
   const [applianceType, setApplianceType] = useState(""); // State for appliance type
   const [applianceName, setApplianceName] = useState(""); // State for appliance name
   // State to store chart data
@@ -117,8 +121,11 @@ const RoomPage = () => {
 
     // Add the new appliance to the room
     addAppliance({
-      applianceType: applianceType,
-      name: applianceName,
+      requester: user.username,
+      appliance: {
+        applianceType: applianceType,
+        name: applianceName,
+      }
     });
 
     // Reset form fields and close the Popover

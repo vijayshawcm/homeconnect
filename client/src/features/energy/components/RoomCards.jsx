@@ -4,9 +4,8 @@ import { Button } from "@/components/ui/button";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { useHomeStore } from "@/store/home";
 
-const FloorPlan = () => {
-  const [activeRoom, setActiveRoom] = useState("Living Room");
-	const { currentHome } = useHomeStore()
+const RoomCards = () => {
+	const [activeRoom, setActiveRoom] = useState('Living Room');
 
   return (
     <Card className="flex-1 flex flex-col h-full bg-transparent border-none shadow-none p-0 overflow-hidden">
@@ -38,4 +37,4 @@ const FloorPlan = () => {
   );
 };
 
-export default FloorPlan;
+export default RoomCards;

@@ -45,18 +45,21 @@ const sendOTP = async (req, res) => {
 		return res.status(404).json('User not found.');
 	}
 
-	// Check if username has already been registered
-	const userByName = await User.findOne({
+	if (req.body.status == 'register'){
+			// Check if username has already been registered
+		const userByName = await User.findOne({
 		'userInfo.usernameLower': req.body.username.toLowerCase(),
-	});
-	if (req.body.status == 'register' && userByEmail) {
-		return res
-			.status(409)
-			.json('The provided email has already been registered.');
-	} else if (req.body.status == 'register' && userByName) {
-		return res
-			.status(409)
-			.json('The provided uername has already been registered.');
+		});
+
+		if (userByEmail) {
+			return res
+				.status(409)
+				.json('The provided email has already been registered.');
+		} else if (userByName) {
+			return res
+				.status(409)
+				.json('The provided uername has already been registered.');
+		}
 	}
 
 	var otp = randInt(100000, 999999);
@@ -145,6 +148,7 @@ const loginStatus = async (req, res) => {
 					year: 'numeric',
 					month: 'long',
 				}), // format date
+				settings: user.settings,
 				loggedIn: true,
 			};
 			return res.status(200).json(response);

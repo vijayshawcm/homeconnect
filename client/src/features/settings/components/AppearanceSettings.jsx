@@ -12,9 +12,11 @@ import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { toast } from 'sonner';
 import { Loader2, Palette, Check } from 'lucide-react';
+import { userAuthStore } from '@/store/userAuth';
 
 function AppearanceSettings() {
-	const [theme, setTheme] = useState('system');
+	const { user } = userAuthStore(); // Get user from store
+	const [theme, setTheme] = useState(user.settings.theme);
 	const [originalTheme, setOriginalTheme] = useState('system');
 	const [isSaving, setIsSaving] = useState(false);
 
@@ -41,13 +43,17 @@ function AppearanceSettings() {
 	const handleSubmit = async (e) => {
 		e.preventDefault();
 		setIsSaving(true);
-
 		try {
-			// simulate api call
-			await new Promise((resolve) => setTimeout(resolve, 1500));
+			const response = await fetch("/server/users/updateTheme", {
+				method: 'PATCH',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ username: user.username, theme: theme})
+			})
 
-			applyTheme(theme);
-			setOriginalTheme(theme);
+			if(response.ok) {
+				applyTheme(theme);
+				setOriginalTheme(theme);
+			}
 			toast.success('Appearance settings updated successfully');
 		} catch (error) {
 			toast.error('Failed to update appearance settings');
