@@ -117,11 +117,12 @@ function RegisterForm({ onRegisterSuccess }) {
 		const response = await fetch('server/auth/sendOTP', {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({ email, username, status: "register" }),
+			body: JSON.stringify({ email, username, status: 'register' }),
 		});
 
 		if (response.status == 409) {
-			throw new Error(await response.text());
+			const data = await response.json();
+			throw new Error(data.message || 'Unknown error occurred.');
 		} else if (!response.ok) {
 			throw new Error('Failed to send OTP. Please try again.');
 		}
