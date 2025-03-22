@@ -9,6 +9,7 @@ const {
   Appliance,
   Home,
   User,
+  EnergyProfile,
 } = require("../models");
 
 const createAppliance = async (req, res) => {
@@ -28,15 +29,19 @@ const createAppliance = async (req, res) => {
       return res.status(404).json("Requester not found.");
   }
 
-  // Prevent duplicate names
-  if ((await Appliance.findOne({ name: appliance.name }))) {
-    return res.status(409).json({ success: false, message: "Duplicate appliance name" });
-  }
-
   // Verify that the room exists
-  if (!(await Room.findById(id))) {
+  const room = await Room.findById(id);
+  if (!room) {
     return res.status(404).json({ success: false, message: "Room not found" });
   }
+
+  // Prevent duplicate names
+  room.appliances.forEach(async e => {
+    const curr = await Appliance.findById(e);
+    if (curr.name == appliance.name) {
+      return res.status(409).json({ success: false, message: "Duplicate appliance name" });
+    }
+  })
 
   // Query database for home to check user permissions
   const home = await Home.findOne({ rooms: id });
@@ -115,13 +120,14 @@ const removeAppliance = async (req, res) => {
       return res.status(403).json("User does not have sufficient permissions");
   }
 
-  // Delete appliance
+  // Delete appliance and all documents associated with it
   await room.updateOne({
     $pull: {
       appliances: id
     }
   })
-  
+
+  const appliance = await appliance.findByIdAndDelete(id);
   res.status(200).json({ success: true, data: room});
 };
 
@@ -145,9 +151,12 @@ const renameAppliance = async (req, res) => {
   }
 
   // Prevent duplicate names
-  if ((await Appliance.findOne({ name: applianceName }))) {
-    return res.status(409).json({ success: false, message: "Duplicate appliance name" });
-  }
+  room.appliances.forEach(async e => {
+    const curr = await Appliance.findById(e);
+    if (curr.name == appliance.name) {
+      return res.status(409).json({ success: false, message: "Duplicate appliance name" });
+    }
+  })
 
   // Query database for home and room to check user permissions
   const room = await Room.findOne({ appliances: id });
@@ -165,7 +174,7 @@ const renameAppliance = async (req, res) => {
       return res.status(403).json("User does not have sufficient permissions");
   }
 
-  // Delete appliance
+  // Rename appliance
   const appliance = await Appliance.findByIdAndUpdate(id, { name: applianceName });
   
   res.status(200).json({ success: true, data: appliance });
