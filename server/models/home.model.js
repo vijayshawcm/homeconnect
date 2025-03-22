@@ -22,12 +22,14 @@ const homeSchema = new Schema(
         },
         // This thing uses presence based checking (permission is granted if key exists).
         accessLevel: {
-          addRemoveDweller: { type: Boolean }, 
-          modifyDweller: { type: Boolean }, 
-          onOffAppliance: { type: Boolean, default: true }, 
-          enableDisableAppliance: { type: Boolean }, 
-          addRemoveAppliance: { type: Boolean }, 
-          modifyAppliance: { type: Boolean } // ? Assuming this includes name and schedules
+          addRemoveDweller: { type: Boolean },
+          modifyDweller: { type: Boolean },
+          onOffAppliance: { type: Boolean, default: true },
+          adjustAppliance: { type: Boolean, default: true },
+          automateAppliance: { type: Boolean },
+          enableDisableAppliance: { type: Boolean },
+          addRemoveAppliance: { type: Boolean },
+          modifyHome: { type: Boolean }
         },
       },
     ],
