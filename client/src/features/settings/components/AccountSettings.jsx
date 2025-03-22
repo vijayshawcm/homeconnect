@@ -36,7 +36,7 @@ import {
 import { userAuthStore } from '@/store/userAuth';
 
 function AccountSettings() {
-	const { user } = userAuthStore(); // access user from store
+	const { user, logoutUser } = userAuthStore(); // access user from store
 	// email change state
 	const [email, setEmail] = useState(user?.email || '');
 	const [newEmail, setNewEmail] = useState('');
@@ -142,7 +142,7 @@ function AccountSettings() {
 		}
 	};
 
-	const handleRequestEmailChange = (e) => {
+	const handleRequestEmailChange = async (e) => {
 		e.preventDefault();
 
 		// validate email
@@ -165,20 +165,35 @@ function AccountSettings() {
 
 		setIsChangingEmail(true);
 
-		// simulate api call
-		setTimeout(() => {
+		// api call
+		const response = await fetch("/server/auth/sendOTP", {
+			method: "POST",
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({ status: "modifyPassword", email }),
+		})
+
+		if(response.ok) {
 			setIsChangingEmail(false);
 			setShowEmailVerification(true);
 			toast.success('Verification code sent', {
 				description: `We've sent a verification code to ${newEmail}`,
 			});
-		}, 1500);
+		}
 	};
 
 	const handleVerifyEmail = async (e) => {
 		e.preventDefault();
 
-		if (!verificationCode) {
+		// api call to update email
+		const res1= await fetch("/server/auth/verifyOTP", {
+			method: "POST",
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({ OTP: verificationCode }),
+		})
+
+		console.log(verificationCode);
+
+		if (!res1.ok) {
 			toast.error('Verification failed', {
 				description: 'Please enter the verification code',
 			});
@@ -187,14 +202,14 @@ function AccountSettings() {
 
 		setIsVerifying(true);
 
-		// api call
-		const response = await fetch("/server/users/updateEmail", {
+		// api call to update email
+		const res2 = await fetch("/server/users/updateEmail", {
 			method: "PATCH",
 			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({ user: user.username, email }),
+			body: JSON.stringify({ username: user.username, email: newEmail }),
 		})
 
-		if(response.ok) {
+		if(res2.ok) {
 			setIsVerifying(false);
 			setShowEmailVerification(false);
 			setEmail(newEmail);
@@ -205,17 +220,23 @@ function AccountSettings() {
 		}
 	};
 
-	const handleResendCode = () => {
+	const handleResendCode = async () => {
 		if (resendDisabled) return;
 
 		setResendDisabled(true);
 
-		// simulate api call
-		setTimeout(() => {
+		// api call
+		const response = await fetch("/server/auth/sendOTP", {
+			method: "POST",
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({ status: "modifyPassword", email }),
+		})
+
+		if(response.ok) {
 			toast.success('Code resent', {
 				description: `A new verification code has been sent to ${newEmail}`,
 			});
-		}, 800);
+		}
 	};
 
 	// location handler(s)
@@ -338,25 +359,28 @@ function AccountSettings() {
 	};
 
 	// acct management handlers
-	const handleDeactivateAccount = () => {
+	const handleDeactivateAccount = async () => {
 		setIsDeactivating(true);
 
-		// simulate api call
-		setTimeout(() => {
+		// api call to update account status
+		const response = await fetch("/server/users/accountStatus", {
+			method: "PATCH",
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({ username: user.username, status: "deactivated" }),
+		})
+
+		if(response.ok) {
 			setIsDeactivating(false);
 			setShowDeactivateDialog(false);
 			setDeactivateReason('');
 			toast.success('Account deactivated', {
 				description:
 					'Your account has been deactivated. You will be logged out shortly.',
-			});
-
-			// simulate logout
-			setTimeout(() => {
-				window.location.href = '/login';
-			}, 3000);
-		}, 1500);
-	};
+			})
+			await logoutUser();
+			window.location.href = '/login';
+		};
+	}
 
 	const handleDeleteAccount = () => {
 		if (deleteConfirmation !== 'DELETE') {
