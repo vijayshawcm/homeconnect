@@ -17,8 +17,8 @@ var userSchema = new mongoose.Schema(
       theme: { type: String, enum: ['light', 'dark', 'system'], default: 'system' },
       twoFactorAuthentication: { type: Boolean, default: false },
       notification: {
-        channels: { type: [String], enum: ['email', 'push', 'sms'], default: ['email'] },
-        types: { type: [String], enum: ['marketing', 'security', 'update', 'reminder', 'billing'], default: ['security', 'reminder', 'billing']}
+        channels: { type: [String], enum: ['email', 'push', 'device'], default: ['email'] },
+        types: { type: [String], enum: ['marketing', 'security', 'updates', 'reminders', 'billing'], default: ['security', 'reminders', 'billing']}
       },
     },
     sessions: [{
@@ -75,7 +75,7 @@ userSchema.pre("findOneAndUpdate", async function (next) {
     // Notification channel update
     if(update['settings.notification.channels']) {
       update['settings.notification.channels'].forEach(element => {
-        if(element!= 'email' && element != 'push' && element != 'sms') {
+        if(element!= 'email' && element != 'push' && element != 'device') {
           throw new Error("Invalid input received"); // Throw error to be handled at api call.
         }
       });
@@ -84,7 +84,7 @@ userSchema.pre("findOneAndUpdate", async function (next) {
     // Notification type update
     if(update['settings.notification.types']) {
       update['settings.notification.types'].forEach(element => {
-        if(element!= 'marketing' && element != 'security' && element != 'update' && element != 'reminder' && element != 'billing') {
+        if(element!= 'marketing' && element != 'security' && element != 'updates' && element != 'reminders' && element != 'billing') {
           throw new Error("Invalid input received"); // Throw error to be handled at api call.
         }
       });
