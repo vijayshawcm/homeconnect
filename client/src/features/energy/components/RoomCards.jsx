@@ -3,7 +3,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 
-const FloorPlan = () => {
+const RoomCards = () => {
 	const [activeRoom, setActiveRoom] = useState('Living Room');
 
 	const rooms = [
@@ -39,4 +39,4 @@ const FloorPlan = () => {
 	);
 };
 
-export default FloorPlan;
+export default RoomCards;
