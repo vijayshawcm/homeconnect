@@ -36,12 +36,12 @@ const createAppliance = async (req, res) => {
   }
 
   // Prevent duplicate names
-  room.appliances.forEach(async e => {
+  for (const e in room.appliances){
     const curr = await Appliance.findById(e);
     if (curr.name == appliance.name) {
       return res.status(409).json({ success: false, message: "Duplicate appliance name" });
     }
-  })
+  }
 
   // Query database for home to check user permissions
   const home = await Home.findOne({ rooms: id });
@@ -150,14 +150,6 @@ const renameAppliance = async (req, res) => {
       return res.status(404).json("Requester not found.");
   }
 
-  // Prevent duplicate names
-  room.appliances.forEach(async e => {
-    const curr = await Appliance.findById(e);
-    if (curr.name == appliance.name) {
-      return res.status(409).json({ success: false, message: "Duplicate appliance name" });
-    }
-  })
-
   // Query database for home and room to check user permissions
   const room = await Room.findOne({ appliances: id });
   if (!room) {
@@ -172,6 +164,14 @@ const renameAppliance = async (req, res) => {
   const validPerms = checkPermission(requester, home, "addRemoveAppliance");
   if(!validPerms) {
       return res.status(403).json("User does not have sufficient permissions");
+  }
+
+  // Prevent duplicate names
+  for (const e of room.appliances) {
+    const curr = await Appliance.findById(e);
+    if (curr.name == applianceName) {
+      return res.status(409).json({ success: false, message: "Duplicate appliance name" });
+    }
   }
 
   // Rename appliance
@@ -277,6 +277,73 @@ const adjustAppliance = async (req, res) => {
     res.status(500).json({ success: false, message: "Server Error" });
   }
 };
+
+const scheduleAppliance = async (req, res) => {
+  const { id } = req.params;
+  if(!req.body.schedule) {
+    return res
+      .status(400)
+      .json({ success: false, message: "Please provide all fields" });
+  }
+
+  const schedule = req.body.schedule;
+  if (!req.body.requester || !schedule.name || !schedule.startTime.hour || !schedule.startTime.minute || !schedule.endTime.hour || !schedule.endTime.minute || !schedule.days) {
+    return res
+      .status(400)
+      .json({ success: false, message: "Please provide all fields" });
+  }
+
+  const validHour = (schedule.startTime.hour >= 0 && schedule.startTime.hour < 24) || (schedule.endTime.hour >= 0 && schedule.endTime.hour < 24)
+  const validMinute = (schedule.startTime.minute >= 0 && schedule.startTime.minute < 60) || (schedule.endTime.minute >= 0 && schedule.endTime.minute < 60)
+  const validTime = validHour && validMinute;
+  if(!validTime) {
+    return res
+    .status(400)
+    .json({ success: false, message: "Malformed time" });
+  }
+
+  // Query database for appliance
+  const appliance = await Appliance.findById(id);
+  if (!appliance) {
+    return res
+      .status(404)
+      .json({ success: false, message: "Appliance not found" });
+  }
+
+  const requesterName = req.body.requester;
+  // Attempt to query database for user that is sending the request
+  const requester = await User.findOne({ 'userInfo.usernameLower': requesterName.toLowerCase() });
+  if(!requester) {
+    return res.status(404).json("Requester not found.");
+  } 
+
+  // Query database for home and room to check user permissions
+  const room = await Room.findOne({ appliances: id });
+  if (!room) {
+    return res.status(404).json({ success: false, message: "Room not found" });
+  }
+  const home = await Home.findOne({ rooms: room._id });
+  if(!home) {
+    return res.status(404).json("Could not find home.");
+  }
+
+  // Permission check
+  const validPerms = checkPermission(requester, home, "automateAppliance");
+  if(!validPerms) {
+    return res.status(403).json("User does not have sufficient permissions");
+  }
+
+  // Prevent duplicate names
+  for (const e of appliance.schedules) {
+    if (e.name == schedule.name) {
+      return res.status(409).json({ success: false, message: "Duplicate schedule name" });
+    }
+  }
+
+  await appliance.updateOne({ $push: {schedules: schedule }});
+  return res.status(200).json("Schedule created successfully.");
+}
+
 
 const turnOnAppliance = async (req, res) => {
   const { id } = req.params;
@@ -550,6 +617,7 @@ module.exports = {
   turnOnAppliance,
   turnOffAppliance,
   adjustAppliance,
+  scheduleAppliance,
   disableAppliance,
   enableAppliance,
 };
