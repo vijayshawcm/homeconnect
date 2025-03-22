@@ -69,7 +69,6 @@ applianceSchema.pre("deleteOne", { document: true }, async function (next) {
   try {
     if (this.energyProfile) {
       console.log("Deleting energyProfile for appliance:", this._id);
-      console.log(this.energyProfile)
       await EnergyProfile.findByIdAndDelete(this.energyProfile);
     }
     next();

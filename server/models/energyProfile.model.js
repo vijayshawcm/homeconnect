@@ -27,6 +27,7 @@ const energyProfileSchema = new Schema({
     default: 0,
   },
   energyConsumption: {
+    //  this is KwH
     type: Number,
     default: 0,
   },

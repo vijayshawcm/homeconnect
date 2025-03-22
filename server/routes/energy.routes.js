@@ -5,6 +5,6 @@ const {
 } = require("../controllers/energy.controller");
 
 const router = express.Router();
-router.get("/totalTypeCurrentUsage/:id", getTotalTypeCurrentUsage);
+router.get("/totalTypeCurrentUsage/:id/:type", getTotalTypeCurrentUsage);
 
 module.exports = router;
