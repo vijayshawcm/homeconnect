@@ -14,12 +14,16 @@ import { ChevronLeft, Power, PowerOff, Sun, SunDim, Timer } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import Thermostat from "./Thermostat";
 import { TbAirConditioning } from "react-icons/tb";
+import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
+import { Settings, Plus, Trash, X } from "lucide-react"; // Import icons
 
 const ExpandedView = ({ appliance, onClose }) => {
   const { currentRoom, turnOnAppliance, turnOffAppliance, modifyAppliance } =
     useRoomStore();
   const [lightCarouselApi, setLightCarouselApi] = useState(null);
   const [airConCarouselApi, setAirConCarouselApi] = useState(null);
+  // Inside the ExpandedView component
+  const [isSettingsExpanded, setIsSettingsExpanded] = useState(false);
 
   const getApplianceStats = useCallback(
     (type) => {
@@ -86,7 +90,7 @@ const ExpandedView = ({ appliance, onClose }) => {
 
     if (lightCarouselApi && currentAppliance) {
       const modeIndex = lightModes.findIndex(
-        ({value}) => value === currentAppliance.colorTemperature
+        ({ value }) => value === currentAppliance.colorTemperature
       );
       if (modeIndex !== -1) {
         lightCarouselApi.scrollTo(modeIndex); // Auto-scroll to selected mode
@@ -173,9 +177,31 @@ const ExpandedView = ({ appliance, onClose }) => {
     }));
   };
 
+  // Function to handle settings button click
+  const handleSettingsClick = () => {
+    setIsSettingsExpanded(!isSettingsExpanded);
+  };
+
+  // Function to handle add appliance
+  const handleAddAppliance = () => {
+    console.log("Add Appliance clicked");
+    // Add your logic for adding an appliance here
+  };
+
+  // Function to handle delete appliance
+  const handleDeleteAppliance = () => {
+    console.log("Delete Appliance clicked");
+    // Add your logic for deleting an appliance here
+  };
+
+  // Function to handle close expanded menu
+  const handleCloseExpandedMenu = () => {
+    setIsSettingsExpanded(false);
+  };
+
   return (
     <div className="flex flex-1 gap-4 h-full flex-col xl:flex-row">
-      <Card className="flex flex-col p-4 xl:w-[20%] gap-8">
+      <Card className="flex flex-col p-4 xl:w-[20%] max-h-none">
         <div
           className="flex justify-start items-center gap-2 cursor-pointer"
           onClick={onClose}
@@ -191,9 +217,9 @@ const ExpandedView = ({ appliance, onClose }) => {
               : null}
           </div>
         </div>
-        <div className="flex-1 flex justify-start items-center flex-col w-full">
-          <div className="flex xl:flex-col items-center gap-10 w-full">
-            <div className="flex flex-col gap-2">
+        <div className="flex justify-start items-center flex-col flex-1">
+          <div className="flex flex-col items-center xl:gap-6 w-full justify-center h-full">
+            <div className="flex xl:flex-col gap-2">
               <div className="text-3xl font-normal">
                 <span
                   className={`text-5xl ${
@@ -204,36 +230,80 @@ const ExpandedView = ({ appliance, onClose }) => {
                 </span>
                 /{getStats.total}
               </div>
-              <div className="flex flex-col items-center font-semibold">
+              <div className="flex xl:flex-col items-center font-semibold">
                 <span className="block">Active</span>
                 <span className="block">Devices</span>
               </div>
             </div>
-            <div className="flex xl:flex-col gap-4 w-full px-2">
-              {getStats.appliances.map((appliance) => {
-                return (
-                  <Card
-                    key={appliance._id}
-                    className={`p-4 rounded-2xl text-balance text-center font-semibold cursor-pointer transition-all duration-150 ${
-                      appliance._id === currentAppliance._id
-                        ? "bg-[#C2E03A] scale-105 shadow-md"
-                        : "bg-white border-[#184C85] border-4"
-                    }`}
-                    onClick={() => {
-                      setCurrentAppliance(appliance);
-                    }}
+            <ScrollArea className="w-full xl:h-[250px] h-full xl:px-2">
+              <div className="flex xl:flex-col xL:gap-3 gap-6 w-full px-2 py-2 justify-center xl:justify-start">
+                {getStats.appliances.map((appliance) => {
+                  return (
+                    <Card
+                      key={appliance._id}
+                      className={`xl:p-4 px-10 py-4 rounded-2xl text-balance text-center font-semibold cursor-pointer transition-all duration-150 ${
+                        appliance._id === currentAppliance._id
+                          ? "bg-[#C2E03A] scale-105 shadow-md"
+                          : "bg-white border-[#184C85] border-4"
+                      }`}
+                      onClick={() => {
+                        setCurrentAppliance(appliance);
+                      }}
+                    >
+                      {appliance.name}
+                    </Card>
+                  );
+                })}
+              </div>
+              <ScrollBar></ScrollBar>
+            </ScrollArea>
+            <div className="h-[20%] flex justify-center items-end">
+              {isSettingsExpanded ? (
+                // Expanded Buttons
+                <div className="flex flex-col gap-2 w-full">
+                  {/* Add Appliance Button */}
+                  <Button
+                    className="flex items-center gap-2 bg-[#C2E03A] hover:bg-[#A5C32E] text-black w-full"
+                    onClick={handleAddAppliance}
                   >
-                    {appliance.name}
-                  </Card>
-                );
-              })}
+                    <Plus className="size-4" />
+                    <span>Add Appliance</span>
+                  </Button>
+
+                  {/* Delete Appliance Button */}
+                  <Button
+                    className="flex items-center gap-2 bg-red-500 hover:bg-red-600 text-white w-full"
+                    onClick={handleDeleteAppliance}
+                  >
+                    <Trash className="size-4" />
+                    <span>Delete Appliance</span>
+                  </Button>
+
+                  {/* Close Menu Button */}
+                  <Button
+                    className="flex items-center gap-2 bg-gray-500 hover:bg-gray-600 text-white w-full"
+                    onClick={handleCloseExpandedMenu}
+                  >
+                    <X className="size-4" />
+                    <span>Close</span>
+                  </Button>
+                </div>
+              ) : (
+                // Settings Button
+                <Button
+                  className="rounded-full size-10 bg-[#184C85] hover:bg-[#133A65] transition-all duration-200"
+                  onClick={handleSettingsClick}
+                >
+                  <Settings className="!size-8" />
+                </Button>
+              )}
             </div>
           </div>
         </div>
       </Card>
       <Card className="flex-1 flex flex-col justify-center items-center lg:p-6 p-4">
         {appliance === "Light" ? (
-          <div className="flex-1 flex flex-col justify-center items-center w-full relative gap-10">
+          <div className="flex-1 flex flex-col justify-center items-center w-full relative xl:gap-10 gap-4">
             <div className="flex-1 w-full flex justify-center items-center">
               <div className="xl:w-[30%]">
                 <Carousel
@@ -258,10 +328,10 @@ const ExpandedView = ({ appliance, onClose }) => {
               <div className="relative flex-1 h-full">
                 <img
                   src="src/assets/light.svg"
-                  className="absolute aspect-auto w-[40%] top-[5%] right-[40%] z-10"
+                  className="absolute aspect-auto w-[20%] md:w-[30%] max-w-32 md:max-w-max xl:w-[40%] md:top-[20%] xl:top-[5%] xl:right-[40%] right-[20%] z-10"
                 ></img>
                 <motion.div
-                  className="absolute bg-[#fffb18] size-[30%] blur-2xl right-[45%] top-[60%] -z-0"
+                  className="absolute bg-[#fffb18] xl:size-[30%] size-24 blur-2xl xl:right-[45%] xl:top-[60%] right-[27%] bottom-[0%] -z-0"
                   animate={{
                     scale: brightness / 100 + 0.5,
                     opacity: currentAppliance?.status === "on" ? 1 : 0,
@@ -272,7 +342,7 @@ const ExpandedView = ({ appliance, onClose }) => {
             </div>
             <div className="w-full h-[25%] flex justify-center items-center gap-10">
               <Button
-                className={`size-16 rounded-full relative p-0 ${
+                className={`xl:size-16 size-14 rounded-full relative p-0 ${
                   currentAppliance?.status === "on"
                     ? "bg-[#C2E03A] hover:hover:bg-[#A5C32E]"
                     : "bg-[#184C85] hover:bg-[#133A65]"

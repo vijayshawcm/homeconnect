@@ -7,7 +7,6 @@ import {
 } from "@/components/ui/carousel";
 import { useHomeStore } from "@/store/home";
 import { useRoomStore } from "@/store/room";
-import { HeaderInput } from "./HeaderInput";
 import HeaderAvatar from "./HeaderAvatar";
 import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
@@ -62,7 +61,6 @@ const RoomsHeader = () => {
         <CarouselNext className = "absolute right-6"/>
       </Carousel>
       <div className="flex gap-2">
-        <HeaderInput />
         <HeaderAvatar />
       </div>
     </div>

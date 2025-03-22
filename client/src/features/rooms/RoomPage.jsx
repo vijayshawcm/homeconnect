@@ -3,30 +3,45 @@ import { useRoomStore } from "@/store/room";
 import { useEffect, useState } from "react";
 import LightCard from "./components/LightCard";
 import AirConCard from "./components/AirConCard";
-import { Card } from "@/components/ui/card";
+import { Card, CardHeader } from "@/components/ui/card";
 import { AddApplianceCard } from "./components/AddApplianceCard";
 import FanCard from "./components/FanCard";
 import { ArrowRight } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useSidebar } from "@/components/ui/sidebar";
 import ExpandedView from "./components/ExpandedView";
-import { Popover, PopoverTrigger } from "@/components/ui/popover";
-import { PopoverContent } from "@radix-ui/react-popover";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { userAuthStore } from "@/store/userAuth";
+import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+import {
+  ChartContainer,
+  ChartLegend,
+  ChartLegendContent,
+  ChartTooltip,
+  ChartTooltipContent,
+} from "@/components/ui/chart";
+import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from "recharts";
 
 const RoomPage = () => {
   const [currentExpanded, setExpanded] = useState(null);
   const [hovered, setHovered] = useState(null);
-  const { currentRoom, addAppliance} = useRoomStore();
+  const { currentRoom, addAppliance, getCurrentUsag} = useRoomStore();
   const { user } = userAuthStore();
   const { isMobile } = useSidebar();
   const [isPopoverOpen, setIsPopoverOpen] = useState(false); // State for Popover
   const [applianceType, setApplianceType] = useState(""); // State for appliance type
   const [applianceName, setApplianceName] = useState(""); // State for appliance name
+  // State to store chart data
+  const [chartData, setChartData] = useState([]);
 
   // Function to get total and active appliances of a given type
   const getApplianceStats = (type) => {
@@ -40,6 +55,7 @@ const RoomPage = () => {
         .length,
     };
   };
+
   // Track the current room ID
   const [currentRoomId, setCurrentRoomId] = useState(currentRoom?._id);
 
@@ -49,11 +65,51 @@ const RoomPage = () => {
       setCurrentRoomId(currentRoom?._id); // Update the tracked room ID
       setExpanded(null); // Reset expanded view
     }
-  }, [currentRoom?._id]); // Trigger only when the room ID changes
+  }, [currentRoom?._id, currentRoomId, getCurrentUsage]); // Trigger only when the room ID changes
+
+  useEffect(() => {
+    const fetchUsage = async () => {
+      try {
+        // Fetch current usage for all appliance types
+        const lightUsage = await getCurrentUsage("Light");
+        const fanUsage = await getCurrentUsage("Fan");
+        const airConUsage = await getCurrentUsage("AirConditioner");
+
+        // Format the data for the chart
+        const chartData = [
+          {
+            light: lightUsage || 0, // Use 0 if no data is returned
+            fan: fanUsage || 0,
+            airConditioner: airConUsage || 0,
+          },
+        ];
+        setChartData(chartData);
+      } catch (error) {
+        console.error("Failed to fetch usage data:", error);
+        return []; // Return an empty array if there's an error
+      }
+    };
+    fetchUsage();
+  }, [getCurrentUsage, currentRoom?.appliances]);
 
   const lightStats = getApplianceStats("Light");
   const fansStats = getApplianceStats("Fan");
   const airConStats = getApplianceStats("AirConditioner");
+
+  const chartConfig = {
+    light: {
+      label: "Lights",
+      color: "#C2E03A",
+    },
+    fan: {
+      label: "Fan",
+      color: "#184C85",
+    },
+    airConditioner: {
+      label: "AC",
+      color: "#0D1B2A",
+    },
+  };
 
   // Handle form submission
   const handleAddAppliance = () => {
@@ -74,7 +130,6 @@ const RoomPage = () => {
     // Reset form fields and close the Popover
     setApplianceType("");
     setApplianceName("");
-    setIsPopoverOpen(false);
   };
 
   const applianceGrid = [
@@ -118,13 +173,13 @@ const RoomPage = () => {
       className: "roomAddAppliance",
       key: "add",
       component: (
-        <Popover open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
-          <PopoverTrigger asChild>
+        <Dialog>
+          <DialogTrigger asChild>
             <div className="flex-1 flex justify-center items-center h-full">
               <AddApplianceCard key={"add"} />
             </div>
-          </PopoverTrigger>
-          <PopoverContent className="w-80 p-4 bg-white rounded-lg shadow-lg">
+          </DialogTrigger>
+          <DialogContent className="w-80 p-4 bg-white rounded-lg shadow-lg">
             <h3 className="font-semibold text-lg mb-4">Add New Appliance</h3>
             <div className="space-y-4">
               {/* Appliance Type Dropdown */}
@@ -163,14 +218,15 @@ const RoomPage = () => {
                 Add Appliance
               </Button>
             </div>
-          </PopoverContent>
-        </Popover>
+          </DialogContent>
+        </Dialog>
       ),
     },
   ];
+
   return (
     <motion.div
-      className="xl:p-8 flex-1 flex xl:gap-4 gap-2 p-4 flex-col xl:flex-row"
+      className="xl:p-4 flex-1 flex xl:gap-4 gap-2 p-4 flex-col xl:flex-row"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
@@ -178,7 +234,7 @@ const RoomPage = () => {
       key={currentRoom.name}
     >
       <motion.div
-        className="flex-1 flex justify-center items-center"
+        className="flex-1 flex justify-center items-center relative z-50"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
@@ -199,18 +255,17 @@ const RoomPage = () => {
                 layoutId="hoveredCard"
                 initial={{ scale: 1, opacity: 1, filter: "blur(0px)" }}
                 animate={{
-                  scale: hovered === key ? 1.03 : 1,
-                  opacity: hovered && hovered !== key ? 0.6 : 1,
+                  scale: hovered === key ? 1.03 : 1, // Disable hover effect when Popover is open
+                  opacity: hovered && hovered !== key ? 0.6 : 1, // Disable hover effect when Popover is open
                   filter:
                     hovered && hovered !== key ? "blur(2px)" : "blur(0px)",
                   boxShadow: "0px 0px 8px rgb(255,255,255)",
                 }}
                 transition={{ type: "spring", stiffness: 250, damping: 20 }}
-                onHoverStart={() => setHovered(key)}
-                onHoverEnd={() => setHovered(null)}
+                onHoverStart={() => setHovered(key)} // Disable hover effect when Popover is open
+                onHoverEnd={() => setHovered(null)} // Disable hover effect when Popover is open
                 onClick={(e) => {
                   if (key === "add") {
-                    setIsPopoverOpen(true); // Open Popover for "Add Appliance"
                     return; // Prevent setting expanded view
                   }
                   if (e.target.closest(".switch-container")) return; // Prevent expansion if clicking switch
@@ -239,22 +294,23 @@ const RoomPage = () => {
         onHoverStart={() => setHovered("electricity")}
         onHoverEnd={() => setHovered(null)}
       >
-        <Card className="w-full rounded-3xl p-8 font-semibold text-2xl flex flex-col relative bg-gradient-to-r from-white from-90% to-[rgb(217,217,217,66)] cursor-pointer">
-          <span>Energy Profile</span>
-          <span>for</span>
-          <span>{`${currentRoom.name}`}</span>
-          {/* Animated Arrow */}
-          <motion.div
-            className="absolute xl:top-[50%] xl:right-3 top-[40%] right-0"
-            animate={{ x: hovered === "electricity" ? [0, 15, 0] : 0 }} // Subtle left-right motion
-            transition={
-              hovered === "electricity"
-                ? { repeat: Infinity, duration: 0.8, ease: "easeInOut" }
-                : {}
-            }
-          >
-            <ArrowRight className="size-12" />
-          </motion.div>
+        <Card className="w-full rounded-3xl font-semibold text-2xl flex flex-col cursor-pointer">
+          <CardHeader>Current Usage (KWh)</CardHeader>
+          <ChartContainer config={chartConfig} className="flex-1">
+            <BarChart accessibilityLayer data={chartData}>
+              <ChartTooltip
+                content={<ChartTooltipContent hideLabel className="w-44" />}
+              />
+              <ChartLegend content={<ChartLegendContent />} />
+              <Bar dataKey="light" fill="var(--color-light)" radius={4} />
+              <Bar dataKey="fan" fill="var(--color-fan)" radius={4} />
+              <Bar
+                dataKey="airConditioner"
+                fill="var(--color-airConditioner)"
+                radius={4}
+              />
+            </BarChart>
+          </ChartContainer>
         </Card>
       </motion.div>
     </motion.div>

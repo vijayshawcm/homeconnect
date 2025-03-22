@@ -6,6 +6,7 @@ const {
   getHomeById,
   getHomesByUserId,
   addDweller,
+  deleteHome
 } = require("../controllers/home.controller");
 
 const router = express.Router();
@@ -14,5 +15,6 @@ router.get("/", getHomes);
 router.get("/:id", getHomeById);
 router.get("/forUser/:id", getHomesByUserId);
 router.patch("/:id", addDweller);
+router.delete("/:id", deleteHome)
 
 module.exports = router;

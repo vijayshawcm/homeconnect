@@ -1,14 +1,16 @@
-const express = require('express');
-const cors = require('cors');
-const dotenv = require('dotenv');
-const cookieParser = require('cookie-parser');
+const express = require("express");
+const cors = require("cors");
+const dotenv = require("dotenv");
+const cookieParser = require("cookie-parser");
 const {
+
 	authRoutes,
 	userRoutes,
 	permissonRoutes,
 	applianceRoutes,
 	homeRoutes,
 	roomRoutes,
+  energyRoutes,
 	googleRoutes,
 } = require('./routes');
 
@@ -29,7 +31,8 @@ app.use('/server/perms', permissonRoutes,)
 app.use('/server/appliances', applianceRoutes);
 app.use('/server/rooms', roomRoutes);
 app.use('/server/homes', homeRoutes);
-app.use('/sevrer/google', googleRoutes)
+app.use("/server/energy", energyRoutes);
+app.use('/server/google', googleRoutes)
 
 // Export the app
 module.exports = app;

@@ -7,14 +7,13 @@ import { useEffect } from "react";
 
 export default function Dashboard() {
   const { user } = userAuthStore();
-  const { homes, currentHome, updateHome } = useHomeStore();
+  const { currentHome, updateHome } = useHomeStore();
 
   useEffect(() => {
     if (currentHome?._id) {
       updateHome();
     }
   }, [currentHome?._id, updateHome]);
-  console.log(currentHome);
   return (
     <div className="flex-1 py-4">
       <WelcomeUser user={user.fullName} />

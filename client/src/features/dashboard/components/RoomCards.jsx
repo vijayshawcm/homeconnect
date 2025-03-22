@@ -7,11 +7,9 @@ const RoomCards = ({ room }) => {
   const { setCurrentRoom } = useRoomStore();
   const formattedName = room.name.replace(/\s+/g, ""); // Remove spaces
   return (
-    <Link to={`/${formattedName}`} onClick={() => setCurrentRoom(room)}>
-      <Card className="bg-[#C2E03A] lg:w-72 lg:h-40 w-60 rounded-3xl shadow-md relative transition-all duration-300 ease-in-out hover:scale-[1.03] active:scale-95 select-none touch-none hover:shadow-xl border-0 hover:border hover:border-black">
-        <CardHeader className=" text-xl font-semibold">
-          {room.name}
-        </CardHeader>
+    <Card className="bg-[#C2E03A] lg:w-72 lg:h-40 w-60 rounded-3xl shadow-md relative transition-all duration-300 ease-in-out hover:scale-[1.03] active:scale-95 select-none touch-none hover:shadow-xl border-0 hover:border hover:border-black overflow-hidden">
+      <Link to={`/${formattedName}`} onClick={() => setCurrentRoom(room)}>
+        <CardHeader className=" text-xl font-semibold">{room.name}</CardHeader>
         <CardContent className="text-4xl font-medium">
           {room.type === "" ? null : (
             <img
@@ -24,8 +22,8 @@ const RoomCards = ({ room }) => {
             20%
           </div>
         </CardContent>
-      </Card>
-    </Link>
+      </Link>
+    </Card>
   );
 };
 

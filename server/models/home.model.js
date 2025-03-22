@@ -64,5 +64,17 @@ homeSchema.pre("save", async function (next) {
   next();
 });
 
+// Pre-remove hook to delete the associated energyProfile
+homeSchema.pre("deleteOne", { document: true }, async function (next) {
+  try {
+    if (this.energyProfile) {
+      await EnergyProfile.findByIdAndDelete(this.energyProfile);
+    }
+    next();
+  } catch (error) {
+    next(error);
+  }
+});
+
 const homeModel = mongoose.model("Home", homeSchema);
 module.exports = homeModel;

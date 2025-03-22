@@ -684,7 +684,7 @@ const turnOnAppliance = async (req, res) => {
   }
 
   try {
-    const appliance = await Appliance.findById(id);
+    const appliance = await Appliance.findById(id).populate("energyProfile");
     if (!appliance) {
       return res
         .status(404)
@@ -715,6 +715,13 @@ const turnOnAppliance = async (req, res) => {
       } else {
         appliance.status = "on";
         await appliance.save();
+      }
+
+      // Set currentUsage to energyConsumption in the energyProfile
+      if (appliance.energyProfile) {
+        appliance.energyProfile.currentUsage =
+          appliance.energyProfile.energyConsumption;
+        await appliance.energyProfile.save(); // Save the updated energyProfile
       }
     }
 
@@ -758,7 +765,7 @@ const turnOffAppliance = async (req, res) => {
   }
 
   try {
-    const appliance = await Appliance.findById(id);
+    const appliance = await Appliance.findById(id).populate("energyProfile");
     if (!appliance) {
       return res
         .status(404)
@@ -790,6 +797,10 @@ const turnOffAppliance = async (req, res) => {
         appliance.status = "off";
         await appliance.save();
       }
+
+      if (appliance.energyProfile) {
+        appliance.energyProfile.currentUsage = 0;
+        await appliance.energyProfile.save(); // Save the updated energyProfile
     }
 
     res.status(200).json({ success: true, data: appliance });

@@ -44,5 +44,39 @@ roomSchema.pre("save", async function (next) {
   next();
 });
 
+// Pre-remove hook to delete the associated energyProfile
+roomSchema.pre("deleteOne", { document: true }, async function (next) {
+  try {
+    if (this.energyProfile) {
+      await EnergyProfile.findByIdAndDelete(this.energyProfile);
+    }
+    next();
+  } catch (error) {
+    next(error);
+  }
+});
+
+// Post-save hook to update the home's energyProfile
+roomSchema.post("save", async function (doc) {
+  try {
+    const { updateHomeEnergyProfile } = require("../utils/energyProfile.utils"); // Lazy load
+    // Update the home's energyProfile whenever a room is saved
+    await updateHomeEnergyProfile(doc.home);
+  } catch (error) {
+    console.error("Error in post-save hook:", error.message);
+  }
+});
+
+// Post-save hook to update the home's energyProfile
+roomSchema.post("findByIdAndUpdate", async function (doc) {
+  try {
+    const { updateHomeEnergyProfile } = require("../utils/energyProfile.utils"); // Lazy load
+    // Update the home's energyProfile whenever a room is saved
+    await updateHomeEnergyProfile(doc.home);
+  } catch (error) {
+    console.error("Error in post-save hook:", error.message);
+  }
+});
+
 const RoomModel = mongoose.model("Room", roomSchema);
 module.exports = RoomModel;
