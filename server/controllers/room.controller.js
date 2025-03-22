@@ -36,8 +36,7 @@ const createRoom = async (req, res) => {
 const getRoomById = async (req, res) => {
   const { id } = req.params;
   try {
-    const room = await Room
-      .findById(id)
+    const room = await Room.findById(id)
       .populate({
         path: "appliances",
         populate: [{ path: "energyProfile" }],
@@ -70,14 +69,26 @@ const getRoomsByHome = async (req, res) => {
 
 const deleteRoom = async (req, res) => {
   const { id } = req.params;
+
   try {
-    const room = await Room.findByIdAndDelete(id);
+    // Find the room to ensure it exists
+    const room = await Room.findById(id);
     if (!room) {
       return res
         .status(404)
         .json({ success: false, message: "Room not found" });
     }
-    res.status(200).json({ success: true, message: "Room Deleted" });
+
+    // Delete all appliances associated with the room
+    await Appliance.deleteMany({ room: id });
+
+    // Delete the room
+    await Room.findByIdAndDelete(id);
+
+    res.status(200).json({
+      success: true,
+      message: "Room and associated appliances deleted",
+    });
   } catch (error) {
     res.status(500).json({ success: false, message: "Server Error" });
     console.log(error.message);

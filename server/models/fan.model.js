@@ -12,5 +12,30 @@ const fanSchema = new Schema({
   },
 });
 
+// Pre-save hook to set energyConsumption in energyProfile for Light appliances
+fanSchema.pre("save", async function (next) {
+  try {
+    // Check if the document is newly created (not an update)
+    if (this.isNew) {
+      // If energyProfile already exists (created by the base schema hook), update it
+      if (this.energyProfile) {
+        await EnergyProfile.findByIdAndUpdate(this.energyProfile, {
+          energyConsumption: 45, // Set default energyConsumption for Light
+        });
+      } else {
+        // If energyProfile does not exist, create a new one
+        const energyProfile = await EnergyProfile.create({
+          energyConsumption: 45, // Set default energyConsumption for Light
+        });
+        this.energyProfile = energyProfile._id;
+      }
+    }
+
+    next();
+  } catch (error) {
+    next(error); // Pass any errors to Mongoose
+  }
+});
+
 const Fan = BaseAppliance.discriminator("Fan", fanSchema);
 module.exports = Fan;

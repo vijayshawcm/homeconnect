@@ -26,6 +26,10 @@ const energyProfileSchema = new Schema({
     type: Number,
     default: 0,
   },
+  energyConsumption: {
+    type: Number,
+    default: 0,
+  },
 });
 
 const EnergyProfile = mongoose.model("EnergyProfile", energyProfileSchema);

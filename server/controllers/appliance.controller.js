@@ -11,8 +11,6 @@ const createAppliance = async (req, res) => {
   const { id } = req.params;
   const appliance = req.body;
 
-  console.log(id);
-
   if (!appliance.name || !appliance.applianceType) {
     return res
       .status(400)
@@ -132,7 +130,7 @@ const modifyAppliance = async (req, res) => {
 const turnOnAppliance = async (req, res) => {
   const { id } = req.params;
   try {
-    const appliance = await Appliance.findById(id);
+    const appliance = await Appliance.findById(id).populate("energyProfile");
     if (!appliance) {
       return res
         .status(404)
@@ -148,6 +146,13 @@ const turnOnAppliance = async (req, res) => {
 
     if (appliance.status === "off") {
       appliance.status = "on";
+      // Set currentUsage to energyConsumption in the energyProfile
+      if (appliance.energyProfile) {
+        appliance.energyProfile.currentUsage =
+          appliance.energyProfile.energyConsumption;
+        await appliance.energyProfile.save(); // Save the updated energyProfile
+      }
+
       await appliance.save();
     }
 
@@ -161,7 +166,7 @@ const turnOnAppliance = async (req, res) => {
 const turnOffAppliance = async (req, res) => {
   const { id } = req.params;
   try {
-    const appliance = await Appliance.findById(id);
+    const appliance = await Appliance.findById(id).populate("energyProfile");
     if (!appliance) {
       return res
         .status(404)
@@ -177,6 +182,10 @@ const turnOffAppliance = async (req, res) => {
 
     if (appliance.status === "on") {
       appliance.status = "off";
+      if (appliance.energyProfile) {
+        appliance.energyProfile.currentUsage = 0;
+        await appliance.energyProfile.save(); // Save the updated energyProfile
+      }
       await appliance.save();
     }
 

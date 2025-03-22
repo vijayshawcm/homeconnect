@@ -1,4 +1,4 @@
-const { Home, User } = require("../models");
+const { Home, User, Room, Appliance } = require("../models");
 const mongoose = require("mongoose");
 
 const createHome = async (req, res) => {
@@ -116,10 +116,46 @@ const addDweller = async (req, res) => {
   }
 };
 
+const deleteHome = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    // Find the home to ensure it exists
+    const home = await Home.findById(id);
+    if (!home) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Home not found" });
+    }
+
+    // Find all rooms associated with the home
+    const rooms = await Room.find({ home: id });
+
+    // Delete all appliances in each room
+    for (const room of rooms) {
+      const appliances = await Appliance.find({ room: room._id });
+      for (const appliance of appliances) await appliance.deleteOne();
+      await room.deleteOne();
+    }
+
+    // Delete the home
+    await home.deleteOne();
+
+    res.status(200).json({
+      success: true,
+      message: "Home, associated rooms, and appliances deleted",
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: "Server Error" });
+    console.log(error.message);
+  }
+};
+
 module.exports = {
   createHome,
   getHomes,
   getHomeById,
   getHomesByUserId,
   addDweller,
+  deleteHome,
 };

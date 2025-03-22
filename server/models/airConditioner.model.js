@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 const BaseAppliance = require("./appliance.model");
+const EnergyProfile = require("./energyProfile.model");
 
 // AirConditioner Schema
 const airConditionerSchema = new Schema({
@@ -20,18 +21,48 @@ airConditionerSchema.pre("save", function (next) {
     // Set a timeout to turn off the air conditioner when the timer expires
     setTimeout(async () => {
       try {
-        const updatedAppliance = await this.model("AirConditioner").findByIdAndUpdate(
+        const updatedAppliance = await this.model(
+          "AirConditioner"
+        ).findByIdAndUpdate(
           this._id,
           { status: "off", timer: 0, timerActive: false },
           { new: true }
         );
-        console.log("Air Conditioner turned off due to timer:", updatedAppliance);
+        console.log(
+          "Air Conditioner turned off due to timer:",
+          updatedAppliance
+        );
       } catch (error) {
         console.error("Error turning off Air Conditioner:", error);
       }
     }, timerDuration);
   }
   next();
+});
+
+// Pre-save hook to set energyConsumption in energyProfile for Light appliances
+airConditionerSchema.pre("save", async function (next) {
+  try {
+    // Check if the document is newly created (not an update)
+    if (this.isNew) {
+      // If energyProfile already exists (created by the base schema hook), update it
+      if (this.energyProfile) {
+        await EnergyProfile.findByIdAndUpdate(this.energyProfile, {
+          energyConsumption: 1500, // Set default energyConsumption for Light
+        });
+      } else {
+        // If energyProfile does not exist, create a new one
+        const energyProfile = await EnergyProfile.create({
+          energyConsumption: 1500, // Set default energyConsumption for Light
+        });
+        this.energyProfile = energyProfile._id;
+      }
+    }
+
+    next();
+  } catch (error) {
+    next(error); // Pass any errors to Mongoose
+  }
 });
 
 const AirConditioner = BaseAppliance.discriminator(

@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
-const EnergyProfile = require("./energyProfile.model")
+const EnergyProfile = require("./energyProfile.model");
 
 // Base Appliance Schema
 const applianceSchema = new Schema(
@@ -48,7 +48,6 @@ const applianceSchema = new Schema(
         },
       },
     ],
-    methods: {},
   },
   {
     timestamps: true,
@@ -63,6 +62,31 @@ applianceSchema.pre("save", async function (next) {
     this.energyProfile = energyProfile._id;
   }
   next();
+});
+
+// Pre-remove hook to delete the associated energyProfile
+applianceSchema.pre("deleteOne", { document: true }, async function (next) {
+  try {
+    if (this.energyProfile) {
+      console.log("Deleting energyProfile for appliance:", this._id);
+      console.log(this.energyProfile)
+      await EnergyProfile.findByIdAndDelete(this.energyProfile);
+    }
+    next();
+  } catch (error) {
+    next(error);
+  }
+});
+
+// Post-save hook to update the room's energyProfile
+applianceSchema.post("save", async function (doc) {
+  try {
+    const { updateRoomEnergyProfile } = require("../utils/energyProfile.utils"); // Lazy load
+    // Update the room's energyProfile whenever an appliance is saved
+    await updateRoomEnergyProfile(doc.room);
+  } catch (error) {
+    console.error("Error in post-save hook:", error.message);
+  }
 });
 
 // Create the base model
