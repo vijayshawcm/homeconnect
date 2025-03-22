@@ -6,7 +6,7 @@ const {
   turnOnAppliance,
   turnOffAppliance,
   renameAppliance,
-  modifyAppliance,
+  adjustAppliance,
   disableAppliance,
   removeAppliance,
 } = require("../controllers/appliance.controller");
@@ -18,7 +18,7 @@ router.patch("/turnOff/:id", turnOffAppliance);
 router.patch("/turnOn/:id", turnOnAppliance);
 router.patch("/rename/:id", renameAppliance);
 router.patch("/disable/:id", disableAppliance);
-router.patch("/modify/:id", modifyAppliance);
+router.patch("/adjust/:id", adjustAppliance);
 router.delete("/:id", removeAppliance);
 
 module.exports = router;
