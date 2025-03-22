@@ -26,24 +26,26 @@ export const useRoomStore = create(
       } catch (error) {
         console.error("Failed to update room data:", error);
       }
-    },
-    addAppliance: async (body) => {
-      const { currentRoom, updateRoom } = get();
-      if (!currentRoom) return;
-      try {
-        const res = await fetch(`/server/appliances/${currentRoom._id}`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(body),
-        });
-        const data = await res.json();
-        if (data.success) {
-          await updateRoom();
-          // Also update home if needed
-          const homeStore = useHomeStore.getState();
-          if (homeStore.currentHome?._id === data.data.home) {
-            await homeStore.updateHome();
-          }
+    } catch (error) {
+      console.error("Failed to update room data:", error);
+    }
+  },
+  addAppliance: async (body) => {
+    const { currentRoom, updateRoom } = get();
+    if (!currentRoom) return;
+    try {
+      const res = await fetch(`/server/appliances/${currentRoom._id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      });
+      const data = await res.json();
+      if (data.success) {
+        await updateRoom();
+        // Also update home if needed
+        const homeStore = useHomeStore.getState();
+        if (homeStore.currentHome?._id === data.data.home) {
+          await homeStore.updateHome();
         }
       } catch (error) {
         console.error("Failed to add applaince:", error);

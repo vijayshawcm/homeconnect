@@ -24,6 +24,7 @@ import {
 } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
 import { Progress } from '@/components/ui/progress';
+import { userAuthStore } from '@/store/userAuth';
 
 function SecuritySettings() {
 	const [passwordData, setPasswordData] = useState({
@@ -52,6 +53,8 @@ function SecuritySettings() {
 		hasNumber: false,
 		hasSymbol: false,
 	});
+
+	const { user } = userAuthStore();
 
 	// calc pw strength when pw changes
 	useEffect(() => {
@@ -149,16 +152,25 @@ function SecuritySettings() {
 		setIsUpdatingPassword(true);
 
 		try {
-			// simulate api call
-			await new Promise((resolve) => setTimeout(resolve, 1500));
-
-			toast.success('Password updated successfully');
-			setPasswordData({
-				currentPassword: '',
-				newPassword: '',
-				confirmPassword: '',
+			// API call to update password
+			const response = await fetch('/server/users/updatePassword', {
+				method: 'PATCH',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ email: user.email, currentPassword: currentPassword.value, password: newPassword.value }),
 			});
+			
+			if(response.ok) {
+				toast.success('Password updated successfully');
+				setPasswordData({
+					currentPassword: '',
+					newPassword: '',
+					confirmPassword: '',
+				});
+			} else {
+				throw new Error("Something went wrong updating password");
+			}
 		} catch (error) {
+			console.log(error);
 			toast.error('Failed to update password');
 		} finally {
 			setIsUpdatingPassword(false);
@@ -167,15 +179,22 @@ function SecuritySettings() {
 
 	const handleToggleTwoFactor = async () => {
 		try {
-			// api call
-			await new Promise((resolve) => setTimeout(resolve, 800));
+			// api call to update 2fa status
+			const response = await fetch("/server/users/twoFactorAuthentication", {
+			method: "PATCH",
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({ username: user.username, status: !isTwoFactorEnabled }),
+		})
 
+		if(response.ok) {
 			setIsTwoFactorEnabled(!isTwoFactorEnabled);
 			toast.success(
 				isTwoFactorEnabled
 					? 'Two-factor authentication disabled'
 					: 'Two-factor authentication enabled'
 			);
+		}
+			
 		} catch (error) {
 			toast.error('Failed to update two-factor authentication');
 		}
