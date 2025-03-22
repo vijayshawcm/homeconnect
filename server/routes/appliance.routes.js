@@ -12,6 +12,7 @@ const {
   deleteSchedule,
   automateAppliance,
   modifyAutomation,
+  deleteAutomation,
   disableAppliance,
   enableAppliance,
   removeAppliance,
@@ -28,6 +29,7 @@ router.patch("/schedules/modify/:id", modifySchedule);
 router.delete("/schedules/:id", deleteSchedule);
 router.put("/automations/:id", automateAppliance);
 router.patch("/automations/modify/:id", modifyAutomation);
+router.delete("/automations/:id", deleteAutomation,)
 router.patch("/disable/:id", disableAppliance);
 router.patch("/enable/:id", enableAppliance);
 router.patch("/adjust/:id", adjustAppliance);
