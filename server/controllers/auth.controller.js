@@ -52,11 +52,11 @@ const sendOTP = async (req, res) => {
 	if (req.body.status == 'register' && userByEmail) {
 		return res
 			.status(409)
-			.json('The provided email has already been registered.');
+			.json({ message: 'The provided email has already been registered.' });
 	} else if (req.body.status == 'register' && userByName) {
 		return res
 			.status(409)
-			.json('The provided uername has already been registered.');
+			.json({ message: 'The provided username has already been registered.' });
 	}
 
 	var otp = randInt(100000, 999999);
