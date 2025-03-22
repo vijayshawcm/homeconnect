@@ -8,13 +8,11 @@ import HomeLogo from "../../assets/homeconnect-logo-icon.svg";
 import HomeText from "../../assets/homeconnect-logo-text.svg";
 
 export function SidebarLogo() {
-  const { toggleSidebar } = useSidebar();
   return (
     <SidebarMenu>
       <SidebarMenuItem className="flex justify-center items-center">
         <SidebarMenuButton
-          className="h-16 group-data-[state=collapsed]:!p-0 gap-2 duration-500 pointer-events-none group-data-[state=collapsed]:pointer-events-auto"
-          onClick={() => toggleSidebar()}
+          className="h-16 group-data-[state=collapsed]:!p-0 gap-2 duration-500 pointer-events-none"
         >
           <div className="flex aspect-square size-12 items-center justify-center rounded-lg text-sidebar-primary-foreground group-data-[state=collapsed]:size-8 transition-all duration-500 ">
             <img src={HomeLogo} className="invert hover:invert-0" />

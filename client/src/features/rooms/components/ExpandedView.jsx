@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
+import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Carousel,
   CarouselContent,
@@ -10,7 +10,15 @@ import {
 import { Slider } from "@/components/ui/slider";
 import { useRoomStore } from "@/store/room";
 import { motion } from "framer-motion";
-import { ChevronLeft, Power, PowerOff, Sun, SunDim, Timer } from "lucide-react";
+import {
+  ChevronLeft,
+  PencilLine,
+  Power,
+  PowerOff,
+  Sun,
+  SunDim,
+  Timer,
+} from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import Thermostat from "./Thermostat";
 import { TbAirConditioning } from "react-icons/tb";
@@ -301,9 +309,14 @@ const ExpandedView = ({ appliance, onClose }) => {
           </div>
         </div>
       </Card>
-      <Card className="flex-1 flex flex-col justify-center items-center lg:p-6 p-4">
+      <Card className="flex-1 flex flex-col justify-center rounded-3xl overflow-hidden">
+        <CardHeader className="flex flex-row justify-between items-center bg-[#C2E03A]">
+          <CardTitle className="text-2xl">{currentAppliance.name}</CardTitle>
+          <PencilLine className="size-6" />
+        </CardHeader>
         {appliance === "Light" ? (
-          <div className="flex-1 flex flex-col justify-center items-center w-full relative xl:gap-10 gap-4">
+          <div className="flex-1 flex flex-col justify-center items-center w-full relative p-4">
+            <div></div>
             <div className="flex-1 w-full flex justify-center items-center">
               <div className="xl:w-[30%]">
                 <Carousel

@@ -22,13 +22,13 @@
     --border: 240 5.9% 90%;
     --input: 240 5.9% 90%;
     --ring: 240 10% 3.9%;
-    --chart-1: 12 76% 61%;
-    --chart-2: 173 58% 39%;
-    --chart-3: 197 37% 24%;
-    --chart-4: 43 74% 66%;
-    --chart-5: 27 87% 67%;
+    --chart-1: 139 65% 20%;
+    --chart-2: 140 74% 44%;
+    --chart-3: 142 88% 28%;
+    --chart-4: 137 55% 15%;
+    --chart-5: 141 40% 9%;
     --radius: 0.5rem;
-    --sidebar-background: 211 52.7% 10.8%;
+    --sidebar-background: 211 53% 11%;
     --sidebar-foreground: 0 0 100%;
     --sidebar-primary: 211 52.7% 10.8%;
     --sidebar-primary-foreground: 0 0% 98%;
@@ -204,6 +204,32 @@
         "addAppliance"
         "addAppliance";
     }
+  }
+
+  .energyTotalCard {
+    grid-area: totalEnergy;
+  }
+
+  .energyRoomCard {
+    grid-area: energyRooms;
+  }
+
+  .energyWeeklyCard {
+    grid-area: energyWeekly;
+  }
+
+  .roomEnergyCard {
+    grid-area: roomEnergy;
+  }
+
+  .energy-template-area {
+    grid-template-areas:
+      "totalEnergy totalEnergy totalEnergy energyRooms energyRooms energyRooms energyRooms"
+      "totalEnergy totalEnergy totalEnergy energyRooms energyRooms energyRooms energyRooms"
+      "totalEnergy totalEnergy totalEnergy roomEnergy roomEnergy roomEnergy roomEnergy"
+      "totalEnergy totalEnergy totalEnergy roomEnergy roomEnergy roomEnergy roomEnergy"
+      "energyWeekly energyWeekly energyWeekly roomEnergy roomEnergy roomEnergy roomEnergy"
+      "energyWeekly energyWeekly energyWeekly roomEnergy roomEnergy roomEnergy roomEnergy";
   }
 
   * {

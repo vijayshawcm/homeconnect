@@ -29,6 +29,7 @@ import {
   ChartTooltipContent,
 } from "@/components/ui/chart";
 import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from "recharts";
+import { LampCeiling, AirVent, Fan } from "lucide-react";
 
 const RoomPage = () => {
   const [currentExpanded, setExpanded] = useState(null);
@@ -102,7 +103,7 @@ const RoomPage = () => {
       color: "#184C85",
     },
     airConditioner: {
-      label: "AC",
+      label: "AirConditioner",
       color: "#0D1B2A",
     },
   };
