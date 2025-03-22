@@ -26,8 +26,16 @@ const applianceSchema = new Schema(
     },
     schedules: [
       {
-        startTime: Date,
-        endTime: Date,
+        name: String,
+        // Changing this to store int time in 24h format since Date stores unix timestamp
+        startTime: {
+          hour: Number,
+          minute: Number
+        },
+        endTime: {
+          hour: Number,
+          minute: Number
+        },
         days: [
           {
             type: String,
@@ -42,6 +50,17 @@ const applianceSchema = new Schema(
             ],
           },
         ],
+        active: {
+          type: Boolean,
+          default: true,
+        },
+      },
+    ],
+    automations: [
+      {
+        name: String,
+        sensorType: String,
+        threshold: Number,
         active: {
           type: Boolean,
           default: true,
