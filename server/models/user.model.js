@@ -15,7 +15,7 @@ var userSchema = new mongoose.Schema(
     settings:  {
       accountStatus: { type: String, enum: ['active', 'deactivated'], default: 'active' },
       theme: { type: String, enum: ['light', 'dark', 'system'], default: 'system' },
-      twoFactorAuthentication: Boolean,
+      twoFactorAuthentication: { type: Boolean, default: false },
       notification: {
         channels: { type: [String], enum: ['email', 'push', 'sms'], default: ['email'] },
         types: { type: [String], enum: ['marketing', 'security', 'update', 'reminder', 'billing'], default: ['security', 'reminder']}
