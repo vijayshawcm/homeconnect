@@ -7,6 +7,7 @@ const {
   turnOffAppliance,
   renameAppliance,
   adjustAppliance,
+  scheduleAppliance,
   disableAppliance,
   enableAppliance,
   removeAppliance,
@@ -18,6 +19,7 @@ router.get("/:id", getAppliancesByRoom);
 router.patch("/turnOff/:id", turnOffAppliance);
 router.patch("/turnOn/:id", turnOnAppliance);
 router.patch("/rename/:id", renameAppliance);
+router.put("/schedules/:id", scheduleAppliance);
 router.patch("/disable/:id", disableAppliance);
 router.patch("/enable/:id", enableAppliance);
 router.patch("/adjust/:id", adjustAppliance);
