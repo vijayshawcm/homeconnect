@@ -13,7 +13,7 @@ var userSchema = new mongoose.Schema(
       location: String,
     },
     settings:  {
-      accountStatus: { type: String, enum: ['active', 'inactive'], default: 'active' },
+      accountStatus: { type: String, enum: ['active', 'deactivated'], default: 'active' },
       theme: { type: String, enum: ['light', 'dark', 'system'], default: 'system' },
       twoFactorAuthentication: Boolean,
       notification: {
@@ -92,7 +92,7 @@ userSchema.pre("findOneAndUpdate", async function (next) {
 
     // Account status update
     if(update['settings.accountStatus']) {
-      if(update['settings.accountStatus'] != 'active' && update['settings.accountStatus'] != 'inactive') {
+      if(update['settings.accountStatus'] != 'active' && update['settings.accountStatus'] != 'deactivated') {
         throw new Error("Invalid input received"); // Throw error to be handled at api call.
       }
     }
