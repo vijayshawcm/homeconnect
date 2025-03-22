@@ -122,8 +122,10 @@ function RegisterForm({ onRegisterSuccess }) {
 
 		if (response.status == 409) {
 			const data = await response.json();
+			setIsRegistering(false);
 			throw new Error(data.message || 'Unknown error occurred.');
 		} else if (!response.ok) {
+			setIsRegistering(false);
 			throw new Error('Failed to send OTP. Please try again.');
 		}
 	};
