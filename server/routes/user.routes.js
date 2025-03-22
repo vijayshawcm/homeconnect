@@ -8,7 +8,8 @@ const {
   updateTheme,
   updateNotificationChannel,
   updateNotificationType,
-  updateAccountStatus
+  updateAccountStatus,
+  updateTwoFactor
 } = require("../controllers/user.controller");
 
 const router = express.Router();
@@ -20,5 +21,6 @@ router.patch("/updateTheme", updateTheme);
 router.patch("/updateNotificationChannel", updateNotificationChannel);
 router.patch("/updateNotificationType", updateNotificationType);
 router.patch("/accountStatus", updateAccountStatus);
+router.patch("/twoFactorAuthentication", updateTwoFactor);
 
 module.exports = router;
