@@ -35,7 +35,7 @@ import { LampCeiling, AirVent, Fan } from "lucide-react";
 const RoomPage = () => {
   const [currentExpanded, setExpanded] = useState(null);
   const [hovered, setHovered] = useState(null);
-  const { currentRoom, addAppliance, getCurrentUsag} = useRoomStore();
+  const { currentRoom, addAppliance, getCurrentUsage} = useRoomStore();
   const { user } = userAuthStore();
   const { isMobile } = useSidebar();
   const [isPopoverOpen, setIsPopoverOpen] = useState(false); // State for Popover
