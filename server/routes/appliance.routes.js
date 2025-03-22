@@ -8,6 +8,7 @@ const {
   renameAppliance,
   adjustAppliance,
   disableAppliance,
+  enableAppliance,
   removeAppliance,
 } = require("../controllers/appliance.controller");
 
@@ -18,6 +19,7 @@ router.patch("/turnOff/:id", turnOffAppliance);
 router.patch("/turnOn/:id", turnOnAppliance);
 router.patch("/rename/:id", renameAppliance);
 router.patch("/disable/:id", disableAppliance);
+router.patch("/enable/:id", enableAppliance);
 router.patch("/adjust/:id", adjustAppliance);
 router.delete("/:id", removeAppliance);
 
