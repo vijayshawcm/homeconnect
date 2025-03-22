@@ -26,9 +26,6 @@ export const useRoomStore = create(
       } catch (error) {
         console.error("Failed to update room data:", error);
       }
-    } catch (error) {
-      console.error("Failed to update room data:", error);
-    }
   },
   addAppliance: async (body) => {
     const { currentRoom, updateRoom } = get();
@@ -47,11 +44,11 @@ export const useRoomStore = create(
         if (homeStore.currentHome?._id === data.data.home) {
           await homeStore.updateHome();
         }
-      } catch (error) {
-        console.error("Failed to add applaince:", error);
+      } 
+    } catch (error) {
+        console.error("Failed to add appliance:", error);
       }
     },
-
     turnOnAll: async (type) => {
       const { currentRoom, updateRoom } = get();
       if (!currentRoom) return;
