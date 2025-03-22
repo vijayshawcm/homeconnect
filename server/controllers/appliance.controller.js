@@ -346,18 +346,13 @@ const scheduleAppliance = async (req, res) => {
 
 const modifySchedule = async (req, res) => {
   const { id } = req.params;
-  if(!req.body.schedule) {
+  if (!req.body.requester || !req.body.schedule) {
     return res
       .status(400)
       .json({ success: false, message: "Please provide all fields" });
   }
 
   const schedule = req.body.schedule;
-  if (!req.body.requester || !schedule) {
-    return res
-      .status(400)
-      .json({ success: false, message: "Please provide all fields" });
-  }
 
   // Ensure that time is valid if a time is provided
   if(schedule.startTime) {
@@ -542,6 +537,74 @@ const automateAppliance = async (req, res) => {
 
   await appliance.updateOne({ $push: {automations: automation}});
   return res.status(200).json("Automation created successfully.");
+}
+
+const modifyAutomation = async (req, res) => {
+  const { id } = req.params;
+  if (!req.body.requester || !req.body.automation) {
+    return res
+      .status(400)
+      .json({ success: false, message: "Please provide all fields" });
+  }
+
+  const automation = req.body.automation;
+  // Query database for appliance
+  const appliance = await Appliance.findOne({ 'automations._id': id });
+  if (!appliance) {
+    return res
+      .status(404)
+      .json({ success: false, message: "Appliance not found" });
+  }
+
+  const requesterName = req.body.requester;
+  // Attempt to query database for user that is sending the request
+  const requester = await User.findOne({ 'userInfo.usernameLower': requesterName.toLowerCase() });
+  if(!requester) {
+    return res.status(404).json("Requester not found.");
+  } 
+
+  // Query database for home and room to check user permissions
+  const room = await Room.findOne({ appliances: appliance._id });
+  if (!room) {
+    return res.status(404).json({ success: false, message: "Room not found" });
+  }
+  const home = await Home.findOne({ rooms: room._id });
+  if(!home) {
+    return res.status(404).json("Could not find home.");
+  }
+
+  // Permission check
+  const validPerms = checkPermission(requester, home, "automateAppliance");
+  if(!validPerms) {
+    return res.status(403).json("User does not have sufficient permissions");
+  }
+
+  // Prevent duplicate names if name is provided as a parameter
+  if(automation.name) {
+    for (const e of appliance.automations) {
+      if (e.name == automation.name && !e._id.equals(id)) {
+        return res.status(409).json({ success: false, message: "Duplicate automation name" });
+      }
+    }
+  }
+
+  // Update field provided to appliance
+  const dbAutomation = appliance.automations.find(e => e._id.equals(id));
+  if(automation.name) {
+    dbAutomation.name = automation.name;
+  }
+  if(automation.sensorType) {
+    dbAutomation.sensorType = automation.sensorType;
+  }
+  if(automation.threshold) {
+    dbAutomation.threshold = automation.threshold;
+  }
+  if(automation.active !=  null) {
+    dbAutomation.active = automation.active;
+  }
+
+  await appliance.save();
+  return res.status(200).json("Automation modified successfully.");
 }
 
 const turnOnAppliance = async (req, res) => {
@@ -820,6 +883,7 @@ module.exports = {
   modifySchedule,
   deleteSchedule,
   automateAppliance,
+  modifyAutomation,
   disableAppliance,
   enableAppliance,
 };
