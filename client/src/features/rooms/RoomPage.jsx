@@ -259,7 +259,7 @@ const RoomPage = () => {
             <ArrowRight className="size-12" />
           </motion.div>
         </Card>
-      </motion.div>
+      </motion.div> 
     </motion.div>
   );
 };

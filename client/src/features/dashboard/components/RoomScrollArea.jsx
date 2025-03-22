@@ -67,12 +67,12 @@ const RoomScrollArea = ({ rooms }) => {
       <div className="flex-1 flex justify-center items-center pb-4 px-4">
         <Dialog>
           <DialogTrigger asChild>
-            <Card className="bg-[#C2E03A] lg:w-72 h-40 w-60 rounded-3xl shadow-md relative transition-all duration-300 ease-in-out hover:scale-[1.03] active:scale-95 select-none touch-none hover:shadow-xl border-0 hover:border hover:border-black flex justify-center items-center">
+            <Card className="bg-[#C2E03A] lg:w-72 h-40 w-60 rounded-3xl shadow-md relative transition-all duration-300 ease-in-out hover:scale-[1.03] active:scale-95 select-none touch-none hover:shadow-xl border-0 hover:border hover:border-black flex justify-center items-center cursor-pointer">
               <Plus className="size-12 lg:size-16"></Plus>
             </Card>
           </DialogTrigger>
-          <DialogContent className="w-80 p-4 bg-white rounded-lg shadow-lg">
-            <h3 className="font-semibold text-lg mb-4">Add New Room</h3>
+          <DialogContent className="w-[25%] px-4 py-10 bg-white !rounded-3xl shadow-lg">
+            <h3 className="font-semibold text-2xl mb-4 text-center">Add New Room</h3>
             <div className="space-y-4">
               {/* Appliance Type Dropdown */}
               <div>
@@ -83,7 +83,7 @@ const RoomScrollArea = ({ rooms }) => {
                     setRoomType(value);
                   }}
                 >
-                  <SelectTrigger className="w-full">
+                  <SelectTrigger className="w-full rounded-3xl">
                     <SelectValue placeholder="Select type" />
                   </SelectTrigger>
                   <SelectContent>
@@ -106,13 +106,19 @@ const RoomScrollArea = ({ rooms }) => {
                     setRoomName(e.target.value);
                   }}
                   placeholder="Enter room name"
+                  className = "rounded-3xl"
                 />
               </div>
 
               {/* Submit Button */}
-              <Button onClick={handleAddRoom} className="w-full">
-                Add Room
-              </Button>
+              <div className="w-full flex justify-center items-center">
+                <Button
+                  onClick={handleAddRoom}
+                  className="w-[50%] rounded-full bg-[#C2E03A] text-black font-semibold hover:bg-[#A8C82A]"
+                >
+                  Add Room
+                </Button>
+              </div>
             </div>
           </DialogContent>
         </Dialog>
