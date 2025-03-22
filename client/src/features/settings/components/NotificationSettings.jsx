@@ -21,16 +21,17 @@ import {
 	Clock,
 	CreditCard,
 } from 'lucide-react';
+import { userAuthStore } from '@/store/userAuth';
 
 function NotificationSettings() {
 	const [originalNotifications, setOriginalNotifications] = useState({
 		email: true,
-		push: true,
-		device: true,
+		push: false,
+		device: false,
 		marketing: false,
 		security: true,
-		updates: true,
-		reminders: false,
+		updates: false,
+		reminders: true,
 		billing: true,
 	});
 
@@ -46,6 +47,8 @@ function NotificationSettings() {
 	});
 
 	const [isSaving, setIsSaving] = useState(false);
+
+	const { user } = userAuthStore();
 
 	const handleToggle = (key) => {
 		setNotifications((prev) => ({
@@ -66,12 +69,47 @@ function NotificationSettings() {
 		e.preventDefault();
 		setIsSaving(true);
 
-		try {
-			// simulate calling api
-			await new Promise((resolve) => setTimeout(resolve, 1500));
+		// Slice the object to seperate channels and types
+		var channels = [];
+		var types = [];
 
-			setOriginalNotifications({ ...notifications });
-			toast.success('Notification preferences updated successfully');
+		var i = 0;
+		for(const key in notifications) {
+			if(i<3) {
+				if(notifications[key]) {
+					channels.push(key)
+				}
+				
+			} else {
+				if(notifications[key]) {
+					types.push(key)
+				}
+			}
+
+			i++;
+		}
+
+		try {
+			// api call
+			
+			const resChannel = await fetch("/server/users/updateNotificationChannel", {
+				method: "PATCH",
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ username: user.username, channels }),
+			})
+
+			const resType = await fetch("/server/users/updateNotificationType", {
+				method: "PATCH",
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ username: user.username, types }),
+			})
+
+			if(resChannel.ok && resType.ok) {
+				setOriginalNotifications({ ...notifications });
+				toast.success('Notification preferences updated successfully');
+			} else {
+				throw new Error('Failed to update notification preferences');
+			}
 		} catch (error) {
 			toast.error('Failed to update notification preferences');
 		} finally {
