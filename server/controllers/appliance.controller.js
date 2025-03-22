@@ -801,8 +801,8 @@ const turnOffAppliance = async (req, res) => {
       if (appliance.energyProfile) {
         appliance.energyProfile.currentUsage = 0;
         await appliance.energyProfile.save(); // Save the updated energyProfile
+      }
     }
-
     res.status(200).json({ success: true, data: appliance });
   } catch (error) {
     console.error("Error in turning on appliance: ", error.message);
