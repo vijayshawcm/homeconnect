@@ -3,7 +3,7 @@ import { useRoomStore } from "@/store/room";
 import { useEffect, useState } from "react";
 import LightCard from "./components/LightCard";
 import AirConCard from "./components/AirConCard";
-import { Card } from "@/components/ui/card";
+import { Card, CardHeader } from "@/components/ui/card";
 import { AddApplianceCard } from "./components/AddApplianceCard";
 import FanCard from "./components/FanCard";
 import { ArrowRight } from "lucide-react";
@@ -21,14 +21,23 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+import {
+  ChartContainer,
+  ChartLegend,
+  ChartLegendContent,
+  ChartTooltip,
+  ChartTooltipContent,
+} from "@/components/ui/chart";
+import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from "recharts";
 
 const RoomPage = () => {
   const [currentExpanded, setExpanded] = useState(null);
   const [hovered, setHovered] = useState(null);
-  const { currentRoom, addAppliance } = useRoomStore();
-  const { isMobile } = useSidebar();
+  const { currentRoom, addAppliance, getCurrentUsage } = useRoomStore();
   const [applianceType, setApplianceType] = useState(""); // State for appliance type
   const [applianceName, setApplianceName] = useState(""); // State for appliance name
+  // State to store chart data
+  const [chartData, setChartData] = useState([]);
 
   // Function to get total and active appliances of a given type
   const getApplianceStats = (type) => {
@@ -52,11 +61,51 @@ const RoomPage = () => {
       setCurrentRoomId(currentRoom?._id); // Update the tracked room ID
       setExpanded(null); // Reset expanded view
     }
-  }, [currentRoom?._id]); // Trigger only when the room ID changes
+  }, [currentRoom?._id, currentRoomId, getCurrentUsage]); // Trigger only when the room ID changes
+
+  useEffect(() => {
+    const fetchUsage = async () => {
+      try {
+        // Fetch current usage for all appliance types
+        const lightUsage = await getCurrentUsage("Light");
+        const fanUsage = await getCurrentUsage("Fan");
+        const airConUsage = await getCurrentUsage("AirConditioner");
+
+        // Format the data for the chart
+        const chartData = [
+          {
+            light: lightUsage || 0, // Use 0 if no data is returned
+            fan: fanUsage || 0,
+            airConditioner: airConUsage || 0,
+          },
+        ];
+        setChartData(chartData);
+      } catch (error) {
+        console.error("Failed to fetch usage data:", error);
+        return []; // Return an empty array if there's an error
+      }
+    };
+    fetchUsage();
+  }, [getCurrentUsage, currentRoom?.appliances]);
 
   const lightStats = getApplianceStats("Light");
   const fansStats = getApplianceStats("Fan");
   const airConStats = getApplianceStats("AirConditioner");
+
+  const chartConfig = {
+    light: {
+      label: "Lights",
+      color: "#C2E03A",
+    },
+    fan: {
+      label: "Fan",
+      color: "#184C85",
+    },
+    airConditioner: {
+      label: "AC",
+      color: "#0D1B2A",
+    },
+  };
 
   // Handle form submission
   const handleAddAppliance = () => {
@@ -177,7 +226,6 @@ const RoomPage = () => {
       transition={{ duration: 1 }}
       key={currentRoom.name}
     >
-
       <motion.div
         className="flex-1 flex justify-center items-center relative z-50"
         initial={{ opacity: 0 }}
@@ -200,13 +248,10 @@ const RoomPage = () => {
                 layoutId="hoveredCard"
                 initial={{ scale: 1, opacity: 1, filter: "blur(0px)" }}
                 animate={{
-                  scale: hovered === key? 1.03 : 1, // Disable hover effect when Popover is open
-                  opacity:
-                    hovered && hovered !== key? 0.6 : 1, // Disable hover effect when Popover is open
+                  scale: hovered === key ? 1.03 : 1, // Disable hover effect when Popover is open
+                  opacity: hovered && hovered !== key ? 0.6 : 1, // Disable hover effect when Popover is open
                   filter:
-                    hovered && hovered !== key
-                      ? "blur(2px)"
-                      : "blur(0px)",
+                    hovered && hovered !== key ? "blur(2px)" : "blur(0px)",
                   boxShadow: "0px 0px 8px rgb(255,255,255)",
                 }}
                 transition={{ type: "spring", stiffness: 250, damping: 20 }}
@@ -242,24 +287,25 @@ const RoomPage = () => {
         onHoverStart={() => setHovered("electricity")}
         onHoverEnd={() => setHovered(null)}
       >
-        <Card className="w-full rounded-3xl p-8 font-semibold text-2xl flex flex-col relative bg-gradient-to-r from-white from-90% to-[rgb(217,217,217,66)] cursor-pointer">
-          <span>Energy Profile</span>
-          <span>for</span>
-          <span>{`${currentRoom.name}`}</span>
-          {/* Animated Arrow */}
-          <motion.div
-            className="absolute xl:top-[50%] xl:right-3 top-[40%] right-0"
-            animate={{ x: hovered === "electricity" ? [0, 15, 0] : 0 }} // Subtle left-right motion
-            transition={
-              hovered === "electricity"
-                ? { repeat: Infinity, duration: 0.8, ease: "easeInOut" }
-                : {}
-            }
-          >
-            <ArrowRight className="size-12" />
-          </motion.div>
+        <Card className="w-full rounded-3xl font-semibold text-2xl flex flex-col cursor-pointer">
+          <CardHeader>Current Usage (KWh)</CardHeader>
+          <ChartContainer config={chartConfig} className="flex-1">
+            <BarChart accessibilityLayer data={chartData}>
+              <ChartTooltip
+                content={<ChartTooltipContent hideLabel className="w-44" />}
+              />
+              <ChartLegend content={<ChartLegendContent />} />
+              <Bar dataKey="light" fill="var(--color-light)" radius={4} />
+              <Bar dataKey="fan" fill="var(--color-fan)" radius={4} />
+              <Bar
+                dataKey="airConditioner"
+                fill="var(--color-airConditioner)"
+                radius={4}
+              />
+            </BarChart>
+          </ChartContainer>
         </Card>
-      </motion.div> 
+      </motion.div>
     </motion.div>
   );
 };

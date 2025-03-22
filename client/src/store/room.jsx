@@ -37,7 +37,6 @@ export const useRoomStore = create(
           body: JSON.stringify(body),
         });
         const data = await res.json();
-        console.log(data)
         if (data.success) {
           await updateRoom();
           // Also update home if needed
@@ -149,6 +148,20 @@ export const useRoomStore = create(
         await updateRoom();
       } catch (error) {
         console.error("Failed to modify appliance:", error);
+      }
+    },
+    getCurrentUsage: async (type) => {
+      const { currentRoom } = get();
+      if (!currentRoom) return;
+
+      try {
+        const res = await fetch(
+          `/server/energy/totalTypeCurrentUsage/${currentRoom._id}/${type}`
+        );
+        const data = await res.json();
+        return data.data;
+      } catch (error) {
+        console.error(`Failed to turn on all ${type}s:`, error);
       }
     },
   })),
