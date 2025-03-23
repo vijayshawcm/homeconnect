@@ -4,6 +4,7 @@ import { userAuthStore } from '@/store/userAuth';
 import RoomScrollArea from './components/RoomScrollArea';
 import BentoGrid from './components/BentoGrid';
 import WelcomeUser from './components/WelcomeUser';
+import ManageHomeDialog from './components/ManageHomeDialog';
 
 function Dashboard() {
 	const { user } = userAuthStore();
@@ -28,6 +29,7 @@ function Dashboard() {
 			<WelcomeUser user={user.fullName} />
 			<RoomScrollArea rooms={currentHome.rooms} />
 			<BentoGrid />
+			<ManageHomeDialog />
 		</div>
 	);
 }
