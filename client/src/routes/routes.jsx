@@ -62,8 +62,6 @@ function AppRoutes() {
         </Route>
         {/* Protected Routes */}
         <Route element={<ProtectedRoute />}>
-          <Route path="/profile" element={<HomeContainer mode="profile" />} />
-          <Route path="/settings" element={<Settings />} />
           <Route path="/welcome" element={<WelcomeContainer />} />
         </Route>
         {currentHome && (
@@ -73,6 +71,11 @@ function AppRoutes() {
               element={<HomeContainer mode="dashboard" />}
             />
             <Route path="/energy" element={<HomeContainer mode="energy" />} />
+            <Route path="/profile" element={<HomeContainer mode="profile" />} />
+            <Route
+              path="/settings"
+              element={<HomeContainer mode="settings" />}
+            />
             {currentHome.rooms.map((room) => {
               const formattedName = room.name.replace(/\s+/g, "");
               return (

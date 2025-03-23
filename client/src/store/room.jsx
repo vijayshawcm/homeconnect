@@ -26,37 +26,38 @@ export const useRoomStore = create(
       } catch (error) {
         console.error("Failed to update room data:", error);
       }
-  },
-  addAppliance: async (body) => {
-    const { currentRoom, updateRoom } = get();
-    if (!currentRoom) return;
-    try {
-      const res = await fetch(`/server/appliances/${currentRoom._id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(body),
-      });
-      const data = await res.json();
-      if (data.success) {
-        await updateRoom();
-        // Also update home if needed
-        const homeStore = useHomeStore.getState();
-        if (homeStore.currentHome?._id === data.data.home) {
-          await homeStore.updateHome();
+    },
+    addAppliance: async (body) => {
+      const { currentRoom, updateRoom } = get();
+      if (!currentRoom) return;
+      try {
+        const res = await fetch(`/server/appliances/${currentRoom._id}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(body),
+        });
+        const data = await res.json();
+        if (data.success) {
+          await updateRoom();
+          // Also update home if needed
+          const homeStore = useHomeStore.getState();
+          if (homeStore.currentHome?._id === data.data.home) {
+            await homeStore.updateHome();
+          }
         }
-      } 
-    } catch (error) {
+      } catch (error) {
         console.error("Failed to add appliance:", error);
       }
     },
-    turnOnAll: async (type) => {
+    turnOnAll: async (body) => {
       const { currentRoom, updateRoom } = get();
       if (!currentRoom) return;
+      console.log(body);
 
       try {
         // Get all appliances of the specified type
         const appliancesToUpdate = currentRoom.appliances.filter(
-          (appliance) => appliance.applianceType === type
+          (appliance) => appliance.applianceType === body.type
         );
 
         if (appliancesToUpdate.length === 0) return;
@@ -65,23 +66,23 @@ export const useRoomStore = create(
             await fetch(`/server/appliances/turnOn/${appliance._id}`, {
               method: "PATCH",
               headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ requester: body.requester }),
             });
           })
         );
         // Refresh the room data after updating
         await updateRoom();
       } catch (error) {
-        console.error(`Failed to turn on all ${type}s:`, error);
+        console.error(`Failed to turn on all ${body.type}s:`, error);
       }
     },
-    turnOffAll: async (type) => {
+    turnOffAll: async (body) => {
       const { currentRoom, updateRoom } = get();
       if (!currentRoom) return;
-
       try {
         // Get all appliances of the specified type
         const appliancesToUpdate = currentRoom.appliances.filter(
-          (appliance) => appliance.applianceType === type
+          (appliance) => appliance.applianceType === body.type
         );
 
         if (appliancesToUpdate.length === 0) return;
@@ -90,36 +91,37 @@ export const useRoomStore = create(
             await fetch(`/server/appliances/turnOff/${appliance._id}`, {
               method: "PATCH",
               headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ requester: body.requester }),
             });
           })
         );
         // Refresh the room data after updating
         await updateRoom();
       } catch (error) {
-        console.error(`Failed to turn on all ${type}s:`, error);
+        console.error(`Failed to turn on all ${body.type}s:`, error);
       }
     },
-    turnOnAppliance: async (id) => {
+    turnOnAppliance: async (body) => {
       try {
         const { updateRoom } = get();
-        const appliance = await fetch(`/server/appliances/turnOn/${id}`, {
+        const appliance = await fetch(`/server/appliances/turnOn/${body.id}`, {
           method: "PATCH",
           headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ requester: body.requester }),
         });
-        console.log(appliance);
         await updateRoom();
       } catch (error) {
         console.error(`Failed to turn on`, error);
       }
     },
-    turnOffAppliance: async (id) => {
+    turnOffAppliance: async (body) => {
       try {
         const { updateRoom } = get();
-        const appliance = await fetch(`/server/appliances/turnOff/${id}`, {
+        const appliance = await fetch(`/server/appliances/turnOff/${body.id}`, {
           method: "PATCH",
           headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ requester: body.requester }),
         });
-        console.log(appliance);
         await updateRoom();
       } catch (error) {
         console.error(`Failed to turn off`, error);
@@ -130,7 +132,7 @@ export const useRoomStore = create(
         const { updateRoom } = get();
 
         // Send the updates to the server
-        const response = await fetch(`/server/appliances/modify/${id}`, {
+        const response = await fetch(`/server/appliances/adjust/${id}`, {
           method: "PATCH",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(updates),
@@ -145,6 +147,31 @@ export const useRoomStore = create(
 
         // Refresh the room data after updating
         await updateRoom();
+      } catch (error) {
+        console.error("Failed to modify appliance:", error);
+      }
+    },
+    renameAppliance: async (id, updates) => {
+      try {
+        const { updateRoom } = get();
+
+        // Send the updates to the server
+        const response = await fetch(`/server/appliances/rename/${id}`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(updates),
+        });
+
+        if (!response.ok) {
+          throw new Error("Failed to update appliance");
+        }
+
+        const data = await response.json();
+        console.log("Appliance renamed:", data);
+
+        // Refresh the room data after updating
+        await updateRoom();
+        return data;
       } catch (error) {
         console.error("Failed to modify appliance:", error);
       }

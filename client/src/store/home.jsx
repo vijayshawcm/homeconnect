@@ -95,7 +95,6 @@ export const useHomeStore = create(
         return { success: false, message: data.message };
       }
       set({ homes: data.data });
-      console.log(data.data);
       return { success: true, data: data.data };
     },
     addRoom: async (roomData) => {
