@@ -30,6 +30,7 @@ import {
   ChartTooltipContent,
 } from "@/components/ui/chart";
 import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from "recharts";
+import { Toaster } from 'sonner';
 
 const RoomPage = () => {
   const [currentExpanded, setExpanded] = useState(null);
@@ -111,14 +112,14 @@ const RoomPage = () => {
   };
 
   // Handle form submission
-  const handleAddAppliance = () => {
+  const handleAddAppliance = async () => {
     if (!applianceType || !applianceName) {
       alert("Please fill in all fields.");
       return;
     }
 
     // Add the new appliance to the room
-    addAppliance({
+    await addAppliance({
       requester: user.username,
       appliance: {
         applianceType: applianceType,
@@ -225,7 +226,8 @@ const RoomPage = () => {
 
   console.log(currentRoom)
   return (
-    <motion.div
+    <>
+      <motion.div
       className="xl:p-4 flex-1 flex xl:gap-4 gap-2 p-4 flex-col xl:flex-row"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
@@ -314,6 +316,8 @@ const RoomPage = () => {
         </Card>
       </motion.div>
     </motion.div>
+     <Toaster position="bottom-right" richColors closeButton={true} />
+    </>
   );
 };
 
