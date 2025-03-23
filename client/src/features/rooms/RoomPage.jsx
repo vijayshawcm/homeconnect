@@ -31,7 +31,6 @@ import {
 } from "@/components/ui/chart";
 import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from "recharts";
 import { Toaster } from 'sonner';
-import { toast } from 'sonner';
 
 const RoomPage = () => {
   const [currentExpanded, setExpanded] = useState(null);
@@ -120,7 +119,6 @@ const RoomPage = () => {
     }
 
     // Add the new appliance to the room
-    toast.info("Adding appliance...");
     await addAppliance({
       requester: user.username,
       appliance: {
@@ -128,8 +126,6 @@ const RoomPage = () => {
         name: applianceName,
       }
     });
-
-    toast.success("Appliance added successfully.");
 
     // Reset form fields and close the Popover
     setApplianceType("");
