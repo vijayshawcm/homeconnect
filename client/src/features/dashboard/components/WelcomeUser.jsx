@@ -1,10 +1,13 @@
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Bell, Settings } from 'lucide-react';
+import { Home } from 'lucide-react';
+import { useState } from 'react';
+import ManageHomeDialog from './ManageHomeDialog';
 
 const WelcomeUser = ({ user }) => {
 	const currentTime = new Date();
 	const hours = currentTime.getHours();
+	const [isManageHomeOpen, setIsManageHomeOpen] = useState(false);
 
 	let greeting;
 	if (hours < 12) {
@@ -29,17 +32,27 @@ const WelcomeUser = ({ user }) => {
 					</div>
 
 					<div className="flex items-center gap-2">
-						<Button variant="outline" size="sm" className="gap-1">
-							<Bell className="h-4 w-4" />
-							<span className="hidden sm:inline">Notifications</span>
-						</Button>
-						<Button variant="outline" size="sm" className="gap-1">
-							<Settings className="h-4 w-4" />
-							<span className="hidden sm:inline">Settings</span>
+						<Button
+							variant="outline"
+							size="sm"
+							className="gap-1"
+							onClick={() => {
+								setIsManageHomeOpen(true);
+								document.getElementById('manage-home-trigger').click();
+							}}
+						>
+							<Home className="h-4 w-4" />
+							<span className="hidden sm:inline">Manage Home</span>
 						</Button>
 					</div>
 				</div>
 			</CardContent>
+
+			{/* Manage Home Dialog */}
+			<ManageHomeDialog
+				open={isManageHomeOpen}
+				onOpenChange={setIsManageHomeOpen}
+			/>
 		</Card>
 	);
 };

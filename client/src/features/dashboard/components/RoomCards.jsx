@@ -1,11 +1,35 @@
 import { Card, CardContent } from '@/components/ui/card';
-import { BedDouble, Sofa, CookingPot, Bath, Home, Trash2 } from 'lucide-react';
+import {
+	BedDouble,
+	Sofa,
+	CookingPot,
+	Bath,
+	Home,
+	Trash2,
+	Edit,
+} from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useRoomStore } from '@/store/room';
+import { useState } from 'react';
+import {
+	Dialog,
+	DialogContent,
+	DialogHeader,
+	DialogTitle,
+	DialogFooter,
+} from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { showToast } from '@/lib/toast';
 
 const RoomCards = ({ room, onDeleteClick }) => {
-	const { setCurrentRoom } = useRoomStore();
+	const { setCurrentRoom, updateRoom } = useRoomStore();
 	const formattedName = room.name.replace(/\s+/g, '');
+	const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+	const [newRoomName, setNewRoomName] = useState(room.name);
+	const [isUpdating, setIsUpdating] = useState(false);
+	const [editError, setEditError] = useState('');
+	const [isEditRoomFocused, setIsEditRoomFocused] = useState(false);
 
 	const getRoomIcon = () => {
 		switch (room.roomType) {
@@ -22,9 +46,52 @@ const RoomCards = ({ room, onDeleteClick }) => {
 		}
 	};
 
+	const handleEditRoom = async () => {
+		if (!newRoomName.trim()) {
+			setEditError('Room name cannot be empty');
+			return;
+		}
+
+		if (newRoomName === room.name) {
+			setIsEditDialogOpen(false);
+			return;
+		}
+
+		setIsUpdating(true);
+		try {
+			// api call
+			await new Promise((resolve) => setTimeout(resolve, 800));
+
+			//update room styore
+			updateRoom({ ...room, name: newRoomName });
+
+			showToast.success('Room updated', `Room name changed to ${newRoomName}`);
+			setIsEditDialogOpen(false);
+		} catch (error) {
+			console.error('Error updating room:', error);
+			showToast.error('Update failed', 'Failed to update room name');
+		} finally {
+			setIsUpdating(false);
+		}
+	};
+
 	return (
 		<div className="relative group">
 			<Card className="w-[200px] cursor-pointer transition-all duration-200 hover:border-primary hover:bg-muted/50 shadow-none">
+				{/* Edit Button */}
+				<button
+					onClick={(e) => {
+						e.preventDefault();
+						setNewRoomName(room.name);
+						setEditError('');
+						setIsEditDialogOpen(true);
+					}}
+					className="absolute top-2 right-10 md:opacity-0 group-hover:md:opacity-100 
+            transition-opacity p-2 bg-background hover:bg-blue-50 rounded-full 
+            shadow-sm z-10"
+				>
+					<Edit className="h-4 w-4 text-blue-600" />
+				</button>
 				{/* Delete Button - always visible on mobile */}
 				<button
 					onClick={(e) => {
@@ -57,6 +124,48 @@ const RoomCards = ({ room, onDeleteClick }) => {
 					</CardContent>
 				</Link>
 			</Card>
+
+			{/* Edit Room Dialog SLOP */}
+			<Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+				<DialogContent className="sm:max-w-[425px]">
+					<DialogHeader>
+						<DialogTitle>Edit Room</DialogTitle>
+					</DialogHeader>
+					<div className="grid gap-4 py-4">
+						<div className="grid grid-cols-4 items-center gap-4">
+							<label htmlFor="roomName" className="text-right">
+								Name
+							</label>
+							<Input
+								id="roomName"
+								value={newRoomName}
+								onChange={(e) => {
+									setNewRoomName(e.target.value);
+									if (e.target.value) setEditError('');
+								}}
+								onFocus={() => setIsEditRoomFocused(true)}
+								onBlur={() => setIsEditRoomFocused(false)}
+								className={`col-span-3 ${
+									editError && !isEditRoomFocused ? 'border-red-500' : ''
+								}`}
+								autoFocus
+							/>
+						</div>
+						{editError && <p className="text-sm text-red-500">{editError}</p>}
+					</div>
+					<DialogFooter>
+						<Button
+							variant="outline"
+							onClick={() => setIsEditDialogOpen(false)}
+						>
+							Cancel
+						</Button>
+						<Button onClick={handleEditRoom} disabled={isUpdating}>
+							{isUpdating ? 'Saving...' : 'Save changes'}
+						</Button>
+					</DialogFooter>
+				</DialogContent>
+			</Dialog>
 		</div>
 	);
 };
