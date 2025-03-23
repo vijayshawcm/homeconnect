@@ -18,10 +18,12 @@ import {
 } from "@/components/ui/select";
 import { useState } from "react";
 import { useHomeStore } from "@/store/home";
+import { userAuthStore } from "@/store/userAuth";
 
 const RoomScrollArea = ({ rooms }) => {
   const { open, isMobile } = useSidebar();
   const { currentHome, addRoom } = useHomeStore();
+  const { user } = userAuthStore();
   // Adjust gap based on sidebar state and screen size
   const gapClass = clsx({
     "gap-4": isMobile, // Smaller gap for mobile
@@ -31,6 +33,9 @@ const RoomScrollArea = ({ rooms }) => {
 
   const [roomType, setRoomType] = useState(""); // State for appliance type
   const [roomName, setRoomName] = useState(""); // State for appliance name
+  const [displayRooms, setDisplayRooms] = useState( // State for room display
+
+  )
 
   // Handle form submission
   const handleAddRoom = () => {
@@ -41,7 +46,8 @@ const RoomScrollArea = ({ rooms }) => {
     console.log(roomType);
 
     // Add the new appliance to the room
-    addRoom({
+    addRoom(user.username,
+      {
       roomType: roomType,
       name: roomName,
     });
