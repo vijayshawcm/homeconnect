@@ -26,10 +26,12 @@ import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Settings, Plus, Trash, X } from "lucide-react"; // Import icons
 import { userAuthStore } from "@/store/userAuth";
 import { Input } from "@/components/ui/input";
+import { toast } from 'sonner';
 
 const ExpandedView = ({ appliance, onClose }) => {
   const {
     currentRoom,
+    removeAppliance,
     turnOnAppliance,
     turnOffAppliance,
     modifyAppliance,
@@ -211,9 +213,16 @@ const ExpandedView = ({ appliance, onClose }) => {
   };
 
   // Function to handle delete appliance
-  const handleDeleteAppliance = () => {
-    console.log("Delete Appliance clicked");
-    // Add your logic for deleting an appliance here
+  const handleDeleteAppliance = async () => {
+    // Delete appliance in database
+    toast.info("Deleting appliance...")
+    const res = await removeAppliance(currentAppliance._id, user.username)
+
+    if(res.ok) {
+      toast.success("Appliance deleted successfully.");
+    } else {
+      toast.error("Something went wrong while trying to delete appliance, please try again");
+    }
   };
 
   // Function to handle close expanded menu
@@ -332,7 +341,7 @@ const ExpandedView = ({ appliance, onClose }) => {
                   {/* Add Appliance Button */}
                   <Button
                     className="flex items-center gap-2 bg-[#C2E03A] hover:bg-[#A5C32E] text-black w-full"
-                    onClick={handleAddAppliance}
+                    onClick={(handleAddAppliance)}
                   >
                     <Plus className="size-4" />
                     <span>Add Appliance</span>
