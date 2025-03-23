@@ -38,6 +38,8 @@ const ExpandedView = ({ appliance, onClose }) => {
   const { user } = userAuthStore();
   const [lightCarouselApi, setLightCarouselApi] = useState(null);
   const [airConCarouselApi, setAirConCarouselApi] = useState(null);
+  const [fanCarouselApi, setFanCarouselApi] = useState(null);
+
   // Inside the ExpandedView component
   const [isSettingsExpanded, setIsSettingsExpanded] = useState(false);
 
@@ -72,6 +74,7 @@ const ExpandedView = ({ appliance, onClose }) => {
   const [airConMode, setairConMode] = useState(
     currentAppliance?.mode || "auto"
   );
+  const [fanSpeed, setFanSpeed] = useState(currentAppliance?.currentSpeed || 0);
   const lightModes = [
     { display: "Warm", value: "warm" },
     { display: "Neutral", value: "neutral" },
@@ -81,6 +84,11 @@ const ExpandedView = ({ appliance, onClose }) => {
     { display: "Auto", value: "auto" },
     { display: "Cool", value: "cool" },
     { display: "Dry", value: "dry" },
+  ];
+  const fanModes = [
+    { display: "High", value: 3 },
+    { display: "Medium", value: 2 },
+    { display: "Low", value: 1 },
   ];
   // Update brightness when currentAppliance changes
   useEffect(() => {
@@ -157,6 +165,30 @@ const ExpandedView = ({ appliance, onClose }) => {
       airConCarouselApi.off("select", handleCarouselChange);
     };
   }, [airConCarouselApi, currentAppliance?._id, modifyAppliance, airConModes]);
+
+  // Handle Carousel scroll events
+  useEffect(() => {
+    if (!fanCarouselApi) return;
+
+    const handleCarouselChange = () => {
+      const selectedIndex = fanCarouselApi.selectedScrollSnap();
+      const selectedMode = fanModes[selectedIndex]?.value;
+      if (selectedMode) {
+        setFanSpeed(selectedMode);
+        modifyAppliance(currentAppliance?._id, {
+          requester: user.username,
+          currentSpeed: selectedMode,
+        });
+      }
+    };
+
+    fanCarouselApi.on("select", handleCarouselChange);
+
+    // Cleanup listener
+    return () => {
+      fanCarouselApi.off("select", handleCarouselChange);
+    };
+  }, [fanCarouselApi, currentAppliance?._id, modifyAppliance, fanModes]);
 
   const handleButton = () => {
     setCurrentAppliance((prevAppliance) => {
@@ -392,7 +424,6 @@ const ExpandedView = ({ appliance, onClose }) => {
         </CardHeader>
         {appliance === "Light" ? (
           <div className="flex-1 flex flex-col justify-center items-center w-full relative p-4">
-            <div></div>
             <div className="flex-1 w-full flex justify-center items-center">
               <div className="xl:w-[30%]">
                 <Carousel
@@ -576,6 +607,62 @@ const ExpandedView = ({ appliance, onClose }) => {
                   }}
                 />
               </div>
+            </div>
+          </div>
+        ) : appliance === "Fan" ? (
+          <div className="flex-1 flex flex-col justify-center items-center w-full relative p-4">
+            <div className="flex-1 w-full flex justify-center items-center">
+              <div className="xl:w-[30%]">
+                <Carousel
+                  orientation="vertical"
+                  className="w-full"
+                  setApi={setFanCarouselApi}
+                >
+                  <CarouselContent className="h-[150px]">
+                    {fanModes.map(({ display, value }) => (
+                      <CarouselItem
+                        key={value}
+                        className="flex items-center justify-center"
+                      >
+                        <div className="text-2xl font-semibold">{display}</div>
+                      </CarouselItem>
+                    ))}
+                  </CarouselContent>
+                  <CarouselPrevious className="absolute top-2 left-1/2 transform -translate-x-1/2" />
+                  <CarouselNext className="absolute bottom-2 left-1/2 transform -translate-x-1/2" />
+                </Carousel>
+              </div>
+              <div className="relative flex-1 h-full">
+                <img
+                  src="src/assets/fan.svg"
+                  className="absolute aspect-auto w-[20%] md:w-[30%] max-w-32 md:max-w-max xl:w-[60%] md:top-[20%] xl:top-[5%] right-[20%] z-10"
+                ></img>
+              </div>
+            </div>
+            <div className="w-full h-[25%] flex justify-center items-center gap-10">
+              <Button
+                className={`xl:size-16 size-14 rounded-full relative p-0 ${
+                  currentAppliance?.status === "on"
+                    ? "bg-[#C2E03A] hover:hover:bg-[#A5C32E]"
+                    : "bg-[#184C85] hover:bg-[#133A65]"
+                }`}
+                onClick={handleButton}
+              >
+                <Power
+                  className={`absolute top-[50%] left-[50%] -translate-x-[50%] -translate-y-[50%] !size-10 transition-opacity duration-200 invert ${
+                    currentAppliance?.status === "on"
+                      ? "opacity-1"
+                      : "opacity-0"
+                  }`}
+                ></Power>
+                <PowerOff
+                  className={`absolute top-[50%] left-[50%] -translate-x-[50%] -translate-y-[50%] !size-10 transition-opacity duration-200 ${
+                    currentAppliance?.status === "off"
+                      ? "opacity-1"
+                      : "opacity-0"
+                  }`}
+                ></PowerOff>
+              </Button>
             </div>
           </div>
         ) : null}

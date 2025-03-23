@@ -53,7 +53,14 @@ const getHomesByUserId = async (req, res) => {
     const ownedHomes = await Home.find({ owner: user._id })
       .populate({
         path: "rooms",
-        populate: [{ path: "appliances" }, { path: "energyProfile" }],
+        populate: {
+          path: "appliances",
+          populate: { path: "energyProfile" }, // Ensure energyProfile inside appliances is populated
+        },
+      })
+      .populate({
+        path: "rooms",
+        populate: { path: "energyProfile" }, // Populate energyProfile inside rooms
       })
       .populate("owner")
       .populate("dwellers")
@@ -61,7 +68,14 @@ const getHomesByUserId = async (req, res) => {
     const dwelledHomes = await Home.find({ "dwellers.user": user._id })
       .populate({
         path: "rooms",
-        populate: [{ path: "appliances" }, { path: "energyProfile" }],
+        populate: {
+          path: "appliances",
+          populate: { path: "energyProfile" }, // Ensure energyProfile inside appliances is populated
+        },
+      })
+      .populate({
+        path: "rooms",
+        populate: { path: "energyProfile" }, // Populate energyProfile inside rooms
       })
       .populate("owner")
       .populate("dwellers")
