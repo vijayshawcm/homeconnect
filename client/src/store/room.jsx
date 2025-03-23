@@ -52,7 +52,6 @@ export const useRoomStore = create(
     turnOnAll: async (body) => {
       const { currentRoom, updateRoom } = get();
       if (!currentRoom) return;
-      console.log(body);
 
       try {
         // Get all appliances of the specified type

@@ -40,7 +40,7 @@ airConditionerSchema.pre("save", function (next) {
   next();
 });
 
-// Pre-save hook to set energyConsumption in energyProfile for Light appliances
+// Pre-save hook to set energyConsumption in energyProfile for AC appliances
 airConditionerSchema.pre("save", async function (next) {
   try {
     // Check if the document is newly created (not an update)
@@ -48,12 +48,12 @@ airConditionerSchema.pre("save", async function (next) {
       // If energyProfile already exists (created by the base schema hook), update it
       if (this.energyProfile) {
         await EnergyProfile.findByIdAndUpdate(this.energyProfile, {
-          energyConsumption: 1500, // Set default energyConsumption for Light
+          energyConsumption: 1000, // Set default energyConsumption for AC
         });
       } else {
         // If energyProfile does not exist, create a new one
         const energyProfile = await EnergyProfile.create({
-          energyConsumption: 1500, // Set default energyConsumption for Light
+          energyConsumption: 1000, // Set default energyConsumption for AC
         });
         this.energyProfile = energyProfile._id;
       }

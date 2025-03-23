@@ -30,15 +30,12 @@ import {
   ChartTooltipContent,
 } from "@/components/ui/chart";
 import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from "recharts";
-import { LampCeiling, AirVent, Fan } from "lucide-react";
 
 const RoomPage = () => {
   const [currentExpanded, setExpanded] = useState(null);
   const [hovered, setHovered] = useState(null);
   const { currentRoom, addAppliance, getCurrentUsage} = useRoomStore();
   const { user } = userAuthStore();
-  const { isMobile } = useSidebar();
-  const [isPopoverOpen, setIsPopoverOpen] = useState(false); // State for Popover
   const [applianceType, setApplianceType] = useState(""); // State for appliance type
   const [applianceName, setApplianceName] = useState(""); // State for appliance name
   // State to store chart data
@@ -85,6 +82,7 @@ const RoomPage = () => {
           },
         ];
         setChartData(chartData);
+        console.log(currentRoom)
       } catch (error) {
         console.error("Failed to fetch usage data:", error);
         return []; // Return an empty array if there's an error
@@ -225,6 +223,7 @@ const RoomPage = () => {
     },
   ];
 
+  console.log(currentRoom)
   return (
     <motion.div
       className="xl:p-4 flex-1 flex xl:gap-4 gap-2 p-4 flex-col xl:flex-row"

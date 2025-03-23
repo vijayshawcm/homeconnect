@@ -1,10 +1,12 @@
 import { Card } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
 import { useRoomStore } from "@/store/room";
+import { userAuthStore } from "@/store/userAuth";
 import { motion } from "framer-motion";
 
 const LightCard = ({ hovered, totalLight, activeLight }) => {
   const { currentRoom, turnOnAll, turnOffAll, updateRoom } = useRoomStore();
+  const { user } = userAuthStore();
 
   // Determine if all lights are ON
   const isAllLightsOn = totalLight > 0 && activeLight === totalLight;
@@ -14,9 +16,9 @@ const LightCard = ({ hovered, totalLight, activeLight }) => {
     try {
       // Update each light in the backend
       if (!isAllLightsOn) {
-        await turnOnAll("Light");
+        await turnOnAll({ requester: user.username, type: "Light" });
       } else {
-        await turnOffAll("Light");
+        await turnOffAll({ requester: user.username, type: "Light" });
       }
       // Update frontend state (refetch or update room store)
       updateRoom();

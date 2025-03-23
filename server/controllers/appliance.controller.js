@@ -739,7 +739,7 @@ const turnOnAppliance = async (req, res) => {
   }
 
   // Query database for home and room to check user permissions
-  const room = await Room.findOne({ appliances: id });
+  const room = await Room.findOne({ appliances: id }).populate("energyProfile");
   if (!room) {
     return res.status(404).json({ success: false, message: "Room not found" });
   }
@@ -787,15 +787,13 @@ const turnOnAppliance = async (req, res) => {
           });
         }
       } else {
+        if (appliance.energyProfile) {
+          appliance.energyProfile.currentUsage =
+            appliance.energyProfile.energyConsumption;
+          await appliance.energyProfile.save(); // Save the updated energyProfile
+        }
         appliance.status = "on";
         await appliance.save();
-      }
-
-      // Set currentUsage to energyConsumption in the energyProfile
-      if (appliance.energyProfile) {
-        appliance.energyProfile.currentUsage =
-          appliance.energyProfile.energyConsumption;
-        await appliance.energyProfile.save(); // Save the updated energyProfile
       }
     }
 
@@ -825,7 +823,7 @@ const turnOffAppliance = async (req, res) => {
   }
 
   // Query database for home and room to check user permissions
-  const room = await Room.findOne({ appliances: id });
+  const room = await Room.findOne({ appliances: id }).populate("energyProfile");
   if (!room) {
     return res.status(404).json({ success: false, message: "Room not found" });
   }
@@ -873,13 +871,12 @@ const turnOffAppliance = async (req, res) => {
           });
         }
       } else {
+        if (appliance.energyProfile) {
+          appliance.energyProfile.currentUsage = 0;
+          await appliance.energyProfile.save(); // Save the updated energyProfile
+        }
         appliance.status = "off";
         await appliance.save();
-      }
-
-      if (appliance.energyProfile) {
-        appliance.energyProfile.currentUsage = 0;
-        await appliance.energyProfile.save(); // Save the updated energyProfile
       }
     }
     res.status(200).json({ success: true, data: appliance });

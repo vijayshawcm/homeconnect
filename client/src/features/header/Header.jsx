@@ -5,6 +5,7 @@ import EnergyHeader from "./components/EnergyHeader";
 import { Separator } from "@/components/ui/separator";
 import SettingsHeader from "./components/SettingsHeader";
 import ProfileHeader from "./components/ProfileHeader";
+import PermissionsHeader from "./components/PermissionsHeader";
 
 const Header = ({ mode }) => {
   return (
@@ -25,6 +26,8 @@ const Header = ({ mode }) => {
           <SettingsHeader />
         ) : mode === "profile" ? (
           <ProfileHeader />
+        ) : mode === "permissions" ? (
+          <PermissionsHeader />
         ) : null}
       </div>
     </div>

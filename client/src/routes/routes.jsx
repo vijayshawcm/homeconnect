@@ -73,6 +73,10 @@ function AppRoutes() {
             <Route path="/energy" element={<HomeContainer mode="energy" />} />
             <Route path="/profile" element={<HomeContainer mode="profile" />} />
             <Route
+              path="/permissions"
+              element={<HomeContainer mode="permissions" />}
+            />
+            <Route
               path="/settings"
               element={<HomeContainer mode="settings" />}
             />

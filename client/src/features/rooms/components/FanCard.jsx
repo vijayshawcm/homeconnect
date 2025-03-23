@@ -1,9 +1,11 @@
 import { Card } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
 import { useRoomStore } from "@/store/room";
+import { userAuthStore } from "@/store/userAuth";
 import { motion } from "framer-motion";
 
 const FanCard = ({ hovered, totalFans, activeFans }) => {
+  const { user } = userAuthStore();
   const { currentRoom, updateRoom, turnOnAll, turnOffAll } = useRoomStore();
 
   // Determine if all fan are ON
@@ -12,16 +14,19 @@ const FanCard = ({ hovered, totalFans, activeFans }) => {
   // Handle Switch Toggle
   const toggleFans = async () => {
     try {
-      // Update each fans in the backend
+      // Update each airCon in the backend
       if (!isAllFansOn) {
-        await turnOnAll("Fan");
+        await turnOnAll({ requester: user.username, type: "Fan" });
       } else {
-        await turnOffAll("Fan");
+        await turnOffAll({
+          requester: user.username,
+          type: "Fan",
+        });
       }
       // Update frontend state (refetch or update room store)
       updateRoom();
     } catch (error) {
-      console.error("Failed to update Fans:", error);
+      console.error("Failed to update Fan:", error);
     }
   };
   return (

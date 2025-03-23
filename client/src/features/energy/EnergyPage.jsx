@@ -26,11 +26,11 @@ const EnergyPage = () => {
     <div className="flex flex-col flex-1">
       <div className="flex-1 grid energy-template-area auto-cols-[1fr] auto-rows-[1fr] gap-4 p-4">
         <div className="energyTotalCard flex">
-					<TotalEnergyCard/>
-				</div>
-        <div className="energyRoomCard flex" >
-					<RoomCards/>
-				</div>
+          <TotalEnergyCard />
+        </div>
+        <div className="energyRoomCard flex">
+          <RoomCards />
+        </div>
         <div className="energyWeeklyCard bg-sky-400" />
         <div className="roomEnergyCard bg-sky-400" />
       </div>

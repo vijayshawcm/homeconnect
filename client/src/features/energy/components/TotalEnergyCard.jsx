@@ -1,62 +1,96 @@
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import {
   ChartContainer,
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
 import { useHomeStore } from "@/store/home";
-import React from "react";
+import { useEffect } from "react";
 import { Label, Pie, PieChart } from "recharts";
 
-const chartConfig = {
-  visitors: {
-    label: "Visitors",
-  },
-  chrome: {
-    label: "Chrome",
-    color: "hsl(var(--chart-1))",
-  },
-  safari: {
-    label: "Safari",
-    color: "hsl(var(--chart-2))",
-  },
-  firefox: {
-    label: "Firefox",
-    color: "hsl(var(--chart-3))",
-  },
-  edge: {
-    label: "Edge",
-    color: "hsl(var(--chart-4))",
-  },
-  other: {
-    label: "Other",
-    color: "hsl(var(--chart-5))",
-  },
-};
+// const chartConfig = {
+//   energyUsage: {
+//     label: "energyUsage",
+//   },
+//   chrome: {
+//     label: "Chrome",
+//     color: "hsl(var(--chart-1))",
+//   },
+//   safari: {
+//     label: "Safari",
+//     color: "hsl(var(--chart-2))",
+//   },
+//   firefox: {
+//     label: "Firefox",
+//     color: "hsl(var(--chart-3))",
+//   },
+//   edge: {
+//     label: "Edge",
+//     color: "hsl(var(--chart-4))",
+//   },
+//   other: {
+//     label: "Other",
+//     color: "hsl(var(--chart-5))",
+//   },
+// };
 
 const chartData = [
-  { browser: "chrome", visitors: 275, fill: "var(--color-chrome)" },
-  { browser: "safari", visitors: 200, fill: "var(--color-safari)" },
-  { browser: "firefox", visitors: 287, fill: "var(--color-firefox)" },
-  { browser: "edge", visitors: 173, fill: "var(--color-edge)" },
-  { browser: "other", visitors: 190, fill: "var(--color-other)" },
+  { room: "chrome", energyUsage: 260, fill: "var(--color-chrome)" },
+  { room: "safari", energyUsage: 100, fill: "var(--color-safari)" },
+  { room: "firefox", energyUsage: 160, fill: "var(--color-firefox)" },
+  { room: "edge", energyUsage: 173, fill: "var(--color-edge)" },
+  { room: "other", energyUsage: 190, fill: "var(--color-other)" },
 ];
 
+function generateChartData(homeRooms) {
+  const chartConfig = {};
+  const chartData = [];
+
+  homeRooms.forEach((room, index) => {
+    const roomKey = room.room.toLowerCase().replace(/\s+/g, "_"); // Convert room name to a valid key
+    const colorVar = `--chart-${index + 1}`; // Dynamically generate color variable
+
+    // Dynamically generate chartConfig
+    chartConfig[roomKey] = {
+      label: room.room,
+      color: `hsl(var(${colorVar}))`,
+    };
+
+    // Dynamically generate chartData
+    chartData.push({
+      room: roomKey,
+      value: room.currentEnergyUsage,
+      fill: `var(--color-${roomKey})`,
+    });
+  });
+
+  return { chartConfig, chartData };
+}
+
 const TotalEnergyCard = () => {
-	const {currentHome} = useHomeStore()
-  const totalVisitors = React.useMemo(() => {
-    return chartData.reduce((acc, curr) => acc + curr.visitors, 0);
-  }, []);
+  const { currentHome, updateHome } = useHomeStore();
+
+  const currentHomeData = currentHome.rooms.map((room) => {
+    return {
+      room: room.name,
+      currentEnergyUsage: room.energyProfile.currentUsage,
+    };
+  });
+  const { chartConfig, chartData } = generateChartData(currentHomeData);
+  console.log(currentHome);
   return (
     <Card className="flex-1 flex flex-col rounded-3xl">
       <CardHeader className="p-3 pl-5">
-        <CardTitle className = "text-xl">Total Energy Usage</CardTitle>
+        <CardTitle className="text-xl">Current Energy Usage</CardTitle>
       </CardHeader>
       <CardContent className="flex-1 flex flex-col p-0">
-        <ChartContainer
-          config={chartConfig}
-          className="flex-1"
-        >
+        <ChartContainer config={chartConfig} className="flex-1">
           <PieChart>
             <ChartTooltip
               cursor={false}
@@ -64,8 +98,8 @@ const TotalEnergyCard = () => {
             />
             <Pie
               data={chartData}
-              dataKey="visitors"
-              nameKey="browser"
+              dataKey="value"
+              nameKey="room"
               innerRadius={60}
               strokeWidth={5}
             >
@@ -102,7 +136,7 @@ const TotalEnergyCard = () => {
           </PieChart>
         </ChartContainer>
       </CardContent>
-			<CardFooter>Bruh</CardFooter>
+      <CardFooter>Bruh</CardFooter>
     </Card>
   );
 };

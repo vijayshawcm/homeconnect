@@ -8,6 +8,7 @@ import { useHomeStore } from "@/store/home";
 import EnergyPage from "../energy/EnergyPage";
 import Profile from "../profile/Profile";
 import Settings from "../settings/Settings";
+import Permissions from "../permissions/Permissions";
 
 const HomeContainer = ({ mode }) => {
   const [hasMounted, setHasMounted] = useState(false);
@@ -50,6 +51,8 @@ const HomeContainer = ({ mode }) => {
               <Profile />
             ) : currentMode === "settings" ? (
               <Settings />
+            ) : currentMode === "permissions" ? (
+              <Permissions />
             ) : null}
           </div>
         </main>
