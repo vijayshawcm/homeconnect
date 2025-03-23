@@ -1,5 +1,6 @@
 const { Home, User, Room, Appliance } = require("../models");
 const mongoose = require("mongoose");
+const { checkPermission } = require("./permissions.controller.js")
 
 const createHome = async (req, res) => {
   const username = req.body.username;
@@ -79,59 +80,56 @@ const getHomesByUserId = async (req, res) => {
   }
 };
 
-const addDweller = async (req, res) => {
-  try {
-    const { id } = req.params;
-    const { userId } = req.body;
-
-    if (!userId) {
-      return res
-        .status(400)
-        .json({ success: false, message: "Please provide all fields" });
-    }
-
-    // Check if user exists
-    const userExists = await User.findById(userId);
-    if (!userExists) {
-      return res
-        .status(404)
-        .json({ success: false, message: "User not found" });
-    }
-
-    // Find the home
-    const home = await Home.findById(id).populate("dwellers.user");
-
-    if (!home) {
-      return res
-        .status(404)
-        .json({ success: false, message: "Home not found" });
-    }
-
-    // Check if user is already a dweller
-    const isAlreadyDweller = home.dwellers.some(
-      (dweller) => dweller.user._id.toString() === userId
-    );
-
-    if (isAlreadyDweller) {
-      return res.status(400).json({
-        success: false,
-        message: "User is already a dweller of this home",
-      });
-    }
-
-    // Add the new dweller
-    home.dwellers.push({ user: userId });
-    await home.save();
-
-    res.status(200).json({ success: true, data: home });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: "Server error" });
+const renameHome = async (req, res) => {
+  const { id } = req.params;
+  if(!req.body.requester || !req.body.name) {
+    return res.status(400).json({ success: false, message: "Please provide all fields" });
   }
-};
+
+  const requesterName = req.body.requester;
+  const homeName = req.body.name;
+
+  // Attempt to query database for user that is sending the request
+  const requester = await User.findOne({
+    "userInfo.usernameLower": requesterName.toLowerCase(),
+  });
+  if (!requester) {
+    return res.status(404).json("Requester not found.");
+  }
+
+  // Find the home to ensure it exists
+  const home = await Home.findById(id);
+  if (!home) {
+    return res
+      .status(404)
+      .json({ success: false, message: "Home not found" });
+  }
+
+  const validPerms = checkPermission(requester, home, "modifyHome");
+    if (!validPerms) {
+      return res.status(403).json({ success: false, message: "User does not have sufficient permissions" });
+    }
+
+  await home.updateOne({ name: homeName });
+  return res.status(200).json({ success: true, data: home });
+
+}
 
 const deleteHome = async (req, res) => {
   const { id } = req.params;
+  if(!req.body.requester) {
+    return res.status(400).json({ success: false, message: "Please provide all fields" });
+  }
+
+  const requesterName = req.body.requester;
+
+  // Attempt to query database for user that is sending the request
+  const requester = await User.findOne({
+    "userInfo.usernameLower": requesterName.toLowerCase(),
+  });
+  if (!requester) {
+    return res.status(404).json("Requester not found.");
+  }
 
   try {
     // Find the home to ensure it exists
@@ -140,6 +138,10 @@ const deleteHome = async (req, res) => {
       return res
         .status(404)
         .json({ success: false, message: "Home not found" });
+    }
+
+    if(!home.owner.equals(requester._id)) {
+      return res.status(403).json({ success: false, message: "Houses can only be deleted by their owner."});
     }
 
     // Find all rooms associated with the home
@@ -170,6 +172,6 @@ module.exports = {
   getHomes,
   getHomeById,
   getHomesByUserId,
-  addDweller,
+  renameHome,
   deleteHome,
 };
