@@ -11,42 +11,7 @@ import {
   ChartTooltipContent,
 } from "@/components/ui/chart";
 import { useHomeStore } from "@/store/home";
-import { useEffect } from "react";
 import { Label, Pie, PieChart } from "recharts";
-
-// const chartConfig = {
-//   energyUsage: {
-//     label: "energyUsage",
-//   },
-//   chrome: {
-//     label: "Chrome",
-//     color: "hsl(var(--chart-1))",
-//   },
-//   safari: {
-//     label: "Safari",
-//     color: "hsl(var(--chart-2))",
-//   },
-//   firefox: {
-//     label: "Firefox",
-//     color: "hsl(var(--chart-3))",
-//   },
-//   edge: {
-//     label: "Edge",
-//     color: "hsl(var(--chart-4))",
-//   },
-//   other: {
-//     label: "Other",
-//     color: "hsl(var(--chart-5))",
-//   },
-// };
-
-const chartData = [
-  { room: "chrome", energyUsage: 260, fill: "var(--color-chrome)" },
-  { room: "safari", energyUsage: 100, fill: "var(--color-safari)" },
-  { room: "firefox", energyUsage: 160, fill: "var(--color-firefox)" },
-  { room: "edge", energyUsage: 173, fill: "var(--color-edge)" },
-  { room: "other", energyUsage: 190, fill: "var(--color-other)" },
-];
 
 function generateChartData(homeRooms) {
   const chartConfig = {};
@@ -136,7 +101,6 @@ const TotalEnergyCard = () => {
           </PieChart>
         </ChartContainer>
       </CardContent>
-      <CardFooter>Bruh</CardFooter>
     </Card>
   );
 };

@@ -21,7 +21,7 @@ const RoomCards = () => {
                 className={`w-60 cursor-pointer border-2 
 									${
                     currentRoom._id === room._id ? "border-black" : ""
-                  } p-2 transition-all bg-[#C2E03A] hover:border-primary hover:bg-[#A8C82A] lg:h-56 lg:w-40 rounded-3xl overflow-hidden flex flex-col`}
+                  } p-2 transition-all bg-[#C2E03A] hover:border-primary hover:bg-[#A8C82A] lg:h-60 lg:w-40 rounded-3xl overflow-hidden flex flex-col`}
               >
                 <CardHeader className="p-2 text-xl font-semibold">
                   {room.name}

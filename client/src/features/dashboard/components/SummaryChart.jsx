@@ -32,6 +32,7 @@ const chartConfig = {
 
 const SummaryChart = () => {
   const { currentHome } = useHomeStore();
+  console.log(currentHome);
   return (
     <ChartContainer config={chartConfig} className="flex-1">
       <BarChart accessibilityLayer data={chartData}>
