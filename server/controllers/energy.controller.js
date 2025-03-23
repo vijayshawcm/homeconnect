@@ -36,7 +36,7 @@ const getTotalCurrentUsage = async (req, res) => {
     if (!appliances || appliances.length === 0) {
       return res.status(404).json({
         success: false,
-        message: `No ${type}s found in the specified room`,
+        message: `No appliances in the specified room`,
       });
     }
 
