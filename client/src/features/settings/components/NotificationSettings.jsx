@@ -24,31 +24,39 @@ import {
 import { userAuthStore } from '@/store/userAuth';
 
 function NotificationSettings() {
+	const { user } = userAuthStore();
+	
+	var userNotifs = {}
+	var originalNotifs = {
+		email: false,
+		push: false,
+		appliance: false,
+		security: false,
+		updates: false,
+		billing: false,
+	}
+
+	// Set original notifications based on user notifications
+	user.settings.notification.channels.forEach(e => Object.assign(userNotifs, {[e]: true}));
+	user.settings.notification.types.forEach(e => Object.assign(userNotifs, {[e]: true}));
+	userNotifs = {...originalNotifs, ...userNotifs};
+
 	const [originalNotifications, setOriginalNotifications] = useState({
 		email: true,
 		push: false,
-		device: false,
-		marketing: false,
+		appliance: true,
 		security: true,
 		updates: false,
-		reminders: true,
 		billing: true,
 	});
 
 	const [notifications, setNotifications] = useState({
-		email: true,
-		push: true,
-		device: true,
-		marketing: false,
-		security: true,
-		updates: true,
-		reminders: false,
-		billing: true,
+		...userNotifs
 	});
 
-	const [isSaving, setIsSaving] = useState(false);
+	console.log(notifications)
 
-	const { user } = userAuthStore();
+	const [isSaving, setIsSaving] = useState(false);
 
 	const handleToggle = (key) => {
 		setNotifications((prev) => ({
@@ -75,7 +83,7 @@ function NotificationSettings() {
 
 		var i = 0;
 		for(const key in notifications) {
-			if(i<3) {
+			if(i<2) {
 				if(notifications[key]) {
 					channels.push(key)
 				}
@@ -136,24 +144,6 @@ function NotificationSettings() {
 			color: 'text-purple-600 dark:text-purple-400',
 			bgColor: 'bg-purple-100 dark:bg-purple-900/30',
 		},
-		{
-			id: 'device',
-			title: 'Device Alerts',
-			description: 'Get alerts for device status changes',
-			icon: Bell,
-			checked: notifications.device,
-			color: 'text-amber-600 dark:text-amber-400',
-			bgColor: 'bg-amber-100 dark:bg-amber-900/30',
-		},
-		{
-			id: 'marketing',
-			title: 'Marketing Emails',
-			description: 'Receive product updates and offers',
-			icon: Megaphone,
-			checked: notifications.marketing,
-			color: 'text-green-600 dark:text-green-400',
-			bgColor: 'bg-green-100 dark:bg-green-900/30',
-		},
 	];
 
 	const notificationTypes = [
@@ -176,13 +166,13 @@ function NotificationSettings() {
 			bgColor: 'bg-blue-100 dark:bg-blue-900/30',
 		},
 		{
-			id: 'reminders',
-			title: 'Reminders',
-			description: 'Task and event reminders',
-			checked: notifications.reminders,
-			icon: Clock,
-			color: 'text-purple-600 dark:text-purple-400',
-			bgColor: 'bg-purple-100 dark:bg-purple-900/30',
+			id: 'appliance',
+			title: 'Appliance Alerts',
+			description: 'Changes in appliance status',
+			icon: Bell,
+			checked: notifications.appliance,
+			color: 'text-amber-600 dark:text-amber-400',
+			bgColor: 'bg-amber-100 dark:bg-amber-900/30',
 		},
 		{
 			id: 'billing',
