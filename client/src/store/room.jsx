@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import { useHomeStore } from "./home";
 import { persist } from "zustand/middleware";
+import { toast } from "sonner";
 
 export const useRoomStore = create(
   persist((set, get) => ({
@@ -30,6 +31,7 @@ export const useRoomStore = create(
     addAppliance: async (body) => {
       const { currentRoom, updateRoom } = get();
       if (!currentRoom) return;
+      toast.info("Adding appliance...");
       try {
         const res = await fetch(`/server/appliances/${currentRoom._id}`, {
           method: "PUT",
@@ -44,18 +46,30 @@ export const useRoomStore = create(
           if (homeStore.currentHome?._id === data.data.home) {
             await homeStore.updateHome();
           }
+
+          toast.success("Appliance added successfully.");
+        } else {
+          toast.error("Failed to add appliance, " + data.message);
         }
       } catch (error) {
+        toast.error("Failed to add appliance.");
         console.error("Failed to add appliance:", error);
       }
     },
     removeAppliance: async (id, requester) => {
         const { updateRoom } = get();
+        toast.info("Deleting appliance...")
         const res = await fetch(`/server/appliances/${id}`, {
           method: "DELETE",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ requester }),
         });
+
+        if(res.ok) {
+          toast.success("Appliance deleted successfully.");
+        } else {
+          toast.error("Something went wrong while trying to delete appliance, please try again");
+        }
 
         await updateRoom();
 
