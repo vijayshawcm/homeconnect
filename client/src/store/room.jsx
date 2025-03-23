@@ -49,6 +49,18 @@ export const useRoomStore = create(
         console.error("Failed to add appliance:", error);
       }
     },
+    removeAppliance: async (id, requester) => {
+        const { updateRoom } = get();
+        const res = await fetch(`/server/appliances/${id}`, {
+          method: "DELETE",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ requester }),
+        });
+
+        await updateRoom();
+
+        return res;
+    },
     turnOnAll: async (body) => {
       const { currentRoom, updateRoom } = get();
       if (!currentRoom) return;
