@@ -27,10 +27,12 @@ import { Settings, Plus, Trash, X } from "lucide-react"; // Import icons
 import { userAuthStore } from "@/store/userAuth";
 import { Input } from "@/components/ui/input";
 import { toast } from 'sonner';
-
+import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
 const ExpandedView = ({ appliance, onClose }) => {
   const {
     currentRoom,
+    addAppliance,
     removeAppliance,
     turnOnAppliance,
     turnOffAppliance,
@@ -42,6 +44,8 @@ const ExpandedView = ({ appliance, onClose }) => {
   const [airConCarouselApi, setAirConCarouselApi] = useState(null);
   // Inside the ExpandedView component
   const [isSettingsExpanded, setIsSettingsExpanded] = useState(false);
+  const [isAddExpanded, setIsAddExpanded] = useState(false);
+  const [applianceNameAdd, setApplianceNameAdd] = useState(""); // State for appliance name
 
   const getApplianceStats = useCallback(
     (type) => {
@@ -207,22 +211,31 @@ const ExpandedView = ({ appliance, onClose }) => {
   };
 
   // Function to handle add appliance
-  const handleAddAppliance = () => {
-    console.log("Add Appliance clicked");
-    // Add your logic for adding an appliance here
+  const handleAddAppliance = async () => {
+    if (!applianceNameAdd) {
+      alert("Please fill in all fields.");
+      return;
+    }
+
+    // Add the new appliance to the room
+    await addAppliance({
+      requester: user.username,
+      appliance: {
+        applianceType: currentAppliance.applianceType,
+        name: applianceNameAdd,
+      }
+    });
+
+    // Reset form fields and close the Popover
+    setApplianceType("");
+    setApplianceName("");
   };
 
   // Function to handle delete appliance
   const handleDeleteAppliance = async () => {
     // Delete appliance in database
     toast.info("Deleting appliance...")
-    const res = await removeAppliance(currentAppliance._id, user.username)
-
-    if(res.ok) {
-      toast.success("Appliance deleted successfully.");
-    } else {
-      toast.error("Something went wrong while trying to delete appliance, please try again");
-    }
+    await removeAppliance(currentAppliance._id, user.username);
   };
 
   // Function to handle close expanded menu
@@ -341,12 +354,43 @@ const ExpandedView = ({ appliance, onClose }) => {
                   {/* Add Appliance Button */}
                   <Button
                     className="flex items-center gap-2 bg-[#C2E03A] hover:bg-[#A5C32E] text-black w-full"
-                    onClick={(handleAddAppliance)}
+                    onClick={() => setIsAddExpanded(true)}
                   >
                     <Plus className="size-4" />
                     <span>Add Appliance</span>
                   </Button>
+                  <Dialog open={isAddExpanded} onOpenChange={setIsAddExpanded}>
+                    <DialogContent className="w-80 p-4 bg-white rounded-lg shadow-lg">
+                      <h3 className="font-semibold text-lg mb-4">Add New Appliance</h3>
+                      <div className="space-y-4">
+                        {/* Appliance Type Dropdown */}
+                        <div>
+                          <Label htmlFor="applianceType">Appliance Type</Label>
+                          <Input
+                            id="applianceName"
+                            placeholder={currentAppliance.applianceType}
+                            disabled
+                          />
+                        </div>
 
+                        {/* Appliance Name Input */}
+                        <div>
+                          <Label htmlFor="applianceName">Appliance Name</Label>
+                          <Input
+                            id="applianceName"
+                            value={applianceNameAdd}
+                            onChange={(e) => setApplianceNameAdd(e.target.value)}
+                            placeholder="Enter appliance name"
+                          />
+                        </div>
+
+                        {/* Submit Button */}
+                        <Button onClick={handleAddAppliance} className="w-full">
+                          Add Appliance
+                        </Button>
+                      </div>
+                    </DialogContent>
+                  </Dialog>
                   {/* Delete Appliance Button */}
                   <Button
                     className="flex items-center gap-2 bg-red-500 hover:bg-red-600 text-white w-full"
