@@ -1,22 +1,27 @@
-import ProfileCard from "./ProfileCard";
-import SummaryCard from "./SummaryCard";
-import WeatherCard from "./WeatherCard";
+import ProfileCard from './ProfileCard';
+import SummaryCard from './SummaryCard';
+import WeatherCard from './WeatherCard';
+import SuggestionsCard from './SuggestionsCard';
 
 const BentoGrid = () => {
-  return (
-    <div className="grid auto-cols-auto lg:auto-cols-[1fr] auto-rows-[1fr] gap-8 grid-template-area p-4 ">
-      <div className="bentoProfile flex">
-        <ProfileCard />
-      </div>
-      <div className="bentoWeather flex">
-        <WeatherCard />
-      </div>
-      <div className="bentoSummary flex">
-        <SummaryCard/>
-      </div>
-      <div className="bg-blue-800 bentoSuggestion flex"></div>
-    </div>
-  );
+	return (
+		<div className="grid grid-cols-1 md:grid-cols-[2fr_1.2fr] gap-4">
+			<div
+				className="flex flex-col gap-4 md:grid"
+				style={{ gridTemplateRows: '2fr 6fr' }}
+			>
+				<ProfileCard />
+				<SummaryCard />
+			</div>
+			<div
+				className="flex flex-col gap-4 md:grid md:grid-rows-2"
+				style={{ gridTemplateRows: '4fr 5fr' }}
+			>
+				<WeatherCard />
+				<SuggestionsCard />
+			</div>
+		</div>
+	);
 };
 
 export default BentoGrid;
