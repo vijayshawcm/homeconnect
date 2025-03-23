@@ -1,10 +1,12 @@
 import { Card } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
 import { useRoomStore } from "@/store/room";
+import { userAuthStore } from "@/store/userAuth";
 import { motion } from "framer-motion";
 
 const AirConCard = ({ hovered, totalAirCons, activeAirCons }) => {
   const { currentRoom, updateRoom, turnOnAll, turnOffAll } = useRoomStore();
+  const { user } = userAuthStore();
 
   // Determine if all airCons are ON
   const isAllAirConOn = totalAirCons > 0 && activeAirCons === totalAirCons;
@@ -14,9 +16,9 @@ const AirConCard = ({ hovered, totalAirCons, activeAirCons }) => {
     try {
       // Update each airCon in the backend
       if (!isAllAirConOn) {
-        await turnOnAll("AirConditioner");
+        await turnOnAll({ requester: user.username, type: "AirConditioner" });
       } else {
-        await turnOffAll("AirConditioner");
+        await turnOffAll({ requester: user.username, type: "AirConditioner" });
       }
       // Update frontend state (refetch or update room store)
       updateRoom();

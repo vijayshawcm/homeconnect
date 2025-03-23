@@ -126,103 +126,103 @@ function AppearanceSettings() {
 	];
 
 	return (
-		<form onSubmit={handleSubmit}>
-			<Card className="border-border/40 shadow-md hover:shadow-lg transition-shadow duration-300">
-				<CardHeader className="pb-5 mb-6 bg-primary/10 rounded-tl-lg rounded-tr-lg">
-					<div className="flex items-center gap-3">
-						<div>
-							<CardTitle className="text-lg font-medium">Appearance</CardTitle>
-							<CardDescription className="text-sm mt-0.5">
-								Customize how HomeConnect looks on your device
-							</CardDescription>
-						</div>
-					</div>
-				</CardHeader>
-				<CardContent className="pb-8">
-					<div className="space-y-6">
-						<div className="flex items-center gap-3">
-							<div className="h-10 w-10 aspect-square rounded-full bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center shadow-sm">
-								<Palette className="h-1/2 w-1/2 text-purple-600 dark:text-purple-400" />
-							</div>
-							<div>
-								<h3 className="text-base font-medium leading-tight">Theme</h3>
-								<p className="text-sm text-muted-foreground mt-0.5">
-									Select your preferred theme for the dashboard
-								</p>
-							</div>
-						</div>
+    <form onSubmit={handleSubmit}>
+      <Card className="border-border/40 shadow-md hover:shadow-lg transition-shadow duration-300">
+        <CardHeader className="pb-5 mb-6 bg-gradient-to-r from-[#7aee6f] to-[#C2E03A] rounded-tl-lg rounded-tr-lg">
+          <div className="flex items-center gap-3">
+            <div>
+              <CardTitle className="text-lg font-medium">Appearance</CardTitle>
+              <CardDescription className="text-sm mt-0.5">
+                Customize how HomeConnect looks on your device
+              </CardDescription>
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent className="pb-8">
+          <div className="space-y-6">
+            <div className="flex items-center gap-3">
+              <div className="h-10 w-10 aspect-square rounded-full bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center shadow-sm">
+                <Palette className="h-1/2 w-1/2 text-purple-600 dark:text-purple-400" />
+              </div>
+              <div>
+                <h3 className="text-base font-medium leading-tight">Theme</h3>
+                <p className="text-sm text-muted-foreground mt-0.5">
+                  Select your preferred theme for the dashboard
+                </p>
+              </div>
+            </div>
 
-						<div className="pl-14 pt-2">
-							<RadioGroup
-								value={theme}
-								onValueChange={(value) => {
-									setTheme(value);
-									applyTheme(value);
-								}}
-								className="grid grid-cols-1 md:grid-cols-3 gap-5"
-							>
-								{themeOptions.map((option) => {
-									return (
-										<div key={option.value} className="relative">
-											<RadioGroupItem
-												value={option.value}
-												id={`theme-${option.value}`}
-												className="peer sr-only"
-											/>
-											<Label
-												htmlFor={`theme-${option.value}`}
-												className="flex flex-col items-center justify-between rounded-xl border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary transition-all duration-200"
-											>
-												{option.preview}
-												<span className="font-medium mb-1">{option.label}</span>
-												<span className="text-xs text-center text-muted-foreground">
-													{option.description}
-												</span>
+            <div className="pl-14 pt-2">
+              <RadioGroup
+                value={theme}
+                onValueChange={(value) => {
+                  setTheme(value);
+                  applyTheme(value);
+                }}
+                className="grid grid-cols-1 md:grid-cols-3 gap-5"
+              >
+                {themeOptions.map((option) => {
+                  return (
+                    <div key={option.value} className="relative">
+                      <RadioGroupItem
+                        value={option.value}
+                        id={`theme-${option.value}`}
+                        className="peer sr-only"
+                      />
+                      <Label
+                        htmlFor={`theme-${option.value}`}
+                        className="flex flex-col items-center justify-between rounded-xl border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary transition-all duration-200"
+                      >
+                        {option.preview}
+                        <span className="font-medium mb-1">{option.label}</span>
+                        <span className="text-xs text-center text-muted-foreground">
+                          {option.description}
+                        </span>
 
-												{theme === option.value && (
-													<div className="absolute -top-1.5 -right-1.5 h-6 w-6 bg-primary rounded-full flex items-center justify-center shadow-sm">
-														<Check className="h-3.5 w-3.5 text-white dark:text-black" />
-													</div>
-												)}
-											</Label>
-										</div>
-									);
-								})}
-							</RadioGroup>
-						</div>
-					</div>
-				</CardContent>
-				<CardFooter className="flex justify-end gap-3 border-t pt-6 px-6">
-					<Button
-						type="button"
-						variant="outline"
-						onClick={() => {
-							setTheme(originalTheme);
-							applyTheme(originalTheme);
-						}}
-						disabled={isSaving || theme === originalTheme}
-						className="h-9 text-sm font-medium"
-					>
-						Reset
-					</Button>
-					<Button
-						type="submit"
-						disabled={isSaving || theme === originalTheme}
-						className="h-9 text-sm font-medium"
-					>
-						{isSaving ? (
-							<>
-								<Loader2 className="mr-2 h-4 w-4 animate-spin" />
-								Saving...
-							</>
-						) : (
-							'Save Changes'
-						)}
-					</Button>
-				</CardFooter>
-			</Card>
-		</form>
-	);
+                        {theme === option.value && (
+                          <div className="absolute -top-1.5 -right-1.5 h-6 w-6 bg-primary rounded-full flex items-center justify-center shadow-sm">
+                            <Check className="h-3.5 w-3.5 text-white dark:text-black" />
+                          </div>
+                        )}
+                      </Label>
+                    </div>
+                  );
+                })}
+              </RadioGroup>
+            </div>
+          </div>
+        </CardContent>
+        <CardFooter className="flex justify-end gap-3 border-t pt-6 px-6">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => {
+              setTheme(originalTheme);
+              applyTheme(originalTheme);
+            }}
+            disabled={isSaving || theme === originalTheme}
+            className="h-9 text-sm font-medium"
+          >
+            Reset
+          </Button>
+          <Button
+            type="submit"
+            disabled={isSaving || theme === originalTheme}
+            className="h-9 text-sm font-medium"
+          >
+            {isSaving ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Saving...
+              </>
+            ) : (
+              "Save Changes"
+            )}
+          </Button>
+        </CardFooter>
+      </Card>
+    </form>
+  );
 }
 
 export default AppearanceSettings;

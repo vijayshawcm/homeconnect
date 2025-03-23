@@ -9,9 +9,7 @@ const EnergyHeader = () => {
 			<h1 className="text-xl lg:text-2xl xl:text-3xl font-bold">
 				Energy Monitoring - {currentHome.name}
 			</h1>
-			<div className="flex">
 				<HeaderAvatar />
-			</div>
 		</div>
 	);
 };

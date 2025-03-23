@@ -7,6 +7,7 @@ import Header from "../header/Header";
 import { useHomeStore } from "@/store/home";
 import EnergyPage from "../energy/EnergyPage";
 import Profile from "../profile/Profile";
+import Settings from "../settings/Settings";
 
 const HomeContainer = ({ mode }) => {
   const [hasMounted, setHasMounted] = useState(false);
@@ -47,6 +48,8 @@ const HomeContainer = ({ mode }) => {
               <EnergyPage />
             ) : currentMode === "profile" ? (
               <Profile />
+            ) : currentMode === "settings" ? (
+              <Settings />
             ) : null}
           </div>
         </main>

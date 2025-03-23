@@ -33,7 +33,7 @@ const DashboardHeader = () => {
     <div className="flex flex-1 items-center justify-between">
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button className="flex items-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors border border-input bg-background shadow-sm hover:bg-accent text-black h-9 px-4 py-2 w-[200px] justify-between">
+          <Button className="flex items-center gap-2 whitespace-nowrap rounded-md text-sm font-semibold transition-colors border border-input bg-background shadow-sm hover:bg-accent text-black h-9 px-4 py-2 w-[200px] justify-between">
             <Home/>
             {currentHome ? currentHome.name : "Select a Home"}
             <ChevronsUpDown />

@@ -30,15 +30,7 @@ function ProfileHeader({ user, onProfileUpdate }) {
     <>
       <Card className="overflow-hidden border-border mb-6">
         {/* Cover Photo */}
-        <div className="h-32 sm:h-48 bg-gradient-to-r from-[#2BB673] to-[#C2E03A] relative">
-          <Button
-            variant="ghost"
-            size="sm"
-            className="absolute bottom-2 right-2 bg-background/80 backdrop-blur-sm"
-          >
-            <Camera className="h-4 w-4 mr-2" />
-            Change Cover
-          </Button>
+        <div className="h-32 sm:h-36 bg-gradient-to-r from-[#2BB673] to-[#C2E03A] relative">
         </div>
 
         <CardContent className="p-6 pt-0 relative">
@@ -75,7 +67,7 @@ function ProfileHeader({ user, onProfileUpdate }) {
               <h1 className="text-2xl font-bold">
                 {userData?.fullName || userData?.username}
               </h1>
-              <p className="text-muted-foreground">@{userData?.username}</p>
+              <p className="text-muted-foreground">@{userData?.email}</p>
 
               <div className="mt-3 flex flex-wrap gap-3">
                 <div className="flex items-center text-sm text-muted-foreground">

@@ -3,6 +3,8 @@ import DashboardHeader from "./components/DashboardHeader";
 import RoomsHeader from "./components/RoomsHeader";
 import EnergyHeader from "./components/EnergyHeader";
 import { Separator } from "@/components/ui/separator";
+import SettingsHeader from "./components/SettingsHeader";
+import ProfileHeader from "./components/ProfileHeader";
 
 const Header = ({ mode }) => {
   return (
@@ -19,6 +21,10 @@ const Header = ({ mode }) => {
           <RoomsHeader />
         ) : mode === "energy" ? (
           <EnergyHeader />
+        ) : mode === "settings" ? (
+          <SettingsHeader />
+        ) : mode === "profile" ? (
+          <ProfileHeader />
         ) : null}
       </div>
     </div>

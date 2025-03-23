@@ -24,10 +24,18 @@ import Thermostat from "./Thermostat";
 import { TbAirConditioning } from "react-icons/tb";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Settings, Plus, Trash, X } from "lucide-react"; // Import icons
+import { userAuthStore } from "@/store/userAuth";
+import { Input } from "@/components/ui/input";
 
 const ExpandedView = ({ appliance, onClose }) => {
-  const { currentRoom, turnOnAppliance, turnOffAppliance, modifyAppliance } =
-    useRoomStore();
+  const {
+    currentRoom,
+    turnOnAppliance,
+    turnOffAppliance,
+    modifyAppliance,
+    renameAppliance,
+  } = useRoomStore();
+  const { user } = userAuthStore();
   const [lightCarouselApi, setLightCarouselApi] = useState(null);
   const [airConCarouselApi, setAirConCarouselApi] = useState(null);
   // Inside the ExpandedView component
@@ -111,8 +119,10 @@ const ExpandedView = ({ appliance, onClose }) => {
       if (selectedMode) {
         setLightMode(selectedMode);
         modifyAppliance(currentAppliance?._id, {
+          requester: user.username,
           colorTemperature: selectedMode,
         });
+        currentAppliance.colorTemperature = selectedMode;
       }
     };
 
@@ -134,6 +144,7 @@ const ExpandedView = ({ appliance, onClose }) => {
       if (selectedMode) {
         setairConMode(selectedMode);
         modifyAppliance(currentAppliance?._id, {
+          requester: user.username,
           mode: selectedMode,
         });
       }
@@ -147,16 +158,19 @@ const ExpandedView = ({ appliance, onClose }) => {
     };
   }, [airConCarouselApi, currentAppliance?._id, modifyAppliance, airConModes]);
 
-  const handleButton = (id) => {
+  const handleButton = () => {
     setCurrentAppliance((prevAppliance) => {
       if (!prevAppliance) return prevAppliance;
 
       const newStatus = prevAppliance.status === "on" ? "off" : "on";
 
       if (newStatus === "on") {
-        turnOnAppliance(id);
+        turnOnAppliance({ requester: user.username, id: currentAppliance._id });
       } else {
-        turnOffAppliance(id);
+        turnOffAppliance({
+          requester: user.username,
+          id: currentAppliance._id,
+        });
       }
 
       setGetStats((prevStats) => ({
@@ -205,6 +219,52 @@ const ExpandedView = ({ appliance, onClose }) => {
   // Function to handle close expanded menu
   const handleCloseExpandedMenu = () => {
     setIsSettingsExpanded(false);
+  };
+
+  const [isEditing, setIsEditing] = useState(false); // State to track edit mode
+  const [editedName, setEditedName] = useState(currentAppliance.name); // State to store edited name
+  // Handle click on the PencilLine icon
+  const handleEditClick = () => {
+    setIsEditing(true); // Enter edit mode
+    setEditedName(currentAppliance.name); // Initialize edited name with the current name
+  };
+
+  // Handle saving the edited name
+  const handleSave = async () => {
+    if (editedName.trim() === "") return; // Prevent saving empty names
+
+    // Make a request to update the appliance name in the database
+    const res = await renameAppliance(currentAppliance._id, {
+      requester: user.username, // Assuming you have access to the user
+      appliance: {
+        name: editedName,
+      },
+    });
+
+    if (res.success) {
+      currentAppliance.name = editedName;
+    }
+
+    setIsEditing(false); // Exit edit mode
+  };
+
+  // Handle input change
+  const handleInputChange = (e) => {
+    setEditedName(e.target.value);
+  };
+
+  // Handle keydown events (e.g., Enter to save, Escape to cancel)
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter") {
+      handleSave(); // Save on Enter key
+    } else if (e.key === "Escape") {
+      setIsEditing(false); // Cancel on Escape key
+    }
+  };
+
+  // Handle blur event (when the input loses focus)
+  const handleBlur = () => {
+    handleSave(); // Save when the input loses focus
   };
 
   return (
@@ -311,8 +371,24 @@ const ExpandedView = ({ appliance, onClose }) => {
       </Card>
       <Card className="flex-1 flex flex-col justify-center rounded-3xl overflow-hidden">
         <CardHeader className="flex flex-row justify-between items-center bg-[#C2E03A]">
-          <CardTitle className="text-2xl">{currentAppliance.name}</CardTitle>
-          <PencilLine className="size-6" />
+          {isEditing ? (
+            // Render an input field in edit mode
+            <Input
+              autoFocus // Automatically focus the input when it appears
+              value={editedName}
+              onChange={handleInputChange}
+              onKeyDown={handleKeyDown}
+              onBlur={handleBlur}
+              className="!text-2xl font-semibold focus-visible:ring-0 border-0 shadow-none px-0 py-0"
+            />
+          ) : (
+            // Render the CardTitle in non-edit mode
+            <CardTitle className="text-2xl">{currentAppliance.name}</CardTitle>
+          )}
+          <PencilLine
+            className="size-6 cursor-pointer"
+            onClick={handleEditClick} // Toggle edit mode on click
+          />
         </CardHeader>
         {appliance === "Light" ? (
           <div className="flex-1 flex flex-col justify-center items-center w-full relative p-4">
@@ -360,9 +436,7 @@ const ExpandedView = ({ appliance, onClose }) => {
                     ? "bg-[#C2E03A] hover:hover:bg-[#A5C32E]"
                     : "bg-[#184C85] hover:bg-[#133A65]"
                 }`}
-                onClick={() => {
-                  handleButton(currentAppliance._id);
-                }}
+                onClick={handleButton}
               >
                 <Power
                   className={`absolute top-[50%] left-[50%] -translate-x-[50%] -translate-y-[50%] !size-10 transition-opacity duration-200 invert ${
@@ -392,6 +466,7 @@ const ExpandedView = ({ appliance, onClose }) => {
                     }}
                     onValueCommit={() => {
                       modifyAppliance(currentAppliance?._id, {
+                        requester: user.username,
                         brightness: brightness,
                       });
                     }}
@@ -495,6 +570,7 @@ const ExpandedView = ({ appliance, onClose }) => {
                   temperature={currentAppliance?.temperature || 23}
                   onTemperatureChange={(newTemp) => {
                     modifyAppliance(currentAppliance?._id, {
+                      requester: user.username,
                       temperature: newTemp,
                     });
                   }}
