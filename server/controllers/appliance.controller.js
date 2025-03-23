@@ -49,13 +49,13 @@ const createAppliance = async (req, res) => {
   // Query database for home to check user permissions
   const home = await Home.findOne({ rooms: id });
   if (!home) {
-    return res.status(404).json("Could not find home.");
+    return res.status(404).json({ success: false, message: "Could not find home." });
   }
 
   // Permission check
   const validPerms = checkPermission(requester, home, "addRemoveAppliance");
   if (!validPerms) {
-    return res.status(403).json("User does not have sufficient permissions");
+    return res.status(403).json({ success: false, message: "User does not have sufficient permissions" });
   }
 
   // Add room ID to appliance object
