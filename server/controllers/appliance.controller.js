@@ -14,6 +14,7 @@ const {
   EnergyProfile,
 } = require("../models");
 
+var interval;
 // Start loop to poll home data every 10 seconds
 async function pollHome() {
   try {
@@ -21,9 +22,8 @@ async function pollHome() {
       method: "GET"
     })
 
-
     if (res.ok) {
-      const interval = setInterval(async () => {
+      interval = setInterval(async () => {
         try {
           const res = await fetch("http://localhost:9797/poll", {
             method: "GET"
@@ -42,10 +42,8 @@ async function pollHome() {
               return Object.assign(acc, { [part[0]]: part[1] })
             }, {});
 
-          // Execute automations and scheduling here.
-
-
-
+          // Return polled data
+          return(data)
           
         } catch (err) {
           console.log("Home I/O server is offline");
@@ -59,7 +57,20 @@ async function pollHome() {
   }
 }
 
-pollHome();
+const executeSchedule = async (req, res) => {
+    const { id } = req.params;
+
+    // Query db for home
+    const home = await Home.findById(id);
+    if (!home) {
+      return res.status(404).json({ success: false, message: "Could not find home." });
+    }
+
+    clearInterval(interval);
+    const homeData = await pollHome();
+
+    return res.status(200);
+}
 
 const createAppliance = async (req, res) => {
   const { id } = req.params;
@@ -1188,4 +1199,5 @@ module.exports = {
   deleteAutomation,
   disableAppliance,
   enableAppliance,
+  executeSchedule,
 };

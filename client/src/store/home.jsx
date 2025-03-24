@@ -7,6 +7,12 @@ export const useHomeStore = create(
     homes: [],
     currentHome: null,
     isLoading: false,
+    executeSchedules: async () => {
+      const res = await fetch(`server/appliances/schedules/execute/${get().currentHome._id}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+      });
+    },
     setCurrentHome: async (id) => {
       set({ isLoading: true });
       const res = await fetch(`/server/homes/${id}`);
@@ -16,6 +22,8 @@ export const useHomeStore = create(
       }
       set({ currentHome: data.data });
       set({ isLoading: false });
+
+     await get().executeSchedules();
     },
     createHome: async (homeData) => {
       set({ isLoading: true });
