@@ -118,10 +118,9 @@ const Permissions = () => {
             </div>
           </div>
         </div>
-        <div className="flex justify-center items-center"></div>
       </Card>
-      <div className="flex-1 flex flex-col gap-2 p-4">
-        <ScrollArea className="max-h-[80%]">
+      <div className="flex-1 flex flex-col gap-2">
+        <ScrollArea className="">
           <div className="flex flex-col gap-4 p-4">
             {currentHome.dwellers.map((dweller) => {
               return (

@@ -4,8 +4,9 @@ import ScrollProgress from '@/features/landing/components/ScrollProgress';
 import HeroSection from '@/features/landing/components/HeroSection';
 import FeaturesSection from '@/features/landing/components/FeaturesSection';
 import DashboardSection from '@/features/landing/components/DashboardSection';
-import CTASection from '@/features/landing/components/CTASection';
-import Footer from '@/features/landing/components/Footer';
+import InteractiveQuiz from '@/features/landing/components/InteractiveQuiz';
+import FAQSection from '@/features/landing/components/FAQSection';
+import CommunityFooter from '@/features/landing/components/CommunityFooter';
 import ScrollToTop from '@/features/landing/components/ScrollToTop';
 import { updatePageTitle } from '@/lib/utils';
 
@@ -36,8 +37,9 @@ function LandingPage() {
 			<HeroSection />
 			<FeaturesSection isVisible={true} />
 			<DashboardSection />
-			<CTASection />
-			<Footer />
+			<InteractiveQuiz />
+			<FAQSection />
+			<CommunityFooter />
 			<ScrollToTop isVisible={showScrollTop} />
 		</div>
 	);

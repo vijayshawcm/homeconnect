@@ -20,7 +20,7 @@ const WelcomeContainer = () => {
   const { user } = userAuthStore();
   const { createHome } = useHomeStore();
   const [HomeSetupStep, setHomeSetupStep] = useState(0);
-  const [userType, setuserType] = useState("homeowner");
+  const [userType, setuserType] = useState("homedweller");
   const [homeName, setHomeName] = useState("");
   const [rooms, setRooms] = useState([]);
   const [newRoom, setNewRoom] = useState({ name: "", type: "" });
@@ -55,7 +55,6 @@ const WelcomeContainer = () => {
       setNewRoom({ name: "", type: newRoom.type });
     }
   };
-
   return (
     <motion.div className="flex items-center justify-center min-h-screen bg-cover bg-center bg-gradient-to-br from-white to-sky-100">
       {HomeSetupStep === 0 ? (
@@ -174,8 +173,7 @@ const WelcomeContainer = () => {
               setHomeSetupStep(2);
             }}
           >
-            {" "}
-            Continue{" "}
+            Continue
           </Button>
         </motion.div>
       ) : userType === "homeowner" && HomeSetupStep === 2 ? (
@@ -266,7 +264,33 @@ const WelcomeContainer = () => {
           </Button>
         </motion.div>
       ) : userType === "homedweller" && HomeSetupStep === 2 ? (
-        "bruh"
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 1.5 }}
+          className="p-8 bg-white rounded-2xl shadow-xl text-center flex flex-col items-center gap-4"
+        >
+          <h2 className="text-2xl font-semibold">Let's connect to your home</h2>
+          <p className="text-gray-600">
+            Please enter your home code
+          </p>
+          <Input
+            type="text"
+            placeholder="Enter home name"
+            className="border rounded-lg p-2 w-full"
+            onChange={(e) => {
+              setHomeName(e.target.value);
+            }}
+          />
+          <Button
+            className=""
+            onClick={() => {
+              setHomeSetupStep(3);
+            }}
+          >
+            Continue
+          </Button>
+        </motion.div>
       ) : null}
     </motion.div>
   );

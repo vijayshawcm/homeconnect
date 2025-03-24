@@ -28,16 +28,19 @@ const createRoom = async (req, res) => {
   }
 
   // Verify that the home exists
-  const home = await Home.findById(room.home)
+  const home = await Home.findById(room.home);
   if (!home) {
     return res.status(404).json({ success: false, message: "Home not found" });
   }
 
-    // Permission check
-    const validPerms = checkPermission(requester, home, "modifyHome");
-    if (!validPerms) {
-      return res.status(403).json({ success: false, message: "User does not have sufficient permissions" });
-    }
+  // Permission check
+  const validPerms = checkPermission(requester, home, "modifyHome");
+  if (!validPerms) {
+    return res.status(403).json({
+      success: false,
+      message: "User does not have sufficient permissions",
+    });
+  }
 
   const newRoom = new Room(room);
 
@@ -111,37 +114,40 @@ const modifyRoom = async (req, res) => {
     return res.status(404).json("Requester not found.");
   }
 
-    // Find the room to ensure it exists
-    const dbRoom = await Room.findById(id);
-    if (!dbRoom) {
-      return res
-        .status(404)
-        .json({ success: false, message: "Room not found" });
-    }
+  // Find the room to ensure it exists
+  const dbRoom = await Room.findById(id);
+  if (!dbRoom) {
+    return res.status(404).json({ success: false, message: "Room not found" });
+  }
 
-    // Query home for permssion check
-    const home = await Home.findOne({ rooms: dbRoom._id });
-    if (!home) {
-      return res.status(404).json("Could not find home.");
-    }
+  // Query home for permssion check
+  const home = await Home.findOne({ rooms: dbRoom._id });
+  if (!home) {
+    return res.status(404).json("Could not find home.");
+  }
 
-    // Permission check
-    const validPerms = checkPermission(requester, home, "modifyHome");
-    if (!validPerms) {
-      return res.status(403).json({ success: false, message: "User does not have sufficient permissions" });
-    }
+  // Permission check
+  const validPerms = checkPermission(requester, home, "modifyHome");
+  if (!validPerms) {
+    return res.status(403).json({
+      success: false,
+      message: "User does not have sufficient permissions",
+    });
+  }
 
-    if(room.name) {
-      dbRoom.name = room.name;
-    }
+  if (room.name) {
+    dbRoom.name = room.name;
+  }
 
-    if(room.type) {
-      dbRoom.type = room.type;
-    }
+  if (room.type) {
+    dbRoom.type = room.type;
+  }
 
-    await dbRoom.save();
-    return res.status(200).json({ success: true, message: "Room updated successfully." });
-}
+  await dbRoom.save();
+  return res
+    .status(200)
+    .json({ success: true, message: "Room updated successfully." });
+};
 
 const deleteRoom = async (req, res) => {
   const { id } = req.params;
@@ -179,11 +185,15 @@ const deleteRoom = async (req, res) => {
     // Permission check
     const validPerms = checkPermission(requester, home, "modifyHome");
     if (!validPerms) {
-      return res.status(403).json({ success: false, message: "User does not have sufficient permissions" });
+      return res.status(403).json({
+        success: false,
+        message: "User does not have sufficient permissions",
+      });
     }
 
     // Delete all appliances associated with the room
-    await Appliance.deleteMany({ room: id });
+    const appliances = await Appliance.find({ room: id });
+    for (const appliance of appliances) await appliance.deleteOne();
 
     await home.updateOne({ $pull: {rooms: id}});
     
@@ -200,4 +210,10 @@ const deleteRoom = async (req, res) => {
   }
 };
 
-module.exports = { createRoom, getRoomById, getRoomsByHome, modifyRoom, deleteRoom };
+module.exports = {
+  createRoom,
+  getRoomById,
+  getRoomsByHome,
+  modifyRoom,
+  deleteRoom,
+};

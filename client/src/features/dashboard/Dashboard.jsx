@@ -19,9 +19,6 @@ export default function Dashboard() {
     if (homeless) {
       navigate("/welcome");
     }
-    if (currentHome?._id) {
-      updateHome();
-    }
   }, [currentHome?._id, updateHome]);
   return (
     <>

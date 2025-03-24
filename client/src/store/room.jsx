@@ -28,6 +28,48 @@ export const useRoomStore = create(
         console.error("Failed to update room data:", error);
       }
     },
+    renameRoom: async (body) => {
+      toast.info("Renaming room...");
+      try {
+        const res = await fetch(`/server/rooms/${body.room.id}`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(body),
+        });
+        const data = await res.json();
+        if (data.success) {
+          const homeStore = useHomeStore.getState();
+          await homeStore.updateHome();
+          toast.success("Room renamed successfully.");
+        } else {
+          toast.error("Failed to rename room, " + data.message);
+        }
+      } catch (error) {
+        toast.error("Failed to rename room.");
+        console.error("Failed to rename room:", error);
+      }
+    },
+    deleteRoom: async (body) => {
+      toast.info("Deleting room...");
+      try {
+        const res = await fetch(`/server/rooms/${body.room.id}`, {
+          method: "DELETE",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(body),
+        });
+        const data = await res.json();
+        if (data.success) {
+          const homeStore = useHomeStore.getState();
+          await homeStore.updateHome();
+          toast.success("Room deleted successfully.");
+        } else {
+          toast.error("Failed to deleted room, " + data.message);
+        }
+      } catch (error) {
+        toast.error("Failed to delete room.");
+        console.error("Failed to delete room:", error);
+      }
+    },
     addAppliance: async (body) => {
       const { currentRoom, updateRoom } = get();
       if (!currentRoom) return;
@@ -57,28 +99,30 @@ export const useRoomStore = create(
       }
     },
     removeAppliance: async (id, requester) => {
-        const { updateRoom } = get();
-        toast.info("Deleting appliance...")
-        const res = await fetch(`/server/appliances/${id}`, {
-          method: "DELETE",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ requester }),
-        });
+      const { updateRoom } = get();
+      toast.info("Deleting appliance...");
+      const res = await fetch(`/server/appliances/${id}`, {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ requester }),
+      });
 
-        if(res.ok) {
-          toast.success("Appliance deleted successfully.");
-        } else {
-          toast.error("Something went wrong while trying to delete appliance, please try again");
-        }
+      if (res.ok) {
+        toast.success("Appliance deleted successfully.");
+      } else {
+        toast.error(
+          "Something went wrong while trying to delete appliance, please try again"
+        );
+      }
 
-        await updateRoom();
+      await updateRoom();
 
-        return res;
+      return res;
     },
     turnOnAll: async (body) => {
       const { currentRoom, updateRoom } = get();
       if (!currentRoom) return;
-      console.log(body.type)
+      console.log(body.type);
 
       toast.info("Turning on appliances...");
       try {
@@ -146,11 +190,11 @@ export const useRoomStore = create(
         });
 
         const res = await appliance.json();
-        
-        if(res.success) {
+
+        if (res.success) {
           toast.info("Appliance turned on successfully.");
         } else {
-          toast.error("Appliance could not be turned on, " + res.message)
+          toast.error("Appliance could not be turned on, " + res.message);
         }
 
         await updateRoom();
@@ -169,11 +213,11 @@ export const useRoomStore = create(
         });
 
         const res = await appliance.json();
-        
-        if(res.success) {
+
+        if (res.success) {
           toast.info("Appliance turned off successfully.");
         } else {
-          toast.error("Appliance could not be turned off, " + res.message)
+          toast.error("Appliance could not be turned off, " + res.message);
         }
 
         await updateRoom();
