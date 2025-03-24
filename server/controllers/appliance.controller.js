@@ -770,22 +770,37 @@ const turnOnAppliance = async (req, res) => {
     }
 
     if (appliance.status === "off") {
-      if (appliance.interface[0]) {
-        // Home I/O Appliance logic
-        const response = await fetch(appliance.interface[0], {
-          method: "GET",
-          headers: { "Content-Type": "application/json" },
-        });
+      if (appliance.interface) {
+        var link = "";
+        const interface = appliance.interface;
 
-        if (response.ok) {
-          appliance.status = "on";
-          await appliance.save();
-        } else {
-          return res.status(500).json({
-            success: false,
-            message: "Home I/O has encountered an error.",
-          });
+        // Home I/O Appliance logic
+        if(appliance.applianceType == "Light") {
+          link = `http://localhost:9797/swl/turn_on/${interface.slice(1) || 1}/${interface.slice(0, 1)}`
+        } else if(appliance.applianceType == "AirConditioner") {
+          link = `http://localhost:9797/swh/turn_on/${interface.slice(1) || 1}/${interface.slice(0, 1)}`
         }
+
+        console.log(link);
+        if(link) {
+          const response = await fetch(link, {
+            method: "GET",
+            headers: { "Content-Type": "application/json" },
+          });
+  
+          if (response.ok) {
+            appliance.status = "on";
+            await appliance.save();
+          } else {
+            return res.status(500).json({
+              success: false,
+              message: "Home I/O has encountered an error.",
+            });
+          }
+        }
+
+        appliance.status = "on";
+        await appliance.save();
       } else {
         if (appliance.energyProfile) {
           appliance.energyProfile.currentUsage =
@@ -854,22 +869,37 @@ const turnOffAppliance = async (req, res) => {
     }
 
     if (appliance.status === "on") {
-      // Home I/O Appliance logic
-      if (appliance.interface[1]) {
-        const response = await fetch(appliance.interface[1], {
-          method: "GET",
-          headers: { "Content-Type": "application/json" },
-        });
+      if (appliance.interface) {
+        var link = "";
+        const interface = appliance.interface;
 
-        if (response.ok) {
-          appliance.status = "off";
-          await appliance.save();
-        } else {
-          return res.status(500).json({
-            success: false,
-            message: "Home I/O has encountered an error.",
-          });
+        // Home I/O Appliance logic
+        if(appliance.applianceType == "Light") {
+          link = `http://localhost:9797/swl/turn_off/${interface.slice(1) || 1}/${interface.slice(0, 1)}`
+        } else if(appliance.applianceType == "AirConditioner") {
+          link = `http://localhost:9797/swh/turn_off/${interface.slice(1) || 1}/${interface.slice(0, 1)}`
         }
+
+        console.log(link);
+        if(link) {
+          const response = await fetch(link, {
+            method: "GET",
+            headers: { "Content-Type": "application/json" },
+          });
+  
+          if (response.ok) {
+            appliance.status = "on";
+            await appliance.save();
+          } else {
+            return res.status(500).json({
+              success: false,
+              message: "Home I/O has encountered an error.",
+            });
+          }
+        }
+
+        appliance.status = "off";
+        await appliance.save();
       } else {
         if (appliance.energyProfile) {
           appliance.energyProfile.currentUsage = 0;
