@@ -114,7 +114,6 @@ const ExpandedView = ({ appliance, onClose }) => {
       setCurrentAppliance(stats.appliances[0]);
     }
   }, [appliance, currentRoom, currentAppliance, getApplianceStats]);
-
   // Handle Carousel scroll events
   useEffect(() => {
     if (!lightCarouselApi) return;
@@ -251,7 +250,7 @@ const ExpandedView = ({ appliance, onClose }) => {
     }
 
     setIsAddExpanded(false);
-    
+
     if (applianceInterfaceAdd) {
       // Add the new appliance to the room
       await addAppliance({
@@ -259,8 +258,8 @@ const ExpandedView = ({ appliance, onClose }) => {
         appliance: {
           applianceType: currentAppliance.applianceType,
           name: applianceNameAdd,
-          interface: applianceInterfaceAdd
-        }
+          interface: applianceInterfaceAdd,
+        },
       });
     } else {
       // Add the new appliance to the room
@@ -269,13 +268,13 @@ const ExpandedView = ({ appliance, onClose }) => {
         appliance: {
           applianceType: currentAppliance.applianceType,
           name: applianceNameAdd,
-        }
+        },
       });
     }
 
     // Reset form fields and close the Popover
     setApplianceNameAdd("");
-    setApplianceInterfaceAdd("")
+    setApplianceInterfaceAdd("");
   };
 
   // Function to handle delete appliance
@@ -283,7 +282,7 @@ const ExpandedView = ({ appliance, onClose }) => {
     // Delete appliance in database
     await removeAppliance(currentAppliance._id, user.username);
 
-    if(initialStats.appliances.length != 0) {
+    if (initialStats.appliances.length != 0) {
       setCurrentAppliance(initialStats.appliances[0]);
     } else {
       // Handle case where no appliance
@@ -297,7 +296,7 @@ const ExpandedView = ({ appliance, onClose }) => {
   };
 
   const [isEditing, setIsEditing] = useState(false); // State to track edit mode
-  const [editedName, setEditedName] = useState(currentAppliance.name); // State to store edited name
+  const [editedName, setEditedName] = useState(currentAppliance?.name || ""); // State to store edited name
   // Handle click on the PencilLine icon
   const handleEditClick = () => {
     setIsEditing(true); // Enter edit mode
@@ -443,11 +442,15 @@ const ExpandedView = ({ appliance, onClose }) => {
 
                         {/* Appliance Id Input */}
                         <div>
-                          <Label htmlFor="applianceId">Appliance Identifier (optional)</Label>
+                          <Label htmlFor="applianceId">
+                            Appliance Identifier (optional)
+                          </Label>
                           <Input
                             id="applianceId"
                             value={applianceInterfaceAdd}
-                            onChange={(e) => setApplianceInterfaceAdd(e.target.value)}
+                            onChange={(e) =>
+                              setApplianceInterfaceAdd(e.target.value)
+                            }
                             placeholder="Enter appliance identifier"
                           />
                         </div>
@@ -491,270 +494,320 @@ const ExpandedView = ({ appliance, onClose }) => {
         </div>
       </Card>
       <Card className="flex-1 flex flex-col justify-center rounded-3xl overflow-hidden">
-        <CardHeader className="flex flex-row justify-between items-center bg-[#C2E03A]">
-          {isEditing ? (
-            // Render an input field in edit mode
-            <Input
-              autoFocus // Automatically focus the input when it appears
-              value={editedName}
-              onChange={handleInputChange}
-              onKeyDown={handleKeyDown}
-              onBlur={handleBlur}
-              className="!text-2xl font-semibold focus-visible:ring-0 border-0 shadow-none px-0 py-0"
-            />
-          ) : (
-            // Render the CardTitle in non-edit mode
-            <CardTitle className="text-2xl">{currentAppliance.name}</CardTitle>
-          )}
-          <PencilLine
-            className="size-6 cursor-pointer"
-            onClick={handleEditClick} // Toggle edit mode on click
-          />
-        </CardHeader>
-        {appliance === "Light" ? (
-          <div className="flex-1 flex flex-col justify-center items-center w-full relative p-4">
-            <div className="flex-1 w-full flex justify-center items-center">
-              <div className="xl:w-[30%]">
-                <Carousel
-                  orientation="vertical"
-                  className="w-full"
-                  setApi={setLightCarouselApi}
-                >
-                  <CarouselContent className="h-[150px]">
-                    {lightModes.map(({ display, value }) => (
-                      <CarouselItem
-                        key={value}
-                        className="flex items-center justify-center"
-                      >
-                        <div className="text-2xl font-semibold">{display}</div>
-                      </CarouselItem>
-                    ))}
-                  </CarouselContent>
-                  <CarouselPrevious className="absolute top-2 left-1/2 transform -translate-x-1/2" />
-                  <CarouselNext className="absolute bottom-2 left-1/2 transform -translate-x-1/2" />
-                </Carousel>
-              </div>
-              <div className="relative flex-1 h-full">
-                <img
-                  src="src/assets/light.svg"
-                  className="absolute aspect-auto w-[20%] md:w-[30%] max-w-32 md:max-w-max xl:w-[40%] md:top-[20%] xl:top-[5%] xl:right-[40%] right-[20%] z-10"
-                ></img>
-                <motion.div
-                  className="absolute bg-[#fffb18] xl:size-[30%] size-24 blur-2xl xl:right-[45%] xl:top-[60%] right-[27%] bottom-[0%] -z-0"
-                  animate={{
-                    scale: brightness / 100 + 0.5,
-                    opacity: currentAppliance?.status === "on" ? 1 : 0,
-                  }} // Adjust scale dynamically
-                  transition={{ duration: 0.2 }}
-                ></motion.div>
-              </div>
-            </div>
-            <div className="w-full h-[25%] flex justify-center items-center gap-10">
-              <Button
-                className={`xl:size-16 size-14 rounded-full relative p-0 ${
-                  currentAppliance?.status === "on"
-                    ? "bg-[#C2E03A] hover:hover:bg-[#A5C32E]"
-                    : "bg-[#184C85] hover:bg-[#133A65]"
-                }`}
-                onClick={handleButton}
+        {currentAppliance == null ? (
+          <div className="flex-1 flex flex-col justify-center items-center text-center p-6 max-w-md mx-auto">
+            <div className="text-gray-500 mb-4">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-12 w-12 mx-auto"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
               >
-                <Power
-                  className={`absolute top-[50%] left-[50%] -translate-x-[50%] -translate-y-[50%] !size-10 transition-opacity duration-200 invert ${
-                    currentAppliance?.status === "on"
-                      ? "opacity-1"
-                      : "opacity-0"
-                  }`}
-                ></Power>
-                <PowerOff
-                  className={`absolute top-[50%] left-[50%] -translate-x-[50%] -translate-y-[50%] !size-10 transition-opacity duration-200 ${
-                    currentAppliance?.status === "off"
-                      ? "opacity-1"
-                      : "opacity-0"
-                  }`}
-                ></PowerOff>
-              </Button>
-              <div className="flex-1 flex items-center gap-4">
-                <SunDim className="size-12" />
-                <div className="flex-1">
-                  <Slider
-                    defaultValue={[brightness]}
-                    value={[brightness]} // Controlled value
-                    max={10}
-                    step={1}
-                    onValueChange={(value) => {
-                      setBrightness((value[0] % 10) + 1);
-                    }}
-                    onValueCommit={() => {
-                      modifyAppliance(currentAppliance?._id, {
-                        requester: user.username,
-                        brightness: brightness,
-                      });
-                    }}
-                  />
-                </div>
-                <Sun className="size-12" />
-              </div>
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={1.5}
+                  d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                />
+              </svg>
+            </div>
+            <h3 className="text-lg font-medium text-gray-700 mb-2">
+              No {appliance}s in {currentRoom.name}
+            </h3>
+            <p className="text-gray-500 mb-4">
+              You haven't added any {appliance.toLowerCase()}s to this room yet.
+            </p>
+            <div className="text-sm text-gray-400">
+              <p>
+                Click the{" "}
+                <span className="font-medium text-indigo-500 inline-block">
+                  <Settings />
+                </span>{" "}
+                on the left
+              </p>
+              <p>
+                to add your first {appliance.toLowerCase()} to{" "}
+                {currentRoom.name}.
+              </p>
             </div>
           </div>
-        ) : appliance === "AirConditioner" ? (
-          <div className="flex-1 flex flex-col justify-center items-center w-full relative gap-6">
-            <div className="flex-1 w-full flex justify-center items-start">
-              <div className="xl:w-[30%] h-full flex justify-center items-center">
-                <Carousel
-                  orientation="vertical"
-                  className="w-full"
-                  setApi={setAirConCarouselApi}
-                >
-                  <CarouselContent className="h-[200px]">
-                    {airConModes.map(({ display, value }) => (
-                      <CarouselItem
-                        key={value}
-                        className="flex items-center justify-center"
-                      >
-                        <div className="text-2xl font-semibold">{display}</div>
-                      </CarouselItem>
-                    ))}
-                  </CarouselContent>
-                  <CarouselPrevious className="absolute top-2 left-1/2 transform -translate-x-1/2" />
-                  <CarouselNext className="absolute bottom-2 left-1/2 transform -translate-x-1/2" />
-                </Carousel>
-              </div>
-              <div className="relative flex-1 h-full">
-                <img
-                  src="src/assets/airCon.svg"
-                  className="absolute aspect-auto w-[70%] top-[10%] right-[10%] z-10"
-                ></img>
-                <motion.div
-                  className="absolute bg-[#BFE6FF] size-[70%] blur-2xl right-[10%] top-[40%] -z-0"
-                  animate={{
-                    scale: brightness / 100 + 0.5,
-                    opacity: currentAppliance?.status === "on" ? 1 : 0,
-                  }} // Adjust scale dynamically
-                  transition={{ duration: 0.2 }}
-                ></motion.div>
-              </div>
-            </div>
-            <div className="w-full h-[50%] flex justify-center items-center gap-10">
-              <div className="flex flex-col justify-center items-center gap-4 w-[50%]">
-                <Button
-                  className={`size-14 rounded-full relative p-0 ${
-                    currentAppliance?.status === "on"
-                      ? "bg-[#C2E03A] hover:hover:bg-[#A5C32E]"
-                      : "bg-[#184C85] hover:bg-[#133A65]"
-                  }`}
-                  onClick={() => {
-                    handleButton(currentAppliance._id);
-                  }}
-                >
-                  <Power
-                    className={`absolute top-[50%] left-[50%] -translate-x-[50%] -translate-y-[50%] !size-8 transition-opacity duration-200 invert ${
-                      currentAppliance?.status === "on"
-                        ? "opacity-1"
-                        : "opacity-0"
-                    }`}
-                  ></Power>
-                  <PowerOff
-                    className={`absolute top-[50%] left-[50%] -translate-x-[50%] -translate-y-[50%] !size-8 transition-opacity duration-200 ${
-                      currentAppliance?.status === "off"
-                        ? "opacity-1"
-                        : "opacity-0"
-                    }`}
-                  ></PowerOff>
-                </Button>
-                <div className="flex gap-4">
-                  <Card
-                    className={`py-2 px-6 flex flex-col justify-center transition-all duration-200 items-center cursor-pointer ${
-                      currentAppliance?.swing === true
-                        ? "bg-[#C2E03A] hover:hover:bg-[#A5C32E] scale-105"
-                        : "border-4 border-[#184C85]"
-                    }`}
-                    onClick={handleSwingClick}
-                  >
-                    <TbAirConditioning className="size-8" />
-                    <div className="">Swing</div>
-                  </Card>
-                  <Card
-                    className={`py-2 px-6 flex flex-col justify-center items-center                     ${
+        ) : (
+          <>
+            <CardHeader className="flex flex-row justify-between items-center bg-[#C2E03A]">
+              {isEditing ? (
+                // Render an input field in edit mode
+                <Input
+                  autoFocus // Automatically focus the input when it appears
+                  value={editedName}
+                  onChange={handleInputChange}
+                  onKeyDown={handleKeyDown}
+                  onBlur={handleBlur}
+                  className="!text-2xl font-semibold focus-visible:ring-0 border-0 shadow-none px-0 py-0"
+                />
+              ) : (
+                // Render the CardTitle in non-edit mode
+                <CardTitle className="text-2xl">
+                  {currentAppliance?.name || ""}
+                </CardTitle>
+              )}
+              <PencilLine
+                className="size-6 cursor-pointer"
+                onClick={handleEditClick} // Toggle edit mode on click
+              />
+            </CardHeader>
+            {appliance === "Light" ? (
+              <div className="flex-1 flex flex-col justify-center items-center w-full relative p-4">
+                <div className="flex-1 w-full flex justify-center items-center">
+                  <div className="xl:w-[30%]">
+                    <Carousel
+                      orientation="vertical"
+                      className="w-full"
+                      setApi={setLightCarouselApi}
+                    >
+                      <CarouselContent className="h-[150px]">
+                        {lightModes.map(({ display, value }) => (
+                          <CarouselItem
+                            key={value}
+                            className="flex items-center justify-center"
+                          >
+                            <div className="text-2xl font-semibold">
+                              {display}
+                            </div>
+                          </CarouselItem>
+                        ))}
+                      </CarouselContent>
+                      <CarouselPrevious className="absolute top-2 left-1/2 transform -translate-x-1/2" />
+                      <CarouselNext className="absolute bottom-2 left-1/2 transform -translate-x-1/2" />
+                    </Carousel>
+                  </div>
+                  <div className="relative flex-1 h-full">
+                    <img
+                      src="src/assets/light.svg"
+                      className="absolute aspect-auto w-[20%] md:w-[30%] max-w-32 md:max-w-max xl:w-[40%] md:top-[20%] xl:top-[5%] xl:right-[40%] right-[20%] z-10"
+                    ></img>
+                    <motion.div
+                      className="absolute bg-[#fffb18] xl:size-[30%] size-24 blur-2xl xl:right-[45%] xl:top-[60%] right-[27%] bottom-[0%] -z-0"
+                      animate={{
+                        scale: brightness / 100 + 0.5,
+                        opacity: currentAppliance?.status === "on" ? 1 : 0,
+                      }} // Adjust scale dynamically
+                      transition={{ duration: 0.2 }}
+                    ></motion.div>
+                  </div>
+                </div>
+                <div className="w-full h-[25%] flex justify-center items-center gap-10">
+                  <Button
+                    className={`xl:size-16 size-14 rounded-full relative p-0 ${
                       currentAppliance?.status === "on"
                         ? "bg-[#C2E03A] hover:hover:bg-[#A5C32E]"
                         : "bg-[#184C85] hover:bg-[#133A65]"
                     }`}
+                    onClick={handleButton}
                   >
-                    <Timer />
-                    <div>Timer</div>
-                  </Card>
+                    <Power
+                      className={`absolute top-[50%] left-[50%] -translate-x-[50%] -translate-y-[50%] !size-10 transition-opacity duration-200 invert ${
+                        currentAppliance?.status === "on"
+                          ? "opacity-1"
+                          : "opacity-0"
+                      }`}
+                    ></Power>
+                    <PowerOff
+                      className={`absolute top-[50%] left-[50%] -translate-x-[50%] -translate-y-[50%] !size-10 transition-opacity duration-200 ${
+                        currentAppliance?.status === "off"
+                          ? "opacity-1"
+                          : "opacity-0"
+                      }`}
+                    ></PowerOff>
+                  </Button>
+                  <div className="flex-1 flex items-center gap-4">
+                    <SunDim className="size-12" />
+                    <div className="flex-1">
+                      <Slider
+                        defaultValue={[brightness]}
+                        value={[brightness]} // Controlled value
+                        max={10}
+                        step={1}
+                        onValueChange={(value) => {
+                          setBrightness((value[0] % 10) + 1);
+                        }}
+                        onValueCommit={() => {
+                          modifyAppliance(currentAppliance?._id, {
+                            requester: user.username,
+                            brightness: brightness,
+                          });
+                        }}
+                      />
+                    </div>
+                    <Sun className="size-12" />
+                  </div>
                 </div>
               </div>
-              <div className="flex-1 flex justify-end">
-                <Thermostat
-                  temperature={currentAppliance?.temperature || 23}
-                  onTemperatureChange={(newTemp) => {
-                    modifyAppliance(currentAppliance?._id, {
-                      requester: user.username,
-                      temperature: newTemp,
-                    });
-                  }}
-                />
-              </div>
-            </div>
-          </div>
-        ) : appliance === "Fan" ? (
-          <div className="flex-1 flex flex-col justify-center items-center w-full relative p-4">
-            <div className="flex-1 w-full flex justify-center items-center">
-              <div className="xl:w-[30%]">
-                <Carousel
-                  orientation="vertical"
-                  className="w-full"
-                  setApi={setFanCarouselApi}
-                >
-                  <CarouselContent className="h-[150px]">
-                    {fanModes.map(({ display, value }) => (
-                      <CarouselItem
-                        key={value}
-                        className="flex items-center justify-center"
+            ) : appliance === "AirConditioner" ? (
+              <div className="flex-1 flex flex-col justify-center items-center w-full relative gap-6">
+                <div className="flex-1 w-full flex justify-center items-start">
+                  <div className="xl:w-[30%] h-full flex justify-center items-center">
+                    <Carousel
+                      orientation="vertical"
+                      className="w-full"
+                      setApi={setAirConCarouselApi}
+                    >
+                      <CarouselContent className="h-[200px]">
+                        {airConModes.map(({ display, value }) => (
+                          <CarouselItem
+                            key={value}
+                            className="flex items-center justify-center"
+                          >
+                            <div className="text-2xl font-semibold">
+                              {display}
+                            </div>
+                          </CarouselItem>
+                        ))}
+                      </CarouselContent>
+                      <CarouselPrevious className="absolute top-2 left-1/2 transform -translate-x-1/2" />
+                      <CarouselNext className="absolute bottom-2 left-1/2 transform -translate-x-1/2" />
+                    </Carousel>
+                  </div>
+                  <div className="relative flex-1 h-full">
+                    <img
+                      src="src/assets/airCon.svg"
+                      className="absolute aspect-auto w-[70%] top-[10%] right-[10%] z-10"
+                    ></img>
+                    <motion.div
+                      className="absolute bg-[#BFE6FF] size-[70%] blur-2xl right-[10%] top-[40%] -z-0"
+                      animate={{
+                        scale: brightness / 100 + 0.5,
+                        opacity: currentAppliance?.status === "on" ? 1 : 0,
+                      }} // Adjust scale dynamically
+                      transition={{ duration: 0.2 }}
+                    ></motion.div>
+                  </div>
+                </div>
+                <div className="w-full h-[50%] flex justify-center items-center gap-10">
+                  <div className="flex flex-col justify-center items-center gap-4 w-[50%]">
+                    <Button
+                      className={`size-14 rounded-full relative p-0 ${
+                        currentAppliance?.status === "on"
+                          ? "bg-[#C2E03A] hover:hover:bg-[#A5C32E]"
+                          : "bg-[#184C85] hover:bg-[#133A65]"
+                      }`}
+                      onClick={() => {
+                        handleButton(currentAppliance._id);
+                      }}
+                    >
+                      <Power
+                        className={`absolute top-[50%] left-[50%] -translate-x-[50%] -translate-y-[50%] !size-8 transition-opacity duration-200 invert ${
+                          currentAppliance?.status === "on"
+                            ? "opacity-1"
+                            : "opacity-0"
+                        }`}
+                      ></Power>
+                      <PowerOff
+                        className={`absolute top-[50%] left-[50%] -translate-x-[50%] -translate-y-[50%] !size-8 transition-opacity duration-200 ${
+                          currentAppliance?.status === "off"
+                            ? "opacity-1"
+                            : "opacity-0"
+                        }`}
+                      ></PowerOff>
+                    </Button>
+                    <div className="flex gap-4">
+                      <Card
+                        className={`py-2 px-6 flex flex-col justify-center transition-all duration-200 items-center cursor-pointer ${
+                          currentAppliance?.swing === true
+                            ? "bg-[#C2E03A] hover:hover:bg-[#A5C32E] scale-105"
+                            : "border-4 border-[#184C85]"
+                        }`}
+                        onClick={handleSwingClick}
                       >
-                        <div className="text-2xl font-semibold">{display}</div>
-                      </CarouselItem>
-                    ))}
-                  </CarouselContent>
-                  <CarouselPrevious className="absolute top-2 left-1/2 transform -translate-x-1/2" />
-                  <CarouselNext className="absolute bottom-2 left-1/2 transform -translate-x-1/2" />
-                </Carousel>
+                        <TbAirConditioning className="size-8" />
+                        <div className="">Swing</div>
+                      </Card>
+                      <Card
+                        className={`py-2 px-6 flex flex-col justify-center items-center                     ${
+                          currentAppliance?.status === "on"
+                            ? "bg-[#C2E03A] hover:hover:bg-[#A5C32E]"
+                            : "bg-[#184C85] hover:bg-[#133A65]"
+                        }`}
+                      >
+                        <Timer />
+                        <div>Timer</div>
+                      </Card>
+                    </div>
+                  </div>
+                  <div className="flex-1 flex justify-end">
+                    <Thermostat
+                      temperature={currentAppliance?.temperature || 23}
+                      onTemperatureChange={(newTemp) => {
+                        modifyAppliance(currentAppliance?._id, {
+                          requester: user.username,
+                          temperature: newTemp,
+                        });
+                      }}
+                    />
+                  </div>
+                </div>
               </div>
-              <div className="relative flex-1 h-full">
-                <img
-                  src="src/assets/fan.svg"
-                  className="absolute aspect-auto w-[20%] md:w-[30%] max-w-32 md:max-w-max xl:w-[60%] md:top-[20%] xl:top-[5%] right-[20%] z-10"
-                ></img>
+            ) : appliance === "Fan" ? (
+              <div className="flex-1 flex flex-col justify-center items-center w-full relative p-4">
+                <div className="flex-1 w-full flex justify-center items-center">
+                  <div className="xl:w-[30%]">
+                    <Carousel
+                      orientation="vertical"
+                      className="w-full"
+                      setApi={setFanCarouselApi}
+                    >
+                      <CarouselContent className="h-[150px]">
+                        {fanModes.map(({ display, value }) => (
+                          <CarouselItem
+                            key={value}
+                            className="flex items-center justify-center"
+                          >
+                            <div className="text-2xl font-semibold">
+                              {display}
+                            </div>
+                          </CarouselItem>
+                        ))}
+                      </CarouselContent>
+                      <CarouselPrevious className="absolute top-2 left-1/2 transform -translate-x-1/2" />
+                      <CarouselNext className="absolute bottom-2 left-1/2 transform -translate-x-1/2" />
+                    </Carousel>
+                  </div>
+                  <div className="relative flex-1 h-full">
+                    <img
+                      src="src/assets/fan.svg"
+                      className="absolute aspect-auto w-[20%] md:w-[30%] max-w-32 md:max-w-max xl:w-[60%] md:top-[20%] xl:top-[5%] right-[20%] z-10"
+                    ></img>
+                  </div>
+                </div>
+                <div className="w-full h-[25%] flex justify-center items-center gap-10">
+                  <Button
+                    className={`xl:size-16 size-14 rounded-full relative p-0 ${
+                      currentAppliance?.status === "on"
+                        ? "bg-[#C2E03A] hover:hover:bg-[#A5C32E]"
+                        : "bg-[#184C85] hover:bg-[#133A65]"
+                    }`}
+                    onClick={handleButton}
+                  >
+                    <Power
+                      className={`absolute top-[50%] left-[50%] -translate-x-[50%] -translate-y-[50%] !size-10 transition-opacity duration-200 invert ${
+                        currentAppliance?.status === "on"
+                          ? "opacity-1"
+                          : "opacity-0"
+                      }`}
+                    ></Power>
+                    <PowerOff
+                      className={`absolute top-[50%] left-[50%] -translate-x-[50%] -translate-y-[50%] !size-10 transition-opacity duration-200 ${
+                        currentAppliance?.status === "off"
+                          ? "opacity-1"
+                          : "opacity-0"
+                      }`}
+                    ></PowerOff>
+                  </Button>
+                </div>
               </div>
-            </div>
-            <div className="w-full h-[25%] flex justify-center items-center gap-10">
-              <Button
-                className={`xl:size-16 size-14 rounded-full relative p-0 ${
-                  currentAppliance?.status === "on"
-                    ? "bg-[#C2E03A] hover:hover:bg-[#A5C32E]"
-                    : "bg-[#184C85] hover:bg-[#133A65]"
-                }`}
-                onClick={handleButton}
-              >
-                <Power
-                  className={`absolute top-[50%] left-[50%] -translate-x-[50%] -translate-y-[50%] !size-10 transition-opacity duration-200 invert ${
-                    currentAppliance?.status === "on"
-                      ? "opacity-1"
-                      : "opacity-0"
-                  }`}
-                ></Power>
-                <PowerOff
-                  className={`absolute top-[50%] left-[50%] -translate-x-[50%] -translate-y-[50%] !size-10 transition-opacity duration-200 ${
-                    currentAppliance?.status === "off"
-                      ? "opacity-1"
-                      : "opacity-0"
-                  }`}
-                ></PowerOff>
-              </Button>
-            </div>
-          </div>
-        ) : null}
+            ) : null}
+          </>
+        )}
       </Card>
     </div>
   );
