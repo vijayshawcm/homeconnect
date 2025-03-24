@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/dialog";
 import { Switch } from "@/components/ui/switch";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import addDweller from "../../assets/addDweller.svg";
 
 const Permissions = () => {
   const { currentHome, updateHome } = useHomeStore();
@@ -76,7 +77,7 @@ const Permissions = () => {
 
       if (response.ok) {
         updateHome(); // Refresh home data to reflect changes
-        } else {
+      } else {
         console.error("Failed to update permissions:", await response.text());
       }
     } catch (error) {
@@ -115,8 +116,8 @@ const Permissions = () => {
         </div>
         <div className="flex justify-center items-center"></div>
       </Card>
-      <div className="flex-1">
-        <ScrollArea className="">
+      <div className="flex-1 flex flex-col gap-2 p-4">
+        <ScrollArea className="max-h-[80%]">
           <div className="flex flex-col gap-4 p-4">
             {currentHome.dwellers.map((dweller) => {
               return (
@@ -168,6 +169,13 @@ const Permissions = () => {
             })}
           </div>
         </ScrollArea>
+        <Card className="flex justify-center items-center p-4 cursor-pointer" onClick = {() => {
+          
+        }}>
+          <Avatar className="size-24 sm:size-24 xl:size-28" key={user.fullName}>
+            <AvatarImage src={addDweller}></AvatarImage>
+          </Avatar>
+        </Card>
       </div>
     </div>
   );
