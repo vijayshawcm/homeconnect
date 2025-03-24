@@ -28,6 +28,29 @@ export const useRoomStore = create(
         console.error("Failed to update room data:", error);
       }
     },
+    renameRoom: async (body) => {
+      const { currentRoom } = get();
+      if (!currentRoom) return;
+      toast.info("Renaming room...");
+      try {
+        const res = await fetch(`/server/rooms/${body.room.id}`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(body),
+        });
+        const data = await res.json();
+        if (data.success) {
+          const homeStore = useHomeStore.getState();
+          await homeStore.updateHome();
+          toast.success("Room renamed successfully.");
+        } else {
+          toast.error("Failed to rename room, " + data.message);
+        }
+      } catch (error) {
+        toast.error("Failed to rename room.");
+        console.error("Failed to rename room:", error);
+      }
+    },
     addAppliance: async (body) => {
       const { currentRoom, updateRoom } = get();
       if (!currentRoom) return;

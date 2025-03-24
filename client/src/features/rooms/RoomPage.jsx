@@ -82,7 +82,6 @@ const RoomPage = () => {
           },
         ];
         setChartData(chartData);
-        console.log(currentRoom);
       } catch (error) {
         console.error("Failed to fetch usage data:", error);
         return []; // Return an empty array if there's an error
