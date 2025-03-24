@@ -26,7 +26,7 @@ import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Settings, Plus, Trash, X } from "lucide-react"; // Import icons
 import { userAuthStore } from "@/store/userAuth";
 import { Input } from "@/components/ui/input";
-import { toast } from 'sonner';
+import { toast } from "sonner";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 const ExpandedView = ({ appliance, onClose }) => {
@@ -48,6 +48,7 @@ const ExpandedView = ({ appliance, onClose }) => {
   const [isSettingsExpanded, setIsSettingsExpanded] = useState(false);
   const [isAddExpanded, setIsAddExpanded] = useState(false);
   const [applianceNameAdd, setApplianceNameAdd] = useState(""); // State for appliance name
+  const [applianceInterfaceAdd, setApplianceInterfaceAdd] = useState("");
 
   const getApplianceStats = useCallback(
     (type) => {
@@ -249,25 +250,45 @@ const ExpandedView = ({ appliance, onClose }) => {
       return;
     }
 
-    // Add the new appliance to the room
-    await addAppliance({
-      requester: user.username,
-      appliance: {
-        applianceType: currentAppliance.applianceType,
-        name: applianceNameAdd,
-      }
-    });
+    setIsAddExpanded(false);
+    
+    if (applianceInterfaceAdd) {
+      // Add the new appliance to the room
+      await addAppliance({
+        requester: user.username,
+        appliance: {
+          applianceType: currentAppliance.applianceType,
+          name: applianceNameAdd,
+          interface: applianceInterfaceAdd
+        }
+      });
+    } else {
+      // Add the new appliance to the room
+      await addAppliance({
+        requester: user.username,
+        appliance: {
+          applianceType: currentAppliance.applianceType,
+          name: applianceNameAdd,
+        }
+      });
+    }
 
     // Reset form fields and close the Popover
-    setApplianceType("");
-    setApplianceName("");
+    setApplianceNameAdd("");
+    setApplianceInterfaceAdd("")
   };
 
   // Function to handle delete appliance
   const handleDeleteAppliance = async () => {
     // Delete appliance in database
-    toast.info("Deleting appliance...")
     await removeAppliance(currentAppliance._id, user.username);
+
+    if(initialStats.appliances.length != 0) {
+      setCurrentAppliance(initialStats.appliances[0]);
+    } else {
+      // Handle case where no appliance
+      setCurrentAppliance(null);
+    }
   };
 
   // Function to handle close expanded menu
@@ -393,13 +414,15 @@ const ExpandedView = ({ appliance, onClose }) => {
                   </Button>
                   <Dialog open={isAddExpanded} onOpenChange={setIsAddExpanded}>
                     <DialogContent className="w-80 p-4 bg-white rounded-lg shadow-lg">
-                      <h3 className="font-semibold text-lg mb-4">Add New Appliance</h3>
+                      <h3 className="font-semibold text-lg mb-4">
+                        Add New Appliance
+                      </h3>
                       <div className="space-y-4">
                         {/* Appliance Type Dropdown */}
                         <div>
                           <Label htmlFor="applianceType">Appliance Type</Label>
                           <Input
-                            id="applianceName"
+                            id="applianceType"
                             placeholder={currentAppliance.applianceType}
                             disabled
                           />
@@ -411,8 +434,21 @@ const ExpandedView = ({ appliance, onClose }) => {
                           <Input
                             id="applianceName"
                             value={applianceNameAdd}
-                            onChange={(e) => setApplianceNameAdd(e.target.value)}
+                            onChange={(e) =>
+                              setApplianceNameAdd(e.target.value)
+                            }
                             placeholder="Enter appliance name"
+                          />
+                        </div>
+
+                        {/* Appliance Id Input */}
+                        <div>
+                          <Label htmlFor="applianceId">Appliance Identifier (optional)</Label>
+                          <Input
+                            id="applianceId"
+                            value={applianceInterfaceAdd}
+                            onChange={(e) => setApplianceInterfaceAdd(e.target.value)}
+                            placeholder="Enter appliance identifier"
                           />
                         </div>
 
@@ -543,10 +579,10 @@ const ExpandedView = ({ appliance, onClose }) => {
                   <Slider
                     defaultValue={[brightness]}
                     value={[brightness]} // Controlled value
-                    max={100}
+                    max={10}
                     step={1}
                     onValueChange={(value) => {
-                      setBrightness(value[0]);
+                      setBrightness((value[0] % 10) + 1);
                     }}
                     onValueCommit={() => {
                       modifyAppliance(currentAppliance?._id, {

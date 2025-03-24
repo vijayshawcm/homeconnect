@@ -22,15 +22,19 @@ const Permissions = () => {
   const permsSettings = [
     {
       value: "addRemoveDweller",
-      description: "Add and Remove dwellers",
+      description: "Add and remove dwellers",
     },
     {
       value: "modifyDweller",
       description: "Modify other dweller permissions",
     },
     {
+      value:"addRemoveAppliance",
+      description: "Add and remove appliances",
+    },
+    {
       value: "onOffAppliance",
-      description: "Turn on/off appliances",
+      description: "Turn appliances on and off",
     },
     {
       value: "adjustAppliance",
@@ -42,7 +46,7 @@ const Permissions = () => {
     },
     {
       value: "enableDisableAppliance",
-      description: "Enable/Disable appliances",
+      description: "Enable and disable appliances",
     },
     {
       value: "modifyHome",
