@@ -33,7 +33,6 @@ const RoomScrollArea = ({ rooms }) => {
 
   const [roomType, setRoomType] = useState(""); // State for appliance type
   const [roomName, setRoomName] = useState(""); // State for appliance name
-  const [displayRooms, setDisplayRooms] = useState(); // State for room display
 
   // Handle form submission
   const handleAddRoom = async () => {
