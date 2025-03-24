@@ -294,7 +294,7 @@ function AccountSettings() {
 				try {
 					const { latitude, longitude } = position.coords;
 					const response = await fetch(
-						`server/google/geocode?lat=${latitude}&lng=${longitude}`
+						`server/google/reverseGeocode?lat=${latitude}&lng=${longitude}`
 					);
 					const data = await response.json();
 					if (data.status === 'OK' && data.results.length > 0) {

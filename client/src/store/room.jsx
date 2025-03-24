@@ -80,6 +80,7 @@ export const useRoomStore = create(
       if (!currentRoom) return;
       console.log(body.type)
 
+      toast.info("Turning on appliances...");
       try {
         // Get all appliances of the specified type
         const appliancesToUpdate = currentRoom.appliances.filter(
@@ -96,15 +97,20 @@ export const useRoomStore = create(
             });
           })
         );
+
+        toast.success("Appliances turned on successfully");
         // Refresh the room data after updating
         await updateRoom();
       } catch (error) {
+        toast.error("Failed to turn on appliances.");
         console.error(`Failed to turn on all ${body.type}s:`, error);
       }
     },
     turnOffAll: async (body) => {
       const { currentRoom, updateRoom } = get();
       if (!currentRoom) return;
+
+      toast.info("Turning off appliances...");
       try {
         // Get all appliances of the specified type
         const appliancesToUpdate = currentRoom.appliances.filter(
@@ -121,20 +127,32 @@ export const useRoomStore = create(
             });
           })
         );
+        toast.success("Appliances turned off successfully.");
         // Refresh the room data after updating
         await updateRoom();
       } catch (error) {
+        toast.error("Failed to turn off appliances.");
         console.error(`Failed to turn on all ${body.type}s:`, error);
       }
     },
     turnOnAppliance: async (body) => {
       try {
         const { updateRoom } = get();
+        toast.info("Turning on appliance...");
         const appliance = await fetch(`/server/appliances/turnOn/${body.id}`, {
           method: "PATCH",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ requester: body.requester }),
         });
+
+        const res = await appliance.json();
+        
+        if(res.success) {
+          toast.info("Appliance turned on successfully.");
+        } else {
+          toast.error("Appliance could not be turned on, " + res.message)
+        }
+
         await updateRoom();
       } catch (error) {
         console.error(`Failed to turn on`, error);
@@ -143,11 +161,21 @@ export const useRoomStore = create(
     turnOffAppliance: async (body) => {
       try {
         const { updateRoom } = get();
+        toast.info("Turning on appliance...");
         const appliance = await fetch(`/server/appliances/turnOff/${body.id}`, {
           method: "PATCH",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ requester: body.requester }),
         });
+
+        const res = await appliance.json();
+        
+        if(res.success) {
+          toast.info("Appliance turned off successfully.");
+        } else {
+          toast.error("Appliance could not be turned off, " + res.message)
+        }
+
         await updateRoom();
       } catch (error) {
         console.error(`Failed to turn off`, error);

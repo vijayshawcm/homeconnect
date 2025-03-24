@@ -7,6 +7,6 @@ const {
 
 const router = express.Router();
 router.get("/autocomplete", geoAutocomplete);
-router.get("/geocode", generateGeocode);
+router.get("/reverseGeocode", generateGeocode);
 
 module.exports = router;
