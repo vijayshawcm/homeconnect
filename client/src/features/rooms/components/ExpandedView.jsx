@@ -48,6 +48,7 @@ const ExpandedView = ({ appliance, onClose }) => {
   const [isSettingsExpanded, setIsSettingsExpanded] = useState(false);
   const [isAddExpanded, setIsAddExpanded] = useState(false);
   const [applianceNameAdd, setApplianceNameAdd] = useState(""); // State for appliance name
+  const [applianceInterfaceAdd, setApplianceInterfaceAdd] = useState("");
 
   const getApplianceStats = useCallback(
     (type) => {
@@ -249,25 +250,45 @@ const ExpandedView = ({ appliance, onClose }) => {
       return;
     }
 
-    // Add the new appliance to the room
-    await addAppliance({
-      requester: user.username,
-      appliance: {
-        applianceType: currentAppliance.applianceType,
-        name: applianceNameAdd,
-      }
-    });
+    setIsAddExpanded(false);
+    
+    if (applianceInterfaceAdd) {
+      // Add the new appliance to the room
+      await addAppliance({
+        requester: user.username,
+        appliance: {
+          applianceType: currentAppliance.applianceType,
+          name: applianceNameAdd,
+          interface: applianceInterfaceAdd
+        }
+      });
+    } else {
+      // Add the new appliance to the room
+      await addAppliance({
+        requester: user.username,
+        appliance: {
+          applianceType: currentAppliance.applianceType,
+          name: applianceNameAdd,
+        }
+      });
+    }
 
     // Reset form fields and close the Popover
-    setApplianceType("");
-    setApplianceName("");
+    setApplianceNameAdd("");
+    setApplianceInterfaceAdd("")
   };
 
   // Function to handle delete appliance
   const handleDeleteAppliance = async () => {
     // Delete appliance in database
-    toast.info("Deleting appliance...")
     await removeAppliance(currentAppliance._id, user.username);
+
+    if(initialStats.appliances.length != 0) {
+      setCurrentAppliance(initialStats.appliances[0]);
+    } else {
+      // Handle case where no appliance
+      setCurrentAppliance(null);
+    }
   };
 
   // Function to handle close expanded menu
@@ -399,7 +420,7 @@ const ExpandedView = ({ appliance, onClose }) => {
                         <div>
                           <Label htmlFor="applianceType">Appliance Type</Label>
                           <Input
-                            id="applianceName"
+                            id="applianceType"
                             placeholder={currentAppliance.applianceType}
                             disabled
                           />
@@ -413,6 +434,17 @@ const ExpandedView = ({ appliance, onClose }) => {
                             value={applianceNameAdd}
                             onChange={(e) => setApplianceNameAdd(e.target.value)}
                             placeholder="Enter appliance name"
+                          />
+                        </div>
+
+                        {/* Appliance Id Input */}
+                        <div>
+                          <Label htmlFor="applianceId">Appliance Identifier (optional)</Label>
+                          <Input
+                            id="applianceId"
+                            value={applianceInterfaceAdd}
+                            onChange={(e) => setApplianceInterfaceAdd(e.target.value)}
+                            placeholder="Enter appliance identifier"
                           />
                         </div>
 
