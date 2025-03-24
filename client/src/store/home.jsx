@@ -209,7 +209,34 @@ export const useHomeStore = create(
         return [];
       }
     },
-    
+    createInvite: async (body) => {
+      try {
+        const res = await fetch("/server/perms/invite", {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(body),
+        });
+        const data = await res.json();
+        return data.data;
+      } catch (error) {
+        console.log(error);
+      }
+    },
+    acceptInvite: async (body) => {
+      try {
+        // Body: invite: invite, username: username
+        console.log(body);
+        const res = await fetch("/server/perms/join", {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(body),
+        });
+        const data = await res.json();
+        console.log(data);
+      } catch (error) {
+        console.log(error);
+      }
+    },
   })),
   {
     name: "home-storage", // Unique name for localStorage key

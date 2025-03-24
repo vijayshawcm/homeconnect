@@ -122,9 +122,7 @@ export const useRoomStore = create(
     turnOnAll: async (body) => {
       const { currentRoom, updateRoom } = get();
       if (!currentRoom) return;
-      console.log(body.type);
-
-      toast.info("Turning on appliances...");
+      toast.info(`Turning on all ${body.type} in ${currentRoom.name} ...`);
       try {
         // Get all appliances of the specified type
         const appliancesToUpdate = currentRoom.appliances.filter(
@@ -132,7 +130,7 @@ export const useRoomStore = create(
         );
 
         if (appliancesToUpdate.length === 0) return;
-        await Promise.all(
+        const data = await Promise.all(
           appliancesToUpdate.map(async (appliance) => {
             await fetch(`/server/appliances/turnOn/${appliance._id}`, {
               method: "PATCH",
@@ -141,8 +139,7 @@ export const useRoomStore = create(
             });
           })
         );
-
-        toast.success("Appliances turned on successfully");
+        toast.success(`${body.type}s turned on successfully`);
         // Refresh the room data after updating
         await updateRoom();
       } catch (error) {
@@ -153,14 +150,12 @@ export const useRoomStore = create(
     turnOffAll: async (body) => {
       const { currentRoom, updateRoom } = get();
       if (!currentRoom) return;
-
       toast.info("Turning off appliances...");
       try {
         // Get all appliances of the specified type
         const appliancesToUpdate = currentRoom.appliances.filter(
           (appliance) => appliance.applianceType === body.type
         );
-
         if (appliancesToUpdate.length === 0) return;
         await Promise.all(
           appliancesToUpdate.map(async (appliance) => {
@@ -176,7 +171,7 @@ export const useRoomStore = create(
         await updateRoom();
       } catch (error) {
         toast.error("Failed to turn off appliances.");
-        console.error(`Failed to turn off all ${body.type}s:`, error);
+        console.error(`Failed to turn on all ${body.type}s:`, error);
       }
     },
     turnOnAppliance: async (body) => {
@@ -192,7 +187,7 @@ export const useRoomStore = create(
         const res = await appliance.json();
 
         if (res.success) {
-          toast.info("Appliance turned on successfully.");
+          toast.success("Appliance turned on successfully.");
         } else {
           toast.error("Appliance could not be turned on, " + res.message);
         }
@@ -205,7 +200,7 @@ export const useRoomStore = create(
     turnOffAppliance: async (body) => {
       try {
         const { updateRoom } = get();
-        toast.info("Turning off appliance...");
+        toast.info("Turning on appliance...");
         const appliance = await fetch(`/server/appliances/turnOff/${body.id}`, {
           method: "PATCH",
           headers: { "Content-Type": "application/json" },
@@ -215,7 +210,7 @@ export const useRoomStore = create(
         const res = await appliance.json();
 
         if (res.success) {
-          toast.info("Appliance turned off successfully.");
+          toast.success("Appliance turned off successfully.");
         } else {
           toast.error("Appliance could not be turned off, " + res.message);
         }
@@ -228,7 +223,6 @@ export const useRoomStore = create(
     modifyAppliance: async (id, updates) => {
       try {
         const { updateRoom } = get();
-
         toast.info("Saving appliance modifications...");
         // Send the updates to the server
         const response = await fetch(`/server/appliances/adjust/${id}`, {
