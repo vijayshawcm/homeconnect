@@ -73,7 +73,6 @@ const ExpandedView = ({ appliance, onClose }) => {
   useEffect(() => {
     setInitialStats(getApplianceStats(appliance));
   }, [currentRoom]); // Runs whenever currentRoom changes
-  console.log(initialStats.total);
   const [getStats, setGetStats] = useState(initialStats);
   const [currentAppliance, setCurrentAppliance] = useState(
     initialStats.appliances.length > 0 ? initialStats.appliances[0] : null
@@ -499,7 +498,7 @@ const ExpandedView = ({ appliance, onClose }) => {
         </div>
       </Card>
       <Card className="flex-1 flex flex-col justify-center rounded-3xl overflow-hidden">
-        {currentAppliance == null ? (
+        {initialStats.total == 0 ? (
           <div className="flex-1 flex flex-col justify-center items-center text-center p-6 max-w-md mx-auto">
             <div className="text-gray-500 mb-4">
               <svg
