@@ -48,6 +48,7 @@ const updateRoomEnergyProfile = async (roomId) => {
       room.energyProfile.currentUsage = totalCurrentUsage;
       await room.energyProfile.save(); // Save the updated energyProfile
     }
+    await room.energyProfile.save();
     await room.save();
   } catch (error) {
     console.error("Error updating room energy profile:", error.message);
