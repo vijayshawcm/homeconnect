@@ -1,5 +1,4 @@
-"use client";
-
+import { useState } from "react";
 import { ChevronRight } from "lucide-react";
 import { BsDoorClosed, BsDoorOpen } from "react-icons/bs";
 import "../../styles/index.css";
@@ -10,7 +9,7 @@ import {
   Sofa,
   BedDouble,
   CookingPot,
-  Toilet,
+  TableIcon as Toilet,
 } from "lucide-react";
 import {
   Collapsible,
@@ -43,6 +42,8 @@ import { Link } from "react-router-dom";
 import { useRoomStore } from "@/store/room";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+import JoinHomeDialog from "@/features/dashboard/components/JoinHomeDialog";
+import CreateHomeDialog from "@/features/dashboard/components/CreateHomeDialog";
 
 const buttonClass = "text-xl font-light h-12 transition-all duration-500";
 
@@ -61,14 +62,18 @@ export function NavMain({ items }) {
   const { currentRoom, setCurrentRoom } = useRoomStore();
   const { open, setOpen } = useSidebar();
 
+  // Dialog states
+  const [isJoinHomeOpen, setIsJoinHomeOpen] = useState(false);
+  const [isCreateHomeOpen, setIsCreateHomeOpen] = useState(false);
+
   const handleSwitchHome = (homeId) => {
     setCurrentHome(homeId);
     navigate("/dashboard");
   };
 
   const homeless =
-    ownedHomes.filter((home) => home._id !== currentHome?._id).length === 0 &&
-    dwelledHomes.filter((home) => home._id !== currentHome?._id).length === 0;
+    (!ownedHomes || ownedHomes.length === 0) &&
+    (!dwelledHomes || dwelledHomes.length === 0);
 
   return (
     <SidebarGroup className="gap-6">
@@ -104,13 +109,13 @@ export function NavMain({ items }) {
                   </p>
                   <div className="flex gap-4">
                     <Button
-                      onClick={() => navigate("/join-home")} // Navigate to join home page
+                      onClick={() => setIsJoinHomeOpen(true)}
                       className="bg-[#C2E03A] text-black hover:bg-[#A8C82A]"
                     >
                       Join a Home
                     </Button>
                     <Button
-                      onClick={() => navigate("/create-home")} // Navigate to create home page
+                      onClick={() => setIsCreateHomeOpen(true)}
                       className="bg-[#184C85] text-white hover:bg-[#0D1B2A]"
                     >
                       Create a Home
@@ -156,6 +161,24 @@ export function NavMain({ items }) {
                           {home.name}
                         </DropdownMenuItem>
                       ))}
+                  </DropdownMenuGroup>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuGroup>
+                    <DropdownMenuLabel className="text-xs text-muted-foreground">
+                      Add Home
+                    </DropdownMenuLabel>
+                    <DropdownMenuItem
+                      className="gap-2 p-2"
+                      onClick={() => setIsJoinHomeOpen(true)}
+                    >
+                      Join Existing Home
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      className="gap-2 p-2"
+                      onClick={() => setIsCreateHomeOpen(true)}
+                    >
+                      Create New Home
+                    </DropdownMenuItem>
                   </DropdownMenuGroup>
                 </div>
               )}
@@ -233,6 +256,13 @@ export function NavMain({ items }) {
           )
         )}
       </SidebarMenu>
+
+      {/* Dialogs */}
+      <JoinHomeDialog open={isJoinHomeOpen} onOpenChange={setIsJoinHomeOpen} />
+      <CreateHomeDialog
+        open={isCreateHomeOpen}
+        onOpenChange={setIsCreateHomeOpen}
+      />
     </SidebarGroup>
   );
 }
