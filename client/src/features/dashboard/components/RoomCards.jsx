@@ -19,7 +19,8 @@ import { userAuthStore } from "@/store/userAuth";
 const RoomCards = ({ room, onConfirmDelete, title, message }) => {
   const { currentHome } = useHomeStore();
   const { user } = userAuthStore();
-  const { currentRoom, setCurrentRoom, renameRoom } = useRoomStore();
+  const { currentRoom, setCurrentRoom, renameRoom, deleteRoom } =
+    useRoomStore();
   const formattedName = room.name.replace(/\s+/g, "");
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
@@ -67,7 +68,12 @@ const RoomCards = ({ room, onConfirmDelete, title, message }) => {
     setIsDeleting(true);
     try {
       // api call
-      await new Promise((resolve) => setTimeout(resolve, 800));
+      await deleteRoom({
+        requester: user.username,
+        room: {
+          id: currentRoom._id,
+        },
+      });
       setIsDeleteDialogOpen(false);
     } catch (error) {
       console.error("Error deleting room:", error);
