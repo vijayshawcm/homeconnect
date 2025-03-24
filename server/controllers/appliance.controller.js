@@ -1,3 +1,5 @@
+// I give up making this file shorter
+
 const { checkPermission } = require("./permissions.controller.js");
 const mongoose = require("mongoose");
 const {
@@ -11,7 +13,53 @@ const {
   User,
   EnergyProfile,
 } = require("../models");
-const { identity } = require("rxjs");
+
+// Start loop to poll home data every 10 seconds
+async function pollHome() {
+  try {
+    const res = await fetch("http://localhost:9797/poll", {
+      method: "GET"
+    })
+
+
+    if (res.ok) {
+      const interval = setInterval(async () => {
+        try {
+          const res = await fetch("http://localhost:9797/poll", {
+            method: "GET"
+          })
+
+          console.log("Polled Home I/O");
+          // Process the data format cuz Home I/O hates json for some reason
+          const data = (await res.text())
+            .split("\n")
+            .reduce((acc, line) => {
+              const part = line.split(" ")
+              // Skip malformed lines
+              if(part.length < 2) {
+                return acc;
+              }
+              return Object.assign(acc, { [part[0]]: part[1] })
+            }, {});
+
+          // Execute automations and scheduling here.
+
+
+
+          
+        } catch (err) {
+          console.log("Home I/O server is offline");
+          clearInterval(interval);
+        }
+      }, 10000)
+    }
+
+  } catch(err) {
+    console.log("Home I/O server is offline");
+  }
+}
+
+pollHome();
 
 const createAppliance = async (req, res) => {
   const { id } = req.params;
@@ -270,7 +318,40 @@ const adjustAppliance = async (req, res) => {
         }
         if (req.body.brightness !== undefined) {
           appliance.brightness = req.body.brightness;
+
+          if (appliance.interface) {
+            var link = "";
+            const interface = appliance.interface;
+    
+            // Home I/O Appliance logic
+            link = `http://localhost:9797/stl/${interface.slice(1) || 1}/${interface.slice(0, 1)}/${req.body.brightness}`
+            console.log(link);
+            try {
+              if(link) {
+                const response = await fetch(link, {
+                  method: "GET",
+                  headers: { "Content-Type": "application/json" },
+                });
+        
+                if (response.ok) {
+                  appliance.status = "on";
+                  await appliance.save();
+                } else {
+                  return res.status(500).json({
+                    success: false,
+                    message: "Home I/O has encountered an error.",
+                  });
+                }
+              }
+            } catch (err) {
+              return res.status(500).json({
+                success: false,
+                message: "Home I/O has encountered an error.",
+              });
+            }
+          }
         }
+
         break;
 
       case "AirConditioner":
@@ -777,38 +858,61 @@ const turnOnAppliance = async (req, res) => {
         // Home I/O Appliance logic
         if(appliance.applianceType == "Light") {
           link = `http://localhost:9797/swl/turn_on/${interface.slice(1) || 1}/${interface.slice(0, 1)}`
+          linkSettings = `http://localhost:9797/stl/${interface.slice(1) || 1}/${interface.slice(0, 1)}/${appliance.brightness}`;
+
         } else if(appliance.applianceType == "AirConditioner") {
           link = `http://localhost:9797/swh/turn_on/${interface.slice(1) || 1}/${interface.slice(0, 1)}`
         }
 
-        console.log(link);
-        if(link) {
-          const response = await fetch(link, {
-            method: "GET",
-            headers: { "Content-Type": "application/json" },
-          });
-  
-          if (response.ok) {
-            appliance.status = "on";
-            await appliance.save();
-          } else {
-            return res.status(500).json({
-              success: false,
-              message: "Home I/O has encountered an error.",
+        try {
+          if(link) {
+            const response = await fetch(link, {
+              method: "GET",
+              headers: { "Content-Type": "application/json" },
+            });
+
+            console.log(linkSettings);
+          if(linkSettings) {
+            const resSettings = await fetch(linkSettings, {
+              method: "GET",
+              headers: { "Content-Type": "application/json" },
             });
           }
+    
+            if (response.ok) {
+              appliance.status = "on";
+              await appliance.save();
+            } else {
+              return res.status(500).json({
+                success: false,
+                message: "Home I/O has encountered an error.",
+              });
+            }
+          }
+        } catch (err) {
+          return res.status(500).json({
+            success: false,
+            message: "Home I/O has encountered an error.",
+          });
         }
 
         appliance.status = "on";
         await appliance.save();
-      } else {
+
         if (appliance.energyProfile) {
           appliance.energyProfile.currentUsage =
             appliance.energyProfile.energyConsumption;
           await appliance.energyProfile.save(); // Save the updated energyProfile
         }
+      } else {
         appliance.status = "on";
         await appliance.save();
+
+        if (appliance.energyProfile) {
+          appliance.energyProfile.currentUsage =
+            appliance.energyProfile.energyConsumption;
+          await appliance.energyProfile.save(); // Save the updated energyProfile
+        }
       }
     }
 
@@ -876,37 +980,57 @@ const turnOffAppliance = async (req, res) => {
         // Home I/O Appliance logic
         if(appliance.applianceType == "Light") {
           link = `http://localhost:9797/swl/turn_off/${interface.slice(1) || 1}/${interface.slice(0, 1)}`
+          linkSettings = `http://localhost:9797/stl/${interface.slice(1) || 1}/${interface.slice(0, 1)}/0`;
         } else if(appliance.applianceType == "AirConditioner") {
           link = `http://localhost:9797/swh/turn_off/${interface.slice(1) || 1}/${interface.slice(0, 1)}`
         }
 
-        console.log(link);
-        if(link) {
-          const response = await fetch(link, {
-            method: "GET",
-            headers: { "Content-Type": "application/json" },
-          });
-  
-          if (response.ok) {
-            appliance.status = "on";
-            await appliance.save();
-          } else {
-            return res.status(500).json({
-              success: false,
-              message: "Home I/O has encountered an error.",
+        try {
+          if(link) {
+            const response = await fetch(link, {
+              method: "GET",
+              headers: { "Content-Type": "application/json" },
+            });
+
+          if(linkSettings) {
+            const resSettings = await fetch(linkSettings, {
+              method: "GET",
+              headers: { "Content-Type": "application/json" },
             });
           }
+    
+            if (response.ok) {
+              appliance.status = "off";
+              await appliance.save();
+            } else {
+              return res.status(500).json({
+                success: false,
+                message: "Home I/O has encountered an error.",
+              });
+            }
+          }
+        } catch (err) {
+          return res.status(500).json({
+            success: false,
+            message: "Home I/O has encountered an error.",
+          });
         }
 
         appliance.status = "off";
         await appliance.save();
-      } else {
+
         if (appliance.energyProfile) {
           appliance.energyProfile.currentUsage = 0;
           await appliance.energyProfile.save(); // Save the updated energyProfile
         }
+      } else {
         appliance.status = "off";
         await appliance.save();
+        
+        if (appliance.energyProfile) {
+          appliance.energyProfile.currentUsage = 0;
+          await appliance.energyProfile.save(); // Save the updated energyProfile
+        }
       }
     }
     res.status(200).json({ success: true, data: appliance });

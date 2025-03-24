@@ -176,7 +176,7 @@ export const useRoomStore = create(
         await updateRoom();
       } catch (error) {
         toast.error("Failed to turn off appliances.");
-        console.error(`Failed to turn on all ${body.type}s:`, error);
+        console.error(`Failed to turn off all ${body.type}s:`, error);
       }
     },
     turnOnAppliance: async (body) => {
@@ -205,7 +205,7 @@ export const useRoomStore = create(
     turnOffAppliance: async (body) => {
       try {
         const { updateRoom } = get();
-        toast.info("Turning on appliance...");
+        toast.info("Turning off appliance...");
         const appliance = await fetch(`/server/appliances/turnOff/${body.id}`, {
           method: "PATCH",
           headers: { "Content-Type": "application/json" },
@@ -229,6 +229,7 @@ export const useRoomStore = create(
       try {
         const { updateRoom } = get();
 
+        toast.info("Saving appliance modifications...");
         // Send the updates to the server
         const response = await fetch(`/server/appliances/adjust/${id}`, {
           method: "PATCH",
@@ -237,10 +238,12 @@ export const useRoomStore = create(
         });
 
         if (!response.ok) {
+          toast.error("Failed saving appliance modification.");
           throw new Error("Failed to update appliance");
         }
 
         const data = await response.json();
+        toast.success("Appliance modifications saved successfully.");
         console.log("Appliance updated:", data);
 
         // Refresh the room data after updating
