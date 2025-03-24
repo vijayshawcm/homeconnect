@@ -26,7 +26,7 @@ import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Settings, Plus, Trash, X } from "lucide-react"; // Import icons
 import { userAuthStore } from "@/store/userAuth";
 import { Input } from "@/components/ui/input";
-import { toast } from 'sonner';
+import { toast } from "sonner";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 const ExpandedView = ({ appliance, onClose }) => {
@@ -255,7 +255,7 @@ const ExpandedView = ({ appliance, onClose }) => {
       appliance: {
         applianceType: currentAppliance.applianceType,
         name: applianceNameAdd,
-      }
+      },
     });
 
     // Reset form fields and close the Popover
@@ -266,7 +266,7 @@ const ExpandedView = ({ appliance, onClose }) => {
   // Function to handle delete appliance
   const handleDeleteAppliance = async () => {
     // Delete appliance in database
-    toast.info("Deleting appliance...")
+    toast.info("Deleting appliance...");
     await removeAppliance(currentAppliance._id, user.username);
   };
 
@@ -393,7 +393,9 @@ const ExpandedView = ({ appliance, onClose }) => {
                   </Button>
                   <Dialog open={isAddExpanded} onOpenChange={setIsAddExpanded}>
                     <DialogContent className="w-80 p-4 bg-white rounded-lg shadow-lg">
-                      <h3 className="font-semibold text-lg mb-4">Add New Appliance</h3>
+                      <h3 className="font-semibold text-lg mb-4">
+                        Add New Appliance
+                      </h3>
                       <div className="space-y-4">
                         {/* Appliance Type Dropdown */}
                         <div>
@@ -411,7 +413,9 @@ const ExpandedView = ({ appliance, onClose }) => {
                           <Input
                             id="applianceName"
                             value={applianceNameAdd}
-                            onChange={(e) => setApplianceNameAdd(e.target.value)}
+                            onChange={(e) =>
+                              setApplianceNameAdd(e.target.value)
+                            }
                             placeholder="Enter appliance name"
                           />
                         </div>
@@ -543,10 +547,10 @@ const ExpandedView = ({ appliance, onClose }) => {
                   <Slider
                     defaultValue={[brightness]}
                     value={[brightness]} // Controlled value
-                    max={100}
+                    max={10}
                     step={1}
                     onValueChange={(value) => {
-                      setBrightness(value[0]);
+                      setBrightness((value[0] % 10) + 1);
                     }}
                     onValueCommit={() => {
                       modifyAppliance(currentAppliance?._id, {
