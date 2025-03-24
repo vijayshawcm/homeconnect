@@ -577,7 +577,7 @@ const ExpandedView = ({ appliance, onClose }) => {
                 <SunDim className="size-12" />
                 <div className="flex-1">
                   <Slider
-                    defaultValue={[brightness]}
+                    defaultValue={currentAppliance.brightness}
                     value={[brightness]} // Controlled value
                     max={10}
                     step={1}
