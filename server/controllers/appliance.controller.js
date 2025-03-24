@@ -55,7 +55,7 @@ const createAppliance = async (req, res) => {
   // Permission check
   const validPerms = checkPermission(requester, home, "addRemoveAppliance");
   if (!validPerms) {
-    return res.status(403).json({ success: false, message: "User does not have sufficient permissions" });
+    return res.status(403).json({ success: false, message: "you do not have the permissions to perform this action." });
   }
 
   // Add room ID to appliance object
@@ -129,7 +129,7 @@ const removeAppliance = async (req, res) => {
   // Permission check
   const validPerms = checkPermission(requester, home, "addRemoveAppliance");
   if (!validPerms) {
-    return res.status(403).json("User does not have sufficient permissions");
+    return res.status(403).json("you do not have the permissions to perform this action.");
   }
 
   await appliance.deleteOne();
@@ -735,7 +735,7 @@ const turnOnAppliance = async (req, res) => {
     "userInfo.usernameLower": requesterName.toLowerCase(),
   });
   if (!requester) {
-    return res.status(404).json("Requester not found.");
+    return res.status(404).json({ success: false, message: "Requester not found" });
   }
 
   // Query database for home and room to check user permissions
@@ -745,13 +745,13 @@ const turnOnAppliance = async (req, res) => {
   }
   const home = await Home.findOne({ rooms: room._id });
   if (!home) {
-    return res.status(404).json("Could not find home.");
+    return res.status(404).json({ success: false, message: "Could not find home." });
   }
 
   // Permission check
   const validPerms = checkPermission(requester, home, "onOffAppliance");
   if (!validPerms) {
-    return res.status(403).json("User does not have sufficient permissions");
+    return res.status(403).json({ success: false, message: "you do not have the permissions to perform this action." });
   }
 
   try {
@@ -834,7 +834,7 @@ const turnOffAppliance = async (req, res) => {
     "userInfo.usernameLower": requesterName.toLowerCase(),
   });
   if (!requester) {
-    return res.status(404).json("Requester not found.");
+    return res.status(404).json({ success: false, message: "Requester not found." });
   }
 
   // Query database for home and room to check user permissions
@@ -844,13 +844,13 @@ const turnOffAppliance = async (req, res) => {
   }
   const home = await Home.findOne({ rooms: room._id });
   if (!home) {
-    return res.status(404).json("Could not find home.");
+    return res.status(404).json({ success: false, message: "Could not find home" });
   }
 
   // Permission check
   const validPerms = checkPermission(requester, home, "onOffAppliance");
   if (!validPerms) {
-    return res.status(403).json("User does not have sufficient permissions");
+    return res.status(403).json({ success: false, message: "you do not have the permissions to perform this action." });
   }
 
   try {
