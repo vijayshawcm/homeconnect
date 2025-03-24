@@ -41,10 +41,13 @@ const RoomScrollArea = ({ rooms }) => {
       return;
     }
     // Add the new appliance to the room
-    await addRoom(user.username, {
-      roomType: roomType,
-      name: roomName,
-    });
+    await addRoom(
+      user.username,
+      {
+        roomType: roomType,
+        name: roomName,
+      },
+    );
 
     // Reset form fields and close the Popover
     setRoomType("");
