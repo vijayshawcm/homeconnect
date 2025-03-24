@@ -14,7 +14,52 @@ const {
   EnergyProfile,
 } = require("../models");
 
+// Start loop to poll home data every 10 seconds
+async function pollHome() {
+  try {
+    const res = await fetch("http://localhost:9797/poll", {
+      method: "GET"
+    })
 
+
+    if (res.ok) {
+      const interval = setInterval(async () => {
+        try {
+          const res = await fetch("http://localhost:9797/poll", {
+            method: "GET"
+          })
+
+          console.log("Polled Home I/O");
+          // Process the data format cuz Home I/O hates json for some reason
+          const data = (await res.text())
+            .split("\n")
+            .reduce((acc, line) => {
+              const part = line.split(" ")
+              // Skip malformed lines
+              if(part.length < 2) {
+                return acc;
+              }
+              return Object.assign(acc, { [part[0]]: part[1] })
+            }, {});
+
+          // Execute automations and scheduling here.
+
+
+
+          
+        } catch (err) {
+          console.log("Home I/O server is offline");
+          clearInterval(interval);
+        }
+      }, 10000)
+    }
+
+  } catch(err) {
+    console.log("Home I/O server is offline");
+  }
+}
+
+pollHome();
 
 const createAppliance = async (req, res) => {
   const { id } = req.params;
