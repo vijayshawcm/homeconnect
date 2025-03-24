@@ -111,7 +111,6 @@ export const useHomeStore = create(
       if (!currentHome) {
         return { success: false, message: "No home selected" };
       }
-
       set({ isLoading: true });
       try {
         const payload = {
@@ -122,7 +121,6 @@ export const useHomeStore = create(
             home: currentHome._id,
           },
         };
-
         toast.info("Creating room...");
         // Step 1: Create the room
         const res = await fetch("/server/rooms", {
