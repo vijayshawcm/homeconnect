@@ -1,3 +1,5 @@
+// I give up making this file shorter
+
 const { checkPermission } = require("./permissions.controller.js");
 const mongoose = require("mongoose");
 const {
@@ -11,7 +13,8 @@ const {
   User,
   EnergyProfile,
 } = require("../models");
-const { identity } = require("rxjs");
+
+
 
 const createAppliance = async (req, res) => {
   const { id } = req.params;
@@ -823,8 +826,9 @@ const turnOnAppliance = async (req, res) => {
               headers: { "Content-Type": "application/json" },
             });
 
-          if(linKSettings) {
-            const response = await fetch(linkSettings, {
+            console.log(linkSettings);
+          if(linkSettings) {
+            const resSettings = await fetch(linkSettings, {
               method: "GET",
               headers: { "Content-Type": "application/json" },
             });
@@ -931,6 +935,7 @@ const turnOffAppliance = async (req, res) => {
         // Home I/O Appliance logic
         if(appliance.applianceType == "Light") {
           link = `http://localhost:9797/swl/turn_off/${interface.slice(1) || 1}/${interface.slice(0, 1)}`
+          linkSettings = `http://localhost:9797/stl/${interface.slice(1) || 1}/${interface.slice(0, 1)}/0`;
         } else if(appliance.applianceType == "AirConditioner") {
           link = `http://localhost:9797/swh/turn_off/${interface.slice(1) || 1}/${interface.slice(0, 1)}`
         }
@@ -941,9 +946,16 @@ const turnOffAppliance = async (req, res) => {
               method: "GET",
               headers: { "Content-Type": "application/json" },
             });
+
+          if(linkSettings) {
+            const resSettings = await fetch(linkSettings, {
+              method: "GET",
+              headers: { "Content-Type": "application/json" },
+            });
+          }
     
             if (response.ok) {
-              appliance.status = "on";
+              appliance.status = "off";
               await appliance.save();
             } else {
               return res.status(500).json({
