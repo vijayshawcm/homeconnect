@@ -29,8 +29,6 @@ export const useRoomStore = create(
       }
     },
     renameRoom: async (body) => {
-      const { currentRoom } = get();
-      if (!currentRoom) return;
       toast.info("Renaming room...");
       try {
         const res = await fetch(`/server/rooms/${body.room.id}`, {
@@ -49,6 +47,27 @@ export const useRoomStore = create(
       } catch (error) {
         toast.error("Failed to rename room.");
         console.error("Failed to rename room:", error);
+      }
+    },
+    deleteRoom: async (body) => {
+      toast.info("Deleting room...");
+      try {
+        const res = await fetch(`/server/rooms/${body.room.id}`, {
+          method: "DELETE",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(body),
+        });
+        const data = await res.json();
+        if (data.success) {
+          const homeStore = useHomeStore.getState();
+          await homeStore.updateHome();
+          toast.success("Room deleted successfully.");
+        } else {
+          toast.error("Failed to deleted room, " + data.message);
+        }
+      } catch (error) {
+        toast.error("Failed to delete room.");
+        console.error("Failed to delete room:", error);
       }
     },
     addAppliance: async (body) => {
