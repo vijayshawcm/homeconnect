@@ -22,7 +22,7 @@ import { userAuthStore } from "@/store/userAuth";
 
 const RoomScrollArea = ({ rooms }) => {
   const { open, isMobile } = useSidebar();
-  const { currentHome, addRoom } = useHomeStore();
+  const { currentHome, addRoom, updateHome } = useHomeStore();
   const { user } = userAuthStore();
   // Adjust gap based on sidebar state and screen size
   const gapClass = clsx({
@@ -33,21 +33,16 @@ const RoomScrollArea = ({ rooms }) => {
 
   const [roomType, setRoomType] = useState(""); // State for appliance type
   const [roomName, setRoomName] = useState(""); // State for appliance name
-  const [displayRooms, setDisplayRooms] = useState( // State for room display
-
-  )
+  const [displayRooms, setDisplayRooms] = useState(); // State for room display
 
   // Handle form submission
-  const handleAddRoom = () => {
+  const handleAddRoom = async () => {
     if (!roomType || !roomName) {
       alert("Please fill in all fields.");
       return;
     }
-    console.log(roomType);
-
     // Add the new appliance to the room
-    addRoom(user.username,
-      {
+    await addRoom(user.username, {
       roomType: roomType,
       name: roomName,
     });
@@ -55,6 +50,7 @@ const RoomScrollArea = ({ rooms }) => {
     // Reset form fields and close the Popover
     setRoomType("");
     setRoomName("");
+    await updateHome();
   };
 
   return (
@@ -78,7 +74,9 @@ const RoomScrollArea = ({ rooms }) => {
             </Card>
           </DialogTrigger>
           <DialogContent className="w-[25%] px-4 py-10 bg-white !rounded-3xl shadow-lg">
-            <h3 className="font-semibold text-2xl mb-4 text-center">Add New Room</h3>
+            <h3 className="font-semibold text-2xl mb-4 text-center">
+              Add New Room
+            </h3>
             <div className="space-y-4">
               {/* Appliance Type Dropdown */}
               <div>
@@ -112,7 +110,7 @@ const RoomScrollArea = ({ rooms }) => {
                     setRoomName(e.target.value);
                   }}
                   placeholder="Enter room name"
-                  className = "rounded-3xl"
+                  className="rounded-3xl"
                 />
               </div>
 

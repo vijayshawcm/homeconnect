@@ -14,7 +14,7 @@ const WeeklyEnergyChart = () => {
 		{ name: 'Sun', electricity: 15, water: 10 },
 		{ name: 'Mon', electricity: 12, water: 8 },
 		{ name: 'Tue', electricity: 10, water: 6 },
-		{ name: 'Wed', electricity: 8, water: 5 },
+		{ name: 'Wed', electricity:  8, water: 5 },
 		{ name: 'Thu', electricity: 9, water: 5 },
 		{ name: 'Fri', electricity: 11, water: 7 },
 		{ name: 'Sat', electricity: 13, water: 11 },

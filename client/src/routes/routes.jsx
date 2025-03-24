@@ -4,8 +4,6 @@ import LandingPage from "@/features/landing/LandingPage";
 import AuthContainer from "@/features/auth/AuthContainer"; // Import AuthContainer
 import PublicRoute from "@/routes/PublicRoute";
 import ProtectedRoute from "@/routes/ProtectedRoute";
-import Profile from "@/features/profile/Profile";
-import Settings from "@/features/settings/Settings";
 import NotFound from "@/pages/NotFound";
 import { useHomeStore } from "@/store/home";
 import HomeContainer from "../features/home/HomeContainer";

@@ -112,11 +112,10 @@ export const useHomeStore = create(
             name: roomData.name,
             type: roomData.roomType,
             home: currentHome._id,
-          }
+          },
         };
 
-        console.log(payload); // Log the payload
-        toast.info("Creating room...")
+        toast.info("Creating room...");
         // Step 1: Create the room
         const res = await fetch("/server/rooms", {
           method: "POST",
@@ -172,6 +171,45 @@ export const useHomeStore = create(
         currentHome: state.currentHome ? data.data : state.currentHome,
       }));
       return { success: true, message: "Dweller Added" };
+    },
+    // Fetch total energy usage for the home in the desired format
+    getRoomsCurrentUsage: async () => {
+      try {
+        const { currentHome } = get();
+        if (!currentHome) return [];
+
+        const types = ["Light", "Fan", "AirConditioner"];
+        const roomsUsage = await Promise.all(
+          currentHome.rooms.map(async (room) => {
+            const usage = await Promise.all(
+              types.map(async (type) => {
+                try {
+                  const res = await fetch(
+                    `/server/energy/totalTypeCurrentUsage/${room._id}/${type}`
+                  );
+                  const data = await res.json();
+                  return { [type]: data.data || 0 };
+                } catch (error) {
+                  console.error(
+                    `Failed to fetch energy for ${room.name} - ${type}:`,
+                    error
+                  );
+                  return { [type]: 0 };
+                }
+              })
+            );
+
+            return {
+              room: room.name,
+              ...Object.assign({}, ...usage),
+            };
+          })
+        );
+        return roomsUsage;
+      } catch (error) {
+        console.error("Failed to fetch home energy for rooms:", error);
+        return [];
+      }
     },
   })),
   {

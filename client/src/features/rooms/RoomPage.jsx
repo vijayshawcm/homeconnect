@@ -31,11 +31,12 @@ import {
 } from "@/components/ui/chart";
 import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from "recharts";
 import { Toaster } from 'sonner';
+import { Link } from "react-router-dom";
 
 const RoomPage = () => {
   const [currentExpanded, setExpanded] = useState(null);
   const [hovered, setHovered] = useState(null);
-  const { currentRoom, addAppliance, getCurrentUsage} = useRoomStore();
+  const { currentRoom, addAppliance, getCurrentUsage } = useRoomStore();
   const { user } = userAuthStore();
   const [applianceType, setApplianceType] = useState(""); // State for appliance type
   const [applianceName, setApplianceName] = useState(""); // State for appliance name
@@ -83,7 +84,7 @@ const RoomPage = () => {
           },
         ];
         setChartData(chartData);
-        console.log(currentRoom)
+        console.log(currentRoom);
       } catch (error) {
         console.error("Failed to fetch usage data:", error);
         return []; // Return an empty array if there's an error
@@ -124,7 +125,7 @@ const RoomPage = () => {
       appliance: {
         applianceType: applianceType,
         name: applianceName,
-      }
+      },
     });
 
     // Reset form fields and close the Popover
@@ -223,8 +224,6 @@ const RoomPage = () => {
       ),
     },
   ];
-
-  console.log(currentRoom)
   return (
     <>
       <motion.div
@@ -297,22 +296,24 @@ const RoomPage = () => {
         onHoverEnd={() => setHovered(null)}
       >
         <Card className="w-full rounded-3xl font-semibold text-2xl flex flex-col cursor-pointer">
-          <CardHeader>Current Usage (KWh)</CardHeader>
-          <ChartContainer config={chartConfig} className="flex-1">
-            <BarChart accessibilityLayer data={chartData}>
-              <ChartTooltip
-                content={<ChartTooltipContent hideLabel className="w-44" />}
-              />
-              <ChartLegend content={<ChartLegendContent />} />
-              <Bar dataKey="light" fill="var(--color-light)" radius={4} />
-              <Bar dataKey="fan" fill="var(--color-fan)" radius={4} />
-              <Bar
-                dataKey="airConditioner"
-                fill="var(--color-airConditioner)"
-                radius={4}
-              />
-            </BarChart>
-          </ChartContainer>
+          <Link to={"/energy"} className="flex flex-1 flex-col">
+            <CardHeader>Current Usage (KWh)</CardHeader>
+            <ChartContainer config={chartConfig} className="flex-1">
+              <BarChart accessibilityLayer data={chartData}>
+                <ChartTooltip
+                  content={<ChartTooltipContent hideLabel className="w-44" />}
+                />
+                <ChartLegend content={<ChartLegendContent />} />
+                <Bar dataKey="light" fill="var(--color-light)" radius={4} />
+                <Bar dataKey="fan" fill="var(--color-fan)" radius={4} />
+                <Bar
+                  dataKey="airConditioner"
+                  fill="var(--color-airConditioner)"
+                  radius={4}
+                />
+              </BarChart>
+            </ChartContainer>
+          </Link>
         </Card>
       </motion.div>
     </motion.div>
