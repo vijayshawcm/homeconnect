@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
+import { toast } from "sonner";
 
 export const useHomeStore = create(
   persist((set, get) => ({
@@ -97,7 +98,7 @@ export const useHomeStore = create(
       set({ homes: data.data });
       return { success: true, data: data.data };
     },
-    addRoom: async (roomData) => {
+    addRoom: async (requester, roomData) => {
       const { currentHome } = get();
       if (!currentHome) {
         return { success: false, message: "No home selected" };
@@ -106,12 +107,16 @@ export const useHomeStore = create(
       set({ isLoading: true });
       try {
         const payload = {
-          name: roomData.name,
-          type: roomData.roomType,
-          home: currentHome._id,
+          requester: requester,
+          room: {
+            name: roomData.name,
+            type: roomData.roomType,
+            home: currentHome._id,
+          }
         };
 
         console.log(payload); // Log the payload
+        toast.info("Creating room...")
         // Step 1: Create the room
         const res = await fetch("/server/rooms", {
           method: "POST",
@@ -139,12 +144,14 @@ export const useHomeStore = create(
 
         set({ isLoading: false });
         console.log(data);
+        toast.success("Room added successfully");
         return {
           success: true,
           message: "Room added successfully",
           data: newRoom,
         };
       } catch (error) {
+        toast.error("Failed to add room, please try again");
         console.error("Failed to add room:", error);
         set({ isLoading: false });
         return { success: false, message: "Failed to add room" };
