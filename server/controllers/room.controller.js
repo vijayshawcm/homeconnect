@@ -185,6 +185,8 @@ const deleteRoom = async (req, res) => {
     // Delete all appliances associated with the room
     await Appliance.deleteMany({ room: id });
 
+    await home.updateOne({ $pull: {rooms: id}});
+    
     // Delete the room
     await Room.findByIdAndDelete(id);
 
