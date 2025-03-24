@@ -11,7 +11,7 @@ const RoomCards = ({ room }) => {
   const totalEnergy = currentHome.energyProfile.currentUsage;
   const roomEnergy = room.energyProfile.currentUsage;
   const energyPercentage =
-    totalEnergy > 0 ? ((roomEnergy / totalEnergy) * 100).toFixed(2) : 0;
+    totalEnergy > 0 ? ((roomEnergy / totalEnergy) * 100).toFixed(0) : 0;
 
   return (
     <Card
