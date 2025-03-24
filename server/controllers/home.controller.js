@@ -34,10 +34,19 @@ const getHomeById = async (req, res) => {
     const home = await Home.findById(id)
       .populate({
         path: "rooms",
-        populate: [{ path: "appliances" }, { path: "energyProfile" }],
+        populate: {
+          path: "appliances",
+          populate: { path: "energyProfile" }, // Ensure energyProfile inside appliances is populated
+        },
+      })
+      .populate({
+        path: "rooms",
+        populate: { path: "energyProfile" }, // Populate energyProfile inside rooms
       })
       .populate("owner")
-      .populate("dwellers")
+      .populate({
+        path: "dwellers.user", // Populate the user inside dwellers
+      })
       .populate("energyProfile");
     res.status(200).json({ success: true, data: home });
   } catch (error) {
@@ -63,7 +72,9 @@ const getHomesByUserId = async (req, res) => {
         populate: { path: "energyProfile" }, // Populate energyProfile inside rooms
       })
       .populate("owner")
-      .populate("dwellers")
+      .populate({
+        path: "dwellers.user", // Populate the user inside dwellers
+      })
       .populate("energyProfile");
     const dwelledHomes = await Home.find({ "dwellers.user": user._id })
       .populate({
@@ -78,7 +89,9 @@ const getHomesByUserId = async (req, res) => {
         populate: { path: "energyProfile" }, // Populate energyProfile inside rooms
       })
       .populate("owner")
-      .populate("dwellers")
+      .populate({
+        path: "dwellers.user", // Populate the user inside dwellers
+      })
       .populate("energyProfile");
     res.status(200).json({
       success: true,

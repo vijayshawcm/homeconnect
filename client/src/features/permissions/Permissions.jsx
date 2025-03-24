@@ -4,7 +4,6 @@ import sampleAvatar from "../../assets/sampleAvatar.png";
 import { Separator } from "@/components/ui/separator";
 import { useHomeStore } from "@/store/home";
 import { userAuthStore } from "@/store/userAuth";
-import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -14,9 +13,10 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Switch } from "@/components/ui/switch";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 const Permissions = () => {
-  const { currentHome } = useHomeStore();
+  const { currentHome, updateHome } = useHomeStore();
   const { user } = userAuthStore();
   const permsSettings = [
     {
@@ -48,9 +48,45 @@ const Permissions = () => {
       description: "Modify the home",
     },
   ];
+
+  // Function to handle permission toggle
+  const handlePermissionToggle = async (dweller, permission) => {
+    const updatedPermissions = {
+      ...dweller.accessLevel,
+      [permission]: !dweller.accessLevel[permission],
+    };
+
+    try {
+      const response = await fetch("server/perms/dweller", {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          requester: user.username,
+          username: dweller.user.userInfo.username,
+          permissions: Object.keys(updatedPermissions).filter(
+            (key) => updatedPermissions[key]
+          ),
+          home: currentHome._id,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        updateHome(); // Refresh home data to reflect changes
+        } else {
+        console.error("Failed to update permissions:", await response.text());
+      }
+    } catch (error) {
+      console.error("Error updating permissions:", error);
+    }
+  };
+
   return (
-    <div className="flex-1 grid grid-cols-2 gap-4 p-4">
-      <Card className="p-10 flex flex-col gap-8 rounded-3xl">
+    <div className="flex-1 flex gap-4 p-4">
+      <Card className="p-10 flex flex-col gap-8 rounded-3xl w-[35%]">
         <div className="w-full flex justify-center">
           <Avatar className="aspect-square w-[25%] h-auto border-2 border-black">
             <AvatarImage src={sampleAvatar} />
@@ -77,38 +113,62 @@ const Permissions = () => {
             </div>
           </div>
         </div>
-        <div className="flex justify-center items-center">
-          <Dialog>
-            <DialogTrigger asChild>
-              <Button className="bg-[#C2E03A] text-black hover:bg-[#A8C82A]">
-                Edit Permission
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="max-w-md !rounded-2xl border-2 border-[#184C85]">
-              <DialogHeader className="p-2">
-                <DialogTitle className="text-center font-semibold tracking-wide text-xl">
-                  Permissions
-                </DialogTitle>
-                <DialogDescription></DialogDescription>
-              </DialogHeader>
-              <div className="flex flex-col gap-4 p-2">
-                {permsSettings.map(({ value, description }) => {
-                  return (
-                    <div
-                      key={value}
-                      className="flex justify-between items-center"
-                    >
-                      {description}
-                      <Switch />
-                    </div>
-                  );
-                })}
-              </div>
-            </DialogContent>
-          </Dialog>
-        </div>
+        <div className="flex justify-center items-center"></div>
       </Card>
-      <Card></Card>
+      <div className="flex-1">
+        <ScrollArea className="">
+          <div className="flex flex-col gap-4 p-4">
+            {currentHome.dwellers.map((dweller) => {
+              return (
+                <Dialog key={dweller._id}>
+                  <DialogTrigger asChild>
+                    <Card
+                      key={dweller._id}
+                      className="p-6 flex gap-10 cursor-pointer hover:scale-105 transition-all duration-300"
+                    >
+                      <Avatar className="aspect-square w-[15%] h-auto border-2 border-black">
+                        <AvatarImage src={sampleAvatar} />
+                      </Avatar>
+                      <div className="flex flex-col justify-center gap-2">
+                        <div className="font-semibold">
+                          {dweller.user.userInfo.displayName}
+                        </div>
+                        <div>{dweller.user.userInfo.email}</div>
+                      </div>
+                    </Card>
+                  </DialogTrigger>
+                  <DialogContent className="max-w-md !rounded-2xl border-2 border-[#184C85]">
+                    <DialogHeader className="p-2">
+                      <DialogTitle className="text-center font-semibold tracking-wide text-xl">
+                        Permissions
+                      </DialogTitle>
+                      <DialogDescription></DialogDescription>
+                    </DialogHeader>
+                    <div className="flex flex-col gap-4 p-2">
+                      {permsSettings.map(({ value, description }) => {
+                        return (
+                          <div
+                            key={value}
+                            className="flex justify-between items-center"
+                          >
+                            {description}
+                            <Switch
+                              checked={dweller.accessLevel[value] || false}
+                              onCheckedChange={() =>
+                                handlePermissionToggle(dweller, value)
+                              }
+                            />
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </DialogContent>
+                </Dialog>
+              );
+            })}
+          </div>
+        </ScrollArea>
+      </div>
     </div>
   );
 };

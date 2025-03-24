@@ -38,26 +38,12 @@ const RoomEnergyChart = () => {
 	];
 
 	return (
-		<Card>
+		<Card className = "flex-1 flex flex-col">
 			<CardHeader className="pb-2">
 				<CardTitle>Energy Usage - Room</CardTitle>
 			</CardHeader>
-			<CardContent>
-				<div className="flex items-center justify-center mb-2">
-					<div className="flex items-center mr-4">
-						<div className="w-3 h-3 bg-[#c1e82b] mr-1"></div>
-						<span className="text-sm">Lights</span>
-					</div>
-					<div className="flex items-center mr-4">
-						<div className="w-3 h-3 bg-[#1e40af] mr-1"></div>
-						<span className="text-sm">Water</span>
-					</div>
-					<div className="flex items-center">
-						<div className="w-3 h-3 bg-[#333333] mr-1"></div>
-						<span className="text-sm">Air Conditioner</span>
-					</div>
-				</div>
-				<div className="h-[200px] w-full">
+			<CardContent className = "flex-1 flex flex-col">
+				<div className="flex-1 w-full">
 					<ResponsiveContainer width="100%" height="100%">
 						<BarChart
 							data={data}

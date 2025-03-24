@@ -34,7 +34,9 @@ const EnergyPage = () => {
         <div className="energyWeeklyCard flex">
           <WeeklyEnergyChart />
         </div>
-        <div className="roomEnergyCard bg-sky-400" />
+        <div className="roomEnergyCard flex">
+          <RoomEnergyChart />
+        </div>
       </div>
     </div>
   );

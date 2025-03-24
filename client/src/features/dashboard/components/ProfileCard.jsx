@@ -12,7 +12,7 @@ const ProfileCard = () => {
   const { user } = userAuthStore();
   return (
     <Card className="bg-white p-4 flex flex-col justify-end gap-4 lg:gap-8 rounded-3xl flex-1">
-      <Link to={"/permissions"} className="flex flex-1 flex-col">
+      <Link to={"/permissions"} className="flex flex-1 flex-col gap-4">
         <h1 className="font-semibold text-2xl">User Management</h1>
         <div className="flex-1 flex justify-center items-center gap-4">
           <div className="flex-1 flex justify-center items-center">
@@ -21,7 +21,7 @@ const ProfileCard = () => {
                 {currentHome.dwellers.map((dweller) => {
                   return (
                     <Avatar
-                      className="size-24 sm:size-24 xl:size-28 border-8 border-black"
+                      className="size-24 sm:size-24 xl:size-24 border- border-black"
                       key={dweller.user}
                     >
                       <AvatarImage src={sampleAvatar}></AvatarImage>
