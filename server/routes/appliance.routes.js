@@ -16,7 +16,7 @@ const {
   disableAppliance,
   enableAppliance,
   removeAppliance,
-  executeSchedule,
+  startPolling,
 } = require("../controllers/appliance.controller");
 
 const router = express.Router();
@@ -27,7 +27,7 @@ router.patch("/turnOn/:id", turnOnAppliance);
 router.patch("/rename/:id", renameAppliance);
 router.put("/schedules/:id", scheduleAppliance);
 router.patch("/schedules/modify/:id", modifySchedule);
-router.post("/schedules/execute/:id", executeSchedule);
+router.post("/schedules/execute/:id", startPolling);
 router.delete("/schedules/:id", deleteSchedule);
 router.put("/automations/:id", automateAppliance);
 router.patch("/automations/modify/:id", modifyAutomation);
