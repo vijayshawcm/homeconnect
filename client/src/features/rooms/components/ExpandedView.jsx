@@ -406,7 +406,7 @@ const ExpandedView = ({ appliance, onClose }) => {
 							</div>
 							<ScrollBar></ScrollBar>
 						</ScrollArea>
-						<div className="h-[20%] flex justify-center items-end">
+						<div className="h-[30%] flex justify-center items-end">
 							{isSettingsExpanded ? (
 								// Expanded Buttons
 								<div className="flex flex-col gap-2 w-full">

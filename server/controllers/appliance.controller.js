@@ -18,43 +18,35 @@ const {
 async function pollHome() {
   try {
     const res = await fetch("http://localhost:9797/poll", {
-      method: "GET"
-    })
-
+      method: "GET",
+    });
 
     if (res.ok) {
       const interval = setInterval(async () => {
         try {
           const res = await fetch("http://localhost:9797/poll", {
-            method: "GET"
-          })
+            method: "GET",
+          });
 
           console.log("Polled Home I/O");
           // Process the data format cuz Home I/O hates json for some reason
-          const data = (await res.text())
-            .split("\n")
-            .reduce((acc, line) => {
-              const part = line.split(" ")
-              // Skip malformed lines
-              if(part.length < 2) {
-                return acc;
-              }
-              return Object.assign(acc, { [part[0]]: part[1] })
-            }, {});
+          const data = (await res.text()).split("\n").reduce((acc, line) => {
+            const part = line.split(" ");
+            // Skip malformed lines
+            if (part.length < 2) {
+              return acc;
+            }
+            return Object.assign(acc, { [part[0]]: part[1] });
+          }, {});
 
           // Execute automations and scheduling here.
-
-
-
-          
         } catch (err) {
           console.log("Home I/O server is offline");
           clearInterval(interval);
         }
-      }, 10000)
+      }, 10000);
     }
-
-  } catch(err) {
+  } catch (err) {
     console.log("Home I/O server is offline");
   }
 }
@@ -97,13 +89,18 @@ const createAppliance = async (req, res) => {
   // Query database for home to check user permissions
   const home = await Home.findOne({ rooms: id });
   if (!home) {
-    return res.status(404).json({ success: false, message: "Could not find home." });
+    return res
+      .status(404)
+      .json({ success: false, message: "Could not find home." });
   }
 
   // Permission check
   const validPerms = checkPermission(requester, home, "addRemoveAppliance");
   if (!validPerms) {
-    return res.status(403).json({ success: false, message: "you do not have the permissions to perform this action." });
+    return res.status(403).json({
+      success: false,
+      message: "you do not have the permissions to perform this action.",
+    });
   }
 
   // Add room ID to appliance object
@@ -177,7 +174,9 @@ const removeAppliance = async (req, res) => {
   // Permission check
   const validPerms = checkPermission(requester, home, "addRemoveAppliance");
   if (!validPerms) {
-    return res.status(403).json("you do not have the permissions to perform this action.");
+    return res
+      .status(403)
+      .json("you do not have the permissions to perform this action.");
   }
 
   await appliance.deleteOne();
@@ -322,17 +321,19 @@ const adjustAppliance = async (req, res) => {
           if (appliance.interface) {
             var link = "";
             const interface = appliance.interface;
-    
+
             // Home I/O Appliance logic
-            link = `http://localhost:9797/stl/${interface.slice(1) || 1}/${interface.slice(0, 1)}/${req.body.brightness}`
+            link = `http://localhost:9797/stl/${
+              interface.slice(1) || 1
+            }/${interface.slice(0, 1)}/${req.body.brightness}`;
             console.log(link);
             try {
-              if(link) {
+              if (link) {
                 const response = await fetch(link, {
                   method: "GET",
                   headers: { "Content-Type": "application/json" },
                 });
-        
+
                 if (response.ok) {
                   appliance.status = "on";
                   await appliance.save();
@@ -816,7 +817,9 @@ const turnOnAppliance = async (req, res) => {
     "userInfo.usernameLower": requesterName.toLowerCase(),
   });
   if (!requester) {
-    return res.status(404).json({ success: false, message: "Requester not found" });
+    return res
+      .status(404)
+      .json({ success: false, message: "Requester not found" });
   }
 
   // Query database for home and room to check user permissions
@@ -826,13 +829,18 @@ const turnOnAppliance = async (req, res) => {
   }
   const home = await Home.findOne({ rooms: room._id });
   if (!home) {
-    return res.status(404).json({ success: false, message: "Could not find home." });
+    return res
+      .status(404)
+      .json({ success: false, message: "Could not find home." });
   }
 
   // Permission check
   const validPerms = checkPermission(requester, home, "onOffAppliance");
   if (!validPerms) {
-    return res.status(403).json({ success: false, message: "you do not have the permissions to perform this action." });
+    return res.status(403).json({
+      success: false,
+      message: "you do not have the permissions to perform this action.",
+    });
   }
 
   try {
@@ -856,29 +864,34 @@ const turnOnAppliance = async (req, res) => {
         const interface = appliance.interface;
 
         // Home I/O Appliance logic
-        if(appliance.applianceType == "Light") {
-          link = `http://localhost:9797/swl/turn_on/${interface.slice(1) || 1}/${interface.slice(0, 1)}`
-          linkSettings = `http://localhost:9797/stl/${interface.slice(1) || 1}/${interface.slice(0, 1)}/${appliance.brightness}`;
-
-        } else if(appliance.applianceType == "AirConditioner") {
-          link = `http://localhost:9797/swh/turn_on/${interface.slice(1) || 1}/${interface.slice(0, 1)}`
+        if (appliance.applianceType == "Light") {
+          link = `http://localhost:9797/swl/turn_on/${
+            interface.slice(1) || 1
+          }/${interface.slice(0, 1)}`;
+          linkSettings = `http://localhost:9797/stl/${
+            interface.slice(1) || 1
+          }/${interface.slice(0, 1)}/${appliance.brightness}`;
+        } else if (appliance.applianceType == "AirConditioner") {
+          link = `http://localhost:9797/swh/turn_on/${
+            interface.slice(1) || 1
+          }/${interface.slice(0, 1)}`;
         }
 
         try {
-          if(link) {
+          if (link) {
             const response = await fetch(link, {
               method: "GET",
               headers: { "Content-Type": "application/json" },
             });
 
             console.log(linkSettings);
-          if(linkSettings) {
-            const resSettings = await fetch(linkSettings, {
-              method: "GET",
-              headers: { "Content-Type": "application/json" },
-            });
-          }
-    
+            if (linkSettings) {
+              const resSettings = await fetch(linkSettings, {
+                method: "GET",
+                headers: { "Content-Type": "application/json" },
+              });
+            }
+
             if (response.ok) {
               appliance.status = "on";
               await appliance.save();
@@ -897,22 +910,21 @@ const turnOnAppliance = async (req, res) => {
         }
 
         appliance.status = "on";
-        await appliance.save();
 
         if (appliance.energyProfile) {
           appliance.energyProfile.currentUsage =
             appliance.energyProfile.energyConsumption;
           await appliance.energyProfile.save(); // Save the updated energyProfile
         }
+        await appliance.save();
       } else {
         appliance.status = "on";
-        await appliance.save();
-
         if (appliance.energyProfile) {
           appliance.energyProfile.currentUsage =
             appliance.energyProfile.energyConsumption;
           await appliance.energyProfile.save(); // Save the updated energyProfile
         }
+        await appliance.save();
       }
     }
 
@@ -938,7 +950,9 @@ const turnOffAppliance = async (req, res) => {
     "userInfo.usernameLower": requesterName.toLowerCase(),
   });
   if (!requester) {
-    return res.status(404).json({ success: false, message: "Requester not found." });
+    return res
+      .status(404)
+      .json({ success: false, message: "Requester not found." });
   }
 
   // Query database for home and room to check user permissions
@@ -948,13 +962,18 @@ const turnOffAppliance = async (req, res) => {
   }
   const home = await Home.findOne({ rooms: room._id });
   if (!home) {
-    return res.status(404).json({ success: false, message: "Could not find home" });
+    return res
+      .status(404)
+      .json({ success: false, message: "Could not find home" });
   }
 
   // Permission check
   const validPerms = checkPermission(requester, home, "onOffAppliance");
   if (!validPerms) {
-    return res.status(403).json({ success: false, message: "you do not have the permissions to perform this action." });
+    return res.status(403).json({
+      success: false,
+      message: "you do not have the permissions to perform this action.",
+    });
   }
 
   try {
@@ -978,27 +997,33 @@ const turnOffAppliance = async (req, res) => {
         const interface = appliance.interface;
 
         // Home I/O Appliance logic
-        if(appliance.applianceType == "Light") {
-          link = `http://localhost:9797/swl/turn_off/${interface.slice(1) || 1}/${interface.slice(0, 1)}`
-          linkSettings = `http://localhost:9797/stl/${interface.slice(1) || 1}/${interface.slice(0, 1)}/0`;
-        } else if(appliance.applianceType == "AirConditioner") {
-          link = `http://localhost:9797/swh/turn_off/${interface.slice(1) || 1}/${interface.slice(0, 1)}`
+        if (appliance.applianceType == "Light") {
+          link = `http://localhost:9797/swl/turn_off/${
+            interface.slice(1) || 1
+          }/${interface.slice(0, 1)}`;
+          linkSettings = `http://localhost:9797/stl/${
+            interface.slice(1) || 1
+          }/${interface.slice(0, 1)}/0`;
+        } else if (appliance.applianceType == "AirConditioner") {
+          link = `http://localhost:9797/swh/turn_off/${
+            interface.slice(1) || 1
+          }/${interface.slice(0, 1)}`;
         }
 
         try {
-          if(link) {
+          if (link) {
             const response = await fetch(link, {
               method: "GET",
               headers: { "Content-Type": "application/json" },
             });
 
-          if(linkSettings) {
-            const resSettings = await fetch(linkSettings, {
-              method: "GET",
-              headers: { "Content-Type": "application/json" },
-            });
-          }
-    
+            if (linkSettings) {
+              const resSettings = await fetch(linkSettings, {
+                method: "GET",
+                headers: { "Content-Type": "application/json" },
+              });
+            }
+
             if (response.ok) {
               appliance.status = "off";
               await appliance.save();
@@ -1016,21 +1041,19 @@ const turnOffAppliance = async (req, res) => {
           });
         }
 
-        appliance.status = "off";
-        await appliance.save();
-
         if (appliance.energyProfile) {
           appliance.energyProfile.currentUsage = 0;
           await appliance.energyProfile.save(); // Save the updated energyProfile
         }
+        appliance.status = "off";
+        await appliance.save();
       } else {
-        appliance.status = "off";
-        await appliance.save();
-        
         if (appliance.energyProfile) {
           appliance.energyProfile.currentUsage = 0;
           await appliance.energyProfile.save(); // Save the updated energyProfile
         }
+        appliance.status = "off";
+        await appliance.save();
       }
     }
     res.status(200).json({ success: true, data: appliance });
