@@ -27,7 +27,7 @@ import { Settings, Plus, Trash, X } from "lucide-react"; // Import icons
 import { userAuthStore } from "@/store/userAuth";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
-import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 const ExpandedView = ({ appliance, onClose }) => {
   const {
@@ -67,7 +67,13 @@ const ExpandedView = ({ appliance, onClose }) => {
   );
 
   // Initialize state with the computed stats
-  const initialStats = getApplianceStats(appliance);
+  const [initialStats, setInitialStats] = useState(
+    getApplianceStats(appliance)
+  );
+  useEffect(() => {
+    setInitialStats(getApplianceStats(appliance));
+  }, [currentRoom]); // Runs whenever currentRoom changes
+  console.log(initialStats.total);
   const [getStats, setGetStats] = useState(initialStats);
   const [currentAppliance, setCurrentAppliance] = useState(
     initialStats.appliances.length > 0 ? initialStats.appliances[0] : null
@@ -256,7 +262,7 @@ const ExpandedView = ({ appliance, onClose }) => {
       await addAppliance({
         requester: user.username,
         appliance: {
-          applianceType: currentAppliance.applianceType,
+          applianceType: appliance,
           name: applianceNameAdd,
           interface: applianceInterfaceAdd,
         },
@@ -266,7 +272,7 @@ const ExpandedView = ({ appliance, onClose }) => {
       await addAppliance({
         requester: user.username,
         appliance: {
-          applianceType: currentAppliance.applianceType,
+          applianceType: appliance,
           name: applianceNameAdd,
         },
       });
@@ -280,13 +286,12 @@ const ExpandedView = ({ appliance, onClose }) => {
   // Function to handle delete appliance
   const handleDeleteAppliance = async () => {
     // Delete appliance in database
-    await removeAppliance(currentAppliance._id, user.username);
-
     if (initialStats.appliances.length != 0) {
       setCurrentAppliance(initialStats.appliances[0]);
+      await removeAppliance(currentAppliance._id, user.username);
     } else {
-      // Handle case where no appliance
       setCurrentAppliance(null);
+      toast.error("No appliance left to delete.");
     }
   };
 
@@ -422,7 +427,7 @@ const ExpandedView = ({ appliance, onClose }) => {
                           <Label htmlFor="applianceType">Appliance Type</Label>
                           <Input
                             id="applianceType"
-                            placeholder={currentAppliance.applianceType}
+                            placeholder={appliance}
                             disabled
                           />
                         </div>

@@ -1,4 +1,3 @@
-import { useHomeStore } from "@/store/home";
 import { useRoomStore } from "@/store/room";
 import { useEffect, useState } from "react";
 import LightCard from "./components/LightCard";
@@ -6,9 +5,7 @@ import AirConCard from "./components/AirConCard";
 import { Card, CardHeader } from "@/components/ui/card";
 import { AddApplianceCard } from "./components/AddApplianceCard";
 import FanCard from "./components/FanCard";
-import { ArrowRight } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
-import { useSidebar } from "@/components/ui/sidebar";
+import { motion } from "framer-motion";
 import ExpandedView from "./components/ExpandedView";
 import {
   Select,
@@ -29,8 +26,8 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
-import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from "recharts";
-import { Toaster } from 'sonner';
+import { Bar, BarChart } from "recharts";
+import { Toaster } from "sonner";
 import { Link } from "react-router-dom";
 
 const RoomPage = () => {
@@ -40,7 +37,7 @@ const RoomPage = () => {
   const { user } = userAuthStore();
   const [applianceType, setApplianceType] = useState(""); // State for appliance type
   const [applianceName, setApplianceName] = useState(""); // State for appliance name
-  const [applianceInterface, setApplianceInterface] = useState("") // State for appliance id
+  const [applianceInterface, setApplianceInterface] = useState(""); // State for appliance id
   // State to store chart data
   const [chartData, setChartData] = useState([]);
 
@@ -122,14 +119,26 @@ const RoomPage = () => {
 
     setExpanded(null);
 
-    // Add the new appliance to the room
-    await addAppliance({
-      requester: user.username,
-      appliance: {
-        applianceType: applianceType,
-        name: applianceName,
-      },
-    });
+    if (applianceInterface) {
+      // Add the new appliance to the room
+      await addAppliance({
+        requester: user.username,
+        appliance: {
+          applianceType: applianceType,
+          name: applianceName,
+          interface: applianceInterface,
+        },
+      });
+    } else {
+      // Add the new appliance to the room
+      await addAppliance({
+        requester: user.username,
+        appliance: {
+          applianceType: applianceType,
+          name: applianceName,
+        },
+      });
+    }
 
     // Reset form fields and close the Popover
     setApplianceType("");
@@ -219,7 +228,9 @@ const RoomPage = () => {
 
               {/* Appliance Id Input */}
               <div>
-                <Label htmlFor="applianceId">Appliance Identifier (optional)</Label>
+                <Label htmlFor="applianceId">
+                  Appliance Identifier (optional)
+                </Label>
                 <Input
                   id="applianceId"
                   value={applianceInterface}
@@ -241,97 +252,97 @@ const RoomPage = () => {
   return (
     <>
       <motion.div
-      className="xl:p-4 flex-1 flex xl:gap-4 gap-2 p-4 flex-col xl:flex-row"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      transition={{ duration: 1 }}
-      key={currentRoom.name}
-    >
-      <motion.div
-        className="flex-1 flex justify-center items-center relative z-50"
+        className="xl:p-4 flex-1 flex xl:gap-4 gap-2 p-4 flex-col xl:flex-row"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        transition={{ duration: 0.8 }}
-        key={currentExpanded}
+        transition={{ duration: 1 }}
+        key={currentRoom.name}
       >
-        {currentExpanded ? (
-          <ExpandedView
-            appliance={currentExpanded}
-            onClose={() => setExpanded(null)}
-          ></ExpandedView>
-        ) : (
-          <div className="grid auto-cols-[1fr] auto-rows-[1fr] room-template-area gap-4 flex-1 h-full">
-            {applianceGrid.map(({ className, key, component }) => (
-              <motion.div
-                key={className}
-                className={`${className} flex rounded-3xl cursor-pointer`}
-                layoutId="hoveredCard"
-                initial={{ scale: 1, opacity: 1, filter: "blur(0px)" }}
-                animate={{
-                  scale: hovered === key ? 1.03 : 1, // Disable hover effect when Popover is open
-                  opacity: hovered && hovered !== key ? 0.6 : 1, // Disable hover effect when Popover is open
-                  filter:
-                    hovered && hovered !== key ? "blur(2px)" : "blur(0px)",
-                  boxShadow: "0px 0px 8px rgb(255,255,255)",
-                }}
-                transition={{ type: "spring", stiffness: 250, damping: 20 }}
-                onHoverStart={() => setHovered(key)} // Disable hover effect when Popover is open
-                onHoverEnd={() => setHovered(null)} // Disable hover effect when Popover is open
-                onClick={(e) => {
-                  if (key === "add") {
-                    return; // Prevent setting expanded view
-                  }
-                  if (e.target.closest(".switch-container")) return; // Prevent expansion if clicking switch
-                  setHovered(null);
-                  setExpanded(key);
-                }}
-              >
-                {component}
-              </motion.div>
-            ))}
-          </div>
-        )}
-      </motion.div>
+        <motion.div
+          className="flex-1 flex justify-center items-center relative z-50"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.8 }}
+          key={currentExpanded}
+        >
+          {currentExpanded ? (
+            <ExpandedView
+              appliance={currentExpanded}
+              onClose={() => setExpanded(null)}
+            ></ExpandedView>
+          ) : (
+            <div className="grid auto-cols-[1fr] auto-rows-[1fr] room-template-area gap-4 flex-1 h-full">
+              {applianceGrid.map(({ className, key, component }) => (
+                <motion.div
+                  key={className}
+                  className={`${className} flex rounded-3xl cursor-pointer`}
+                  layoutId="hoveredCard"
+                  initial={{ scale: 1, opacity: 1, filter: "blur(0px)" }}
+                  animate={{
+                    scale: hovered === key ? 1.03 : 1, // Disable hover effect when Popover is open
+                    opacity: hovered && hovered !== key ? 0.6 : 1, // Disable hover effect when Popover is open
+                    filter:
+                      hovered && hovered !== key ? "blur(2px)" : "blur(0px)",
+                    boxShadow: "0px 0px 8px rgb(255,255,255)",
+                  }}
+                  transition={{ type: "spring", stiffness: 250, damping: 20 }}
+                  onHoverStart={() => setHovered(key)} // Disable hover effect when Popover is open
+                  onHoverEnd={() => setHovered(null)} // Disable hover effect when Popover is open
+                  onClick={(e) => {
+                    if (key === "add") {
+                      return; // Prevent setting expanded view
+                    }
+                    if (e.target.closest(".switch-container")) return; // Prevent expansion if clicking switch
+                    setHovered(null);
+                    setExpanded(key);
+                  }}
+                >
+                  {component}
+                </motion.div>
+              ))}
+            </div>
+          )}
+        </motion.div>
 
-      <div className="border-2 border-[#184C85] rounded-lg"></div>
-      <motion.div
-        className="flex justify-center rounded-3xl xl:w-[25%] w-full"
-        initial={{ scale: 1, opacity: 0, filter: "blur(0px)", x: 50 }}
-        animate={{
-          x: 0,
-          scale: hovered === "electricity" ? 1.02 : 1,
-          opacity: hovered && hovered !== "electricity" ? 1 : 1,
-          boxShadow: "0px 0px 8px rgb(255,255,255)",
-        }}
-        transition={{ type: "spring", stiffness: 250, damping: 20 }}
-        onHoverStart={() => setHovered("electricity")}
-        onHoverEnd={() => setHovered(null)}
-      >
-        <Card className="w-full rounded-3xl font-semibold text-2xl flex flex-col cursor-pointer">
-          <Link to={"/energy"} className="flex flex-1 flex-col">
-            <CardHeader>Current Usage (KWh)</CardHeader>
-            <ChartContainer config={chartConfig} className="flex-1">
-              <BarChart accessibilityLayer data={chartData}>
-                <ChartTooltip
-                  content={<ChartTooltipContent hideLabel className="w-44" />}
-                />
-                <ChartLegend content={<ChartLegendContent />} />
-                <Bar dataKey="light" fill="var(--color-light)" radius={4} />
-                <Bar dataKey="fan" fill="var(--color-fan)" radius={4} />
-                <Bar
-                  dataKey="airConditioner"
-                  fill="var(--color-airConditioner)"
-                  radius={4}
-                />
-              </BarChart>
-            </ChartContainer>
-          </Link>
-        </Card>
+        <div className="border-2 border-[#184C85] rounded-lg"></div>
+        <motion.div
+          className="flex justify-center rounded-3xl xl:w-[25%] w-full"
+          initial={{ scale: 1, opacity: 0, filter: "blur(0px)", x: 50 }}
+          animate={{
+            x: 0,
+            scale: hovered === "electricity" ? 1.02 : 1,
+            opacity: hovered && hovered !== "electricity" ? 1 : 1,
+            boxShadow: "0px 0px 8px rgb(255,255,255)",
+          }}
+          transition={{ type: "spring", stiffness: 250, damping: 20 }}
+          onHoverStart={() => setHovered("electricity")}
+          onHoverEnd={() => setHovered(null)}
+        >
+          <Card className="w-full rounded-3xl font-semibold text-2xl flex flex-col cursor-pointer">
+            <Link to={"/energy"} className="flex flex-1 flex-col">
+              <CardHeader>Current Usage (KWh)</CardHeader>
+              <ChartContainer config={chartConfig} className="flex-1">
+                <BarChart accessibilityLayer data={chartData}>
+                  <ChartTooltip
+                    content={<ChartTooltipContent hideLabel className="w-44" />}
+                  />
+                  <ChartLegend content={<ChartLegendContent />} />
+                  <Bar dataKey="light" fill="var(--color-light)" radius={4} />
+                  <Bar dataKey="fan" fill="var(--color-fan)" radius={4} />
+                  <Bar
+                    dataKey="airConditioner"
+                    fill="var(--color-airConditioner)"
+                    radius={4}
+                  />
+                </BarChart>
+              </ChartContainer>
+            </Link>
+          </Card>
+        </motion.div>
       </motion.div>
-    </motion.div>
-     <Toaster position="bottom-right" richColors closeButton={true} />
+      <Toaster position="bottom-right" richColors closeButton={true} />
     </>
   );
 };
