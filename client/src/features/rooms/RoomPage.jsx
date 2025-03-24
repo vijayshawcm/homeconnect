@@ -40,6 +40,7 @@ const RoomPage = () => {
   const { user } = userAuthStore();
   const [applianceType, setApplianceType] = useState(""); // State for appliance type
   const [applianceName, setApplianceName] = useState(""); // State for appliance name
+  const [applianceInterface, setApplianceInterface] = useState("") // State for appliance id
   // State to store chart data
   const [chartData, setChartData] = useState([]);
 
@@ -118,6 +119,8 @@ const RoomPage = () => {
       alert("Please fill in all fields.");
       return;
     }
+
+    setExpanded(null);
 
     // Add the new appliance to the room
     await addAppliance({
@@ -211,6 +214,17 @@ const RoomPage = () => {
                   value={applianceName}
                   onChange={(e) => setApplianceName(e.target.value)}
                   placeholder="Enter appliance name"
+                />
+              </div>
+
+              {/* Appliance Id Input */}
+              <div>
+                <Label htmlFor="applianceId">Appliance Identifier (optional)</Label>
+                <Input
+                  id="applianceId"
+                  value={applianceInterface}
+                  onChange={(e) => setApplianceInterface(e.target.value)}
+                  placeholder="Enter appliance identifier"
                 />
               </div>
 
