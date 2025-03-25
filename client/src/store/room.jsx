@@ -7,6 +7,10 @@ export const useRoomStore = create(
   persist((set, get) => ({
     currentRoom: null,
     isLoading: true,
+    currentAppliance: null,
+    setCurrentApplianceStore: async (appliance) => {
+      set({ currentAppliance: appliance });
+    },
     setCurrentRoom: async (room) => {
       set({ currentRoom: room });
     },
@@ -277,21 +281,24 @@ export const useRoomStore = create(
         console.error("Failed to modify appliance:", error);
       }
     },
-    createSchedule: async (id, schedule) => {
+    createSchedule: async (id, schedule, username) => {
       try {
         const { updateRoom } = get();
 
         toast.info("Creating appliance schedule...");
         // Send the updates to the server
-        const response = await fetch(`/server/appliances/adjust/${id}`, {
+        const response = await fetch(`/server/appliances/schedules/${id}`, {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(schedule),
+          body: JSON.stringify({
+            requester: username,
+            schedule
+          }),
         });
 
         if (!response.ok) {
           toast.error("Failed while creating appliance schedule.");
-          throw new Error("Failed to update appliance");
+          throw new Error("Failed to schedule appliance");
         }
 
         const data = await response.json();

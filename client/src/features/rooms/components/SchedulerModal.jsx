@@ -21,6 +21,9 @@ const DAYS_OF_WEEK = [
 	{ id: 'sun', label: 'Sun' },
 ];
 
+import { useRoomStore } from '@/store/room';
+import { userAuthStore } from '@/store/userAuth';
+
 const SchedulerModal = ({ isOpen, onClose, appliance }) => {
 	const [schedules, setSchedules] = useState([]);
 	const [expandedId, setExpandedId] = useState(null);
@@ -33,8 +36,11 @@ const SchedulerModal = ({ isOpen, onClose, appliance }) => {
 		days: [],
 	});
 
+	const { createSchedule, currentAppliance } = useRoomStore();
+	const { user } = userAuthStore();
+
 	useEffect(() => {
-		if (isOpen && appliance) {
+		if (isOpen) {
 			fetchSchedules();
 		}
 	}, [isOpen, appliance]);
@@ -47,18 +53,18 @@ const SchedulerModal = ({ isOpen, onClose, appliance }) => {
 				setSchedules([
 					{
 						id: '1',
-						name: 'Weekday Morning',
-						startTime: '07:00',
-						endTime: '09:00',
-						days: ['mon', 'tue', 'wed', 'thu', 'fri'],
+						name: 'Schedule E1',
+						startTime: '20:00',
+						endTime: '21:00',
+						days: ['thu', 'sat'],
 					},
-					{
-						id: '2',
-						name: 'Weekend Schedule',
-						startTime: '10:00',
-						endTime: '18:00',
-						days: ['sat', 'sun'],
-					},
+					// {
+					// 	id: '2',
+					// 	name: 'Weekend Schedule',
+					// 	startTime: '10:00',
+					// 	endTime: '18:00',
+					// 	days: ['sat', 'sun'],
+					// },
 				]);
 				setIsLoading(false);
 			}, 500);
@@ -75,8 +81,24 @@ const SchedulerModal = ({ isOpen, onClose, appliance }) => {
 	const handleAddSchedule = async () => {
 		setIsLoading(true);
 		try {
-			// Mock response
-			setTimeout(() => {
+			const scheduleAdd = {
+				name: newSchedule.name,
+				startTime: {
+					hour: newSchedule.startTime.slice(0, 2),
+					minute: newSchedule.startTime.slice(4)
+				},
+				endTime: {
+					hour: newSchedule.endTime.slice(0, 2),
+					minute: newSchedule.endTime.slice(4)
+				},
+				days: newSchedule.days
+			}
+
+			console.log(scheduleAdd);
+			console.log(currentAppliance);
+			// Add schedule
+			const res = await createSchedule(currentAppliance._id, scheduleAdd, user.username);
+
 				const newId = Math.random().toString(36).substring(2, 9);
 				setSchedules([...schedules, { ...newSchedule, id: newId }]);
 				setNewSchedule({
@@ -87,7 +109,6 @@ const SchedulerModal = ({ isOpen, onClose, appliance }) => {
 				});
 				setIsAddingNew(false);
 				setIsLoading(false);
-			}, 500);
 		} catch (error) {
 			console.error('Failed to add schedule:', error);
 			setIsLoading(false);
