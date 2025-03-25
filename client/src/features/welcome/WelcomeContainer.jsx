@@ -292,8 +292,7 @@ const WelcomeContainer = () => {
                 }); // Wait for completion
                 setTimeout(() => {
                   navigate("/dashboard"); // Navigate after delay
-                }, 1500); // 1.5-second delay
-                navigate("/dashboard"); // Navigate only after createHome finishes
+                }, 2000); // 2-second delay
               } catch (error) {
                 console.error("Failed to create home:", error);
               }
