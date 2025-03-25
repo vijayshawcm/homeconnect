@@ -24,9 +24,9 @@ const WeatherCard = () => {
           <div className="flex flex-col gap-2 sm:gap-4 items-center sm:items-start min-h-52 justify-center">
             <div className="font-semibold text-4xl">
               {/* To be replaced with weather API */}
-              Kuala Lumpur
+              Putrajaya
             </div>
-            <div className="font-bold text-5xl">33°C</div>
+            <div className="font-bold text-5xl">29°C</div>
             <div>
               <div className="font-medium">60% chance of precipitation </div>
             </div>

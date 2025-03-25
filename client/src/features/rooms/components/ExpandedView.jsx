@@ -41,6 +41,7 @@ const ExpandedView = ({ appliance, onClose }) => {
 		turnOffAppliance,
 		modifyAppliance,
 		renameAppliance,
+		setCurrentApplianceStore,
 	} = useRoomStore();
 	const { user } = userAuthStore();
 	const [lightCarouselApi, setLightCarouselApi] = useState(null);
@@ -120,6 +121,7 @@ const ExpandedView = ({ appliance, onClose }) => {
 		// Ensure we set the current appliance if it's null
 		if (!currentAppliance && stats.appliances.length > 0) {
 			setCurrentAppliance(stats.appliances[0]);
+			setCurrentApplianceStore(stats.appliances[0]);
 		}
 	}, [appliance, currentRoom, currentAppliance, getApplianceStats]);
 	// Handle Carousel scroll events
@@ -226,7 +228,33 @@ const ExpandedView = ({ appliance, onClose }) => {
 
 			return { ...prevAppliance, status: newStatus };
 		});
+
+		setCurrentApplianceStore((prevAppliance) => {
+			if (!prevAppliance) return prevAppliance;
+
+			const newStatus = prevAppliance.status === 'on' ? 'off' : 'on';
+
+			if (newStatus === 'on') {
+				turnOnAppliance({ requester: user.username, id: currentAppliance._id });
+			} else {
+				turnOffAppliance({
+					requester: user.username,
+					id: currentAppliance._id,
+				});
+			}
+
+			setGetStats((prevStats) => ({
+				...prevStats,
+				active: prevStats.active + (newStatus === 'on' ? 1 : -1),
+			}));
+
+			return { ...prevAppliance, status: newStatus };
+		});
 	};
+
+	const getCurrentAppliance = () => {
+		return currentAppliance;
+	}
 
 	// Handle swing card click
 	const handleSwingClick = () => {
@@ -240,6 +268,11 @@ const ExpandedView = ({ appliance, onClose }) => {
 
 		// Update local state
 		setCurrentAppliance((prevAppliance) => ({
+			...prevAppliance,
+			swing: newSwingState,
+		}));
+
+		setCurrentApplianceStore((prevAppliance) => ({
 			...prevAppliance,
 			swing: newSwingState,
 		}));
@@ -290,9 +323,11 @@ const ExpandedView = ({ appliance, onClose }) => {
 		// Delete appliance in database
 		if (initialStats.appliances.length != 0) {
 			setCurrentAppliance(initialStats.appliances[0]);
+			setCurrentApplianceStore(initialStats.appliances[0]);
 			await removeAppliance(currentAppliance._id, user.username);
 		} else {
 			setCurrentAppliance(null);
+			setCurrentApplianceStore(null)
 			toast.error('No appliance left to delete.');
 		}
 	};
@@ -397,6 +432,7 @@ const ExpandedView = ({ appliance, onClose }) => {
 											}`}
 											onClick={() => {
 												setCurrentAppliance(appliance);
+												setCurrentApplianceStore(appliance);
 											}}
 										>
 											{appliance.name}

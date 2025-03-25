@@ -52,7 +52,7 @@ const applianceSchema = new Schema(
         ],
         active: {
           type: Boolean,
-          default: true,
+          default: false,
         },
       },
     ],
@@ -63,7 +63,7 @@ const applianceSchema = new Schema(
         threshold: Number,
         active: {
           type: Boolean,
-          default: true,
+          default: false,
         },
       },
     ],
