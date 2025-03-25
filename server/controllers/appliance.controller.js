@@ -14,15 +14,16 @@ const {
   EnergyProfile,
 } = require("../models");
 
+var interval;
 // Start loop to poll home data every 10 seconds
-async function pollHome() {
+async function pollHome(home) {
   try {
     const res = await fetch("http://localhost:9797/poll", {
-      method: "GET",
-    });
+      method: "GET"
+    })
 
     if (res.ok) {
-      const interval = setInterval(async () => {
+      interval = setInterval(async () => {
         try {
           const res = await fetch("http://localhost:9797/poll", {
             method: "GET",
@@ -30,28 +31,237 @@ async function pollHome() {
 
           console.log("Polled Home I/O");
           // Process the data format cuz Home I/O hates json for some reason
-          const data = (await res.text()).split("\n").reduce((acc, line) => {
-            const part = line.split(" ");
-            // Skip malformed lines
-            if (part.length < 2) {
-              return acc;
-            }
-            return Object.assign(acc, { [part[0]]: part[1] });
-          }, {});
+          const data = (await res.text())
+            .split("\n")
+            .reduce((acc, line) => {
+              const part = line.split(" ")
+              // Skip malformed lines
+              if(part.length < 2) {
+                return acc;
+              }
+              return Object.assign(acc, { [part[0]]: part[1] })
+            }, {});
 
-          // Execute automations and scheduling here.
+          // Pass polled data to execute schedule.
+          executeSchedule(data, home);
+          
         } catch (err) {
           console.log("Home I/O server is offline");
           clearInterval(interval);
         }
-      }, 10000);
+      }, 2000);
     }
   } catch (err) {
     console.log("Home I/O server is offline");
   }
 }
 
-pollHome();
+async function executeSchedule(data, home) {
+  console.log("executeSchedule called");
+
+  const homeDate = new Date(`${data['year']}-${data['month']}-${data['day']} ${data['hour']}:${data['minute']}`);
+  var day = homeDate.getDay();
+
+  switch (day) {
+    case 0:
+      day = "sunday";
+      break;
+    case 1:
+      day = "monday";
+      break;
+    case 2:
+      day = "tuesday";
+      break;
+    case 3:
+      day = "wednesday";
+      break;
+    case 4:
+      day = "thursday";
+      break;
+    case 5:
+      day = "friday";
+      break;
+    case 6:
+      day = "saturday";
+      break;
+  }
+
+  // Loop through rooms in house
+  for(const r of home.rooms) {
+    // console.log("room")
+    const room = await Room.findById(r);
+    if(!room) {
+      continue;
+    }
+
+    // Loop through appliance in room
+    for(const a of room.appliances) {
+      // console.log("appliance")
+      const appliance = await Appliance.findById(a).populate("energyProfile");
+      if(!appliance) {
+        continue;
+      }
+      
+      // Loop through schedules in appliance
+      for(const s of appliance.schedules) {
+        // console.log("schedules")
+        if(s.days.find(e => e == day)) {
+          const startDate = new Date(`1970-01-01 ${s.startTime.hour}:${s.startTime.minute}`);
+          const activationDate = new Date(`1970-01-01 ${homeDate.getHours()}:${homeDate.getMinutes()}`);
+          const endDate = new Date(`1970-01-01 ${s.endTime.hour}:${s.endTime.minute}`);
+
+          // Turn on appliance if the time is within automation specification
+          if(activationDate > startDate && activationDate < endDate && !s.active ) {
+            if (appliance.status === "off") {
+              if (appliance.interface) {
+                var link = "";
+                const interface = appliance.interface;
+        
+                // Home I/O Appliance logic
+                if (appliance.applianceType == "Light") {
+                  link = `http://localhost:9797/swl/turn_on/${
+                    interface.slice(1) || 1
+                  }/${interface.slice(0, 1)}`;
+                  linkSettings = `http://localhost:9797/stl/${
+                    interface.slice(1) || 1
+                  }/${interface.slice(0, 1)}/${appliance.brightness}`;
+                } else if (appliance.applianceType == "AirConditioner") {
+                  link = `http://localhost:9797/swh/turn_on/${
+                    interface.slice(1) || 1
+                  }/${interface.slice(0, 1)}`;
+                }
+        
+                try {
+                  if (link) {
+                    const response = await fetch(link, {
+                      method: "GET",
+                      headers: { "Content-Type": "application/json" },
+                    });
+        
+                    console.log(linkSettings);
+                    if (linkSettings) {
+                      const resSettings = await fetch(linkSettings, {
+                        method: "GET",
+                        headers: { "Content-Type": "application/json" },
+                      });
+                    }
+        
+                    if (response.ok) {
+                      appliance.status = "on";
+                      await appliance.save();
+                    } else {
+                      continue;
+                    }
+                  }
+                } catch (err) {
+                  continue;
+                }
+        
+                appliance.status = "on";
+                s.active = true;
+        
+                if (appliance.energyProfile) {
+                  appliance.energyProfile.currentUsage =
+                    appliance.energyProfile.energyConsumption;
+                  await appliance.energyProfile.save(); // Save the updated energyProfile
+                }
+                await appliance.save();
+              } else {
+                appliance.status = "on";
+                s.active = true;
+
+                if (appliance.energyProfile) {
+                  appliance.energyProfile.currentUsage =
+                    appliance.energyProfile.energyConsumption;
+                  await appliance.energyProfile.save(); // Save the updated energyProfile
+                }
+                await appliance.save();
+              }
+            }
+          } else if(activationDate > endDate && s.active) {
+              // Turn off appliance if time is outside of schedule
+              if (appliance.status === "on") {
+                if (appliance.interface) {
+                  var link = "";
+                  const interface = appliance.interface;
+          
+                  // Home I/O Appliance logic
+                  if (appliance.applianceType == "Light") {
+                    link = `http://localhost:9797/swl/turn_off/${
+                      interface.slice(1) || 1
+                    }/${interface.slice(0, 1)}`;
+                    linkSettings = `http://localhost:9797/stl/${
+                      interface.slice(1) || 1
+                    }/${interface.slice(0, 1)}/0`;
+                  } else if (appliance.applianceType == "AirConditioner") {
+                    link = `http://localhost:9797/swh/turn_off/${
+                      interface.slice(1) || 1
+                    }/${interface.slice(0, 1)}`;
+                  }
+          
+                  try {
+                    if (link) {
+                      const response = await fetch(link, {
+                        method: "GET",
+                        headers: { "Content-Type": "application/json" },
+                      });
+          
+                      if (linkSettings) {
+                        const resSettings = await fetch(linkSettings, {
+                          method: "GET",
+                          headers: { "Content-Type": "application/json" },
+                        });
+                      }
+          
+                      if (response.ok) {
+                        appliance.status = "off";
+                        await appliance.save();
+                      } else {
+                        continue;
+                      }
+                    }
+                  } catch (err) {
+                    continue;
+                  }
+          
+                  if (appliance.energyProfile) {
+                    appliance.energyProfile.currentUsage = 0;
+                    await appliance.energyProfile.save(); // Save the updated energyProfile
+                  }
+                  appliance.status = "off";
+                  s.active = false;
+                  await appliance.save();
+                } else {
+                  if (appliance.energyProfile) {
+                    appliance.energyProfile.currentUsage = 0;
+                    await appliance.energyProfile.save(); // Save the updated energyProfile
+                  }
+                  appliance.status = "off";
+                  s.active = false;
+                  await appliance.save();
+                }
+              }
+          }
+        }
+      }
+    } 
+  }
+}
+
+const startPolling = async (req, res) => {
+    const { id } = req.params;
+
+    // Query db for home
+    const home = await Home.findById(id);
+    if (!home) {
+      return res.status(404).json({ success: false, message: "Could not find home." });
+    }
+
+    clearInterval(interval);
+    const homeData = await pollHome(home);
+
+    return res.status(200);
+}
 
 const createAppliance = async (req, res) => {
   const { id } = req.params;
@@ -1211,4 +1421,5 @@ module.exports = {
   deleteAutomation,
   disableAppliance,
   enableAppliance,
+  startPolling,
 };
