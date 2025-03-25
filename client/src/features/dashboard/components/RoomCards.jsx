@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Link } from "react-router-dom";
 import { useRoomStore } from "@/store/room";
@@ -15,11 +15,12 @@ import { BsFillLightningChargeFill } from "react-icons/bs";
 import { useHomeStore } from "@/store/home";
 import { Edit, Trash2 } from "lucide-react";
 import { userAuthStore } from "@/store/userAuth";
+import { update } from "lodash";
 
 const RoomCards = ({ room, onConfirmDelete, title, message }) => {
-  const { currentHome } = useHomeStore();
+  const { currentHome, updateHome } = useHomeStore();
   const { user } = userAuthStore();
-  const { currentRoom, setCurrentRoom, renameRoom, deleteRoom } =
+  const { currentRoom, setCurrentRoom, renameRoom, deleteRoom, updateRoom } =
     useRoomStore();
   const formattedName = room.name.replace(/\s+/g, "");
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
@@ -31,8 +32,15 @@ const RoomCards = ({ room, onConfirmDelete, title, message }) => {
   const [isEditRoomFocused, setIsEditRoomFocused] = useState(false);
   const totalEnergy = currentHome.energyProfile.currentUsage;
   const roomEnergy = room.energyProfile.currentUsage;
-  const energyPercentage =
-    totalEnergy > 0 ? ((roomEnergy / totalEnergy) * 100).toFixed(0) : 0;
+  const [energyPercentage, setEnergyPercentage] = useState(
+    totalEnergy > 0 ? ((roomEnergy / totalEnergy) * 100).toFixed(0) : 0
+  );
+
+  useEffect(() => {
+    const energyPercentage =
+      totalEnergy > 0 ? ((roomEnergy / totalEnergy) * 100).toFixed(0) : 0;
+    setEnergyPercentage(energyPercentage);
+  }, [currentHome]);
 
   const handleEditRoom = async () => {
     if (!newRoomName.trim()) {
@@ -74,6 +82,7 @@ const RoomCards = ({ room, onConfirmDelete, title, message }) => {
           id: currentRoom._id,
         },
       });
+      await updateHome();
       setIsDeleteDialogOpen(false);
     } catch (error) {
       console.error("Error deleting room:", error);

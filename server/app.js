@@ -27,7 +27,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use('/server/auth', authRoutes);
 app.use('/server/users', userRoutes);
-app.use('/server/perms', permissonRoutes,)
+app.use('/server/perms', permissonRoutes)
 app.use('/server/appliances', applianceRoutes);
 app.use('/server/rooms', roomRoutes);
 app.use('/server/homes', homeRoutes);

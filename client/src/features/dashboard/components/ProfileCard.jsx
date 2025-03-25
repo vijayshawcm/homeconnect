@@ -47,6 +47,7 @@ const ProfileCard = () => {
               </Avatar>
             </DialogTrigger>
             <AddMemberDialog
+              key={Date.now()} // Forces remounting
               homeId={currentHome._id}
               invitationCode={currentHome.invitationCode}
               onClose={() => setIsDialogOpen(false)}

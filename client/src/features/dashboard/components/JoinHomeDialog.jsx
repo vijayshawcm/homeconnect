@@ -12,6 +12,8 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Loader2 } from "lucide-react";
+import { useHomeStore } from "@/store/home";
+import { userAuthStore } from "@/store/userAuth";
 
 const JoinHomeDialog = ({ open, onOpenChange }) => {
   const [inviteCode, setInviteCode] = useState("");
@@ -20,6 +22,8 @@ const JoinHomeDialog = ({ open, onOpenChange }) => {
   // track focus state for the invite code input
   const [isInviteFocused, setIsInviteFocused] = useState(false);
   const navigate = useNavigate();
+  const { acceptInvite } = useHomeStore();
+  const { user } = userAuthStore();
 
   const handleJoinHome = async () => {
     if (!inviteCode.trim()) {
@@ -32,8 +36,7 @@ const JoinHomeDialog = ({ open, onOpenChange }) => {
 
     try {
       // simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-
+      await acceptInvite({ invite: inviteCode, username: user.username });
       toast.success("Successfully joined home!");
       onOpenChange(false);
       navigate("/dashboard");
@@ -83,7 +86,12 @@ const JoinHomeDialog = ({ open, onOpenChange }) => {
           </div>
         </div>
         <DialogFooter>
-          <Button variant="outline" onClick={() => onOpenChange(false)}>
+          <Button
+            variant="outline"
+            onClick={() => {
+              handleJoinHome;
+            }}
+          >
             Cancel
           </Button>
           <Button onClick={handleJoinHome} disabled={isLoading}>
