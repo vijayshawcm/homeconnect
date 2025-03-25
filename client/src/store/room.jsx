@@ -277,6 +277,33 @@ export const useRoomStore = create(
         console.error("Failed to modify appliance:", error);
       }
     },
+    createSchedule: async (id, schedule) => {
+      try {
+        const { updateRoom } = get();
+
+        toast.info("Creating appliance schedule...");
+        // Send the updates to the server
+        const response = await fetch(`/server/appliances/adjust/${id}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(schedule),
+        });
+
+        if (!response.ok) {
+          toast.error("Failed while creating appliance schedule.");
+          throw new Error("Failed to update appliance");
+        }
+
+        const data = await response.json();
+        toast.success("Appliance schedule created successfully.");
+        console.log("Appliance updated:", data);
+
+        // Refresh the room data after updating
+        await updateRoom();
+      } catch (error) {
+        console.error("Failed to modify appliance:", error);
+      }
+    },
     getCurrentUsage: async (type) => {
       const { currentRoom } = get();
       if (!currentRoom) return;
