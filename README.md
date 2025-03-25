@@ -68,6 +68,8 @@ HomeConnect is a smart home management system focused on energy savings and effi
      PORT=5000
      MONGODB_URI=your_mongodb_connection_string
      JWT_SECRET=your_jwt_secret_key
+     EMAIL_PASSWORD=your_gmail_application_password
+     GOOGLE_API_KEY=your_google_api_key
      ```
 
    - Start the backend server:
