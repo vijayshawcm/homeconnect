@@ -10,9 +10,8 @@ This is the frontend application for HomeConnect, a smart home management system
 - **State Management:** Zustand
 - **Routing:** React Router v7
 - **Animation:** Framer Motion
-- **Form Handling:** Native React (for now or for good tba)
-- **HTTP Client:** Axios
-- **Icons:** Lucide React
+- **Form Handling:** Native React
+- **Icons:** Lucide React and React Icons
 - **Animations:** Lottie React
 
 ## 📁 Client Structure
