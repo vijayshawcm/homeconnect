@@ -13,7 +13,7 @@ HomeConnect is a smart home management system focused on energy savings and effi
 
 ## Technologies Used
 
-- **Frontend**: React (with Vite), React Router, Tailwind CSS, shadcn/ui
+- **Frontend**: React (with Vite), React Router, Tailwind CSS, Zustand, shadcn/ui
 - **Backend**: Express.js, Node.js, MongoDB
 - **Authentication**: JWT (JSON Web Tokens)
 - **Database**: MongoDB (with Mongoose for schema modeling)
