@@ -171,10 +171,6 @@ homeconnect/
 │   ├── package-lock.json           # Auto-generated exact dependency tree
 │   ├── package.json                # Backend dependencies and scripts
 │   └── server.js                   # Entry point for backend server
-├── config/                         # Shared config files
-├── scripts/                        # Utility scripts for deployment, testing, etc.
-├── tests/                          # Test files for both frontend and backend
-├── docs/                           # Documentation files
 ├── .env                            # Root environment variables (shared)
 ├── .gitignore                      # Root level git ignore file
 ├── package-lock.json               # Root dependency tree
